@@ -17,4 +17,3 @@ BlueScockets
 - HERDOIZA FUSTILLOS Jeronimo
 - WAKIM Carine
 - ZAIED Rayen
-
