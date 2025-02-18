@@ -26,7 +26,9 @@ public class Tank_Player : Tank
         this.ApplyRotation();
     }
 
-
+    /// <summary>
+    /// Make the tank gun "look" in the direction of the player mouse
+    /// </summary>
     protected void GunTrackPlayerMouse() {
         // get the current scene camera
         Camera cam = Camera.main;
