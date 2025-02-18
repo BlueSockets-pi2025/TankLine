@@ -39,7 +39,10 @@ public class Tank_Player : Tank
         Vector3 difference = new Vector3(Input.mousePosition.x - tankPosOnScreen.x, Input.mousePosition.y - tankPosOnScreen.y, 0);
         difference.Normalize();
 
+        // change euclidian coordonates to polar
         float gunRotation = math.atan2(-difference.y, difference.x);
+
+        // rotate this tank gun to face the mouse
         this.SetRotationGun(gunRotation + math.PI/2);
     }
 }
