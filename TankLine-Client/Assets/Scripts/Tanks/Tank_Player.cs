@@ -11,7 +11,6 @@ public class Tank_Player : Tank
         thisGun = thisTank.transform.Find("tankGun");
 
 
-        this.RotateTank(- math.PI / 4);
     }
 
 
@@ -21,6 +20,24 @@ public class Tank_Player : Tank
         float rotation = Input.GetAxis("Horizontal");
 
         this.GoForward(acceleration);
+        this.RotateTank(rotation);
+        this.GunTrackPlayerMouse();
+
         this.ApplyRotation();
+    }
+
+
+    protected void GunTrackPlayerMouse() {
+        // get the current scene camera
+        Camera cam = Camera.main;
+
+        // the tank position on the screen
+        Vector3 tankPosOnScreen = cam.WorldToScreenPoint(thisTank.position);
+
+        Vector3 difference = new Vector3(Input.mousePosition.x - tankPosOnScreen.x, Input.mousePosition.y - tankPosOnScreen.y, 0);
+        difference.Normalize();
+
+        float gunRotation = math.atan2(-difference.y, difference.x);
+        this.SetRotationGun(gunRotation + math.PI/2);
     }
 }

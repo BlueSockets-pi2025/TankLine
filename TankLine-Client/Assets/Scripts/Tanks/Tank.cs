@@ -5,8 +5,10 @@ using UnityEngine;
 public class Tank : MonoBehaviour
 {
 
-    /// <summary>This object movement speed (base speed : 4)</summary>
+    /// <summary>This object movement speed (base speed : 4.0)</summary>
     public float movementSpeed = 4.0f;
+    /// <summary>This object rotation speed (base speed : pi/32)</summary>
+    public float rotationSpeed = math.PI / 32;
 
     protected Transform thisTank;
     protected Transform thisGun;
@@ -49,9 +51,9 @@ public class Tank : MonoBehaviour
     /// Note that it will not rotate the tank gun.
     /// For this purpose you might want to use `RotateGun()`  
     /// </summary>
-    /// <param name="angle">The rotation angle in radians</param>
-    public void RotateTank(float angle) {
-        rotationAngle = (rotationAngle + angle) % (math.PI * 2);
+    /// <param name="force">The rotation force</param>
+    public void RotateTank(float force) {
+        rotationAngle = (rotationAngle + (force*rotationSpeed)) % (math.PI * 2);
     }
 
     /// <summary>
@@ -65,9 +67,9 @@ public class Tank : MonoBehaviour
     /// <summary>
     /// Rotate the tank gun relatively to its previous rotation. <br/>
     /// </summary>
-    /// <param name="angle">The rotation angle in radians</param>
-    public void RotateGun (float angle) {
-        gunRotationAngle = (gunRotationAngle + angle) % (math.PI * 2);
+    /// <param name="force">The rotation force</param>
+    public void RotateGun (float force) {
+        gunRotationAngle = (gunRotationAngle + (force*rotationSpeed)) % (math.PI * 2);
     }
 
     /// <summary>
@@ -76,7 +78,7 @@ public class Tank : MonoBehaviour
     /// <param name="angle">The rotation angle in radians</param>
     public void SetRotationGun(float angle)
     {
-        rotationAngle = (float)(angle % (Math.PI * 2));
+        gunRotationAngle = (float)(angle % (Math.PI * 2));
     }
 
 
@@ -95,7 +97,8 @@ public class Tank : MonoBehaviour
     /// <summary>
     /// Make the tank go forward (relative to rotation)
     /// </summary>
+    /// <param name="force">The movement force (between -1 and 1)</param>
     public void GoForward(float force) {
-        thisTank.Translate(Vector3.forward * movementSpeed * Time.deltaTime * force);
+        thisTank.Translate(force * movementSpeed * Time.deltaTime * Vector3.forward);
     }
 }
