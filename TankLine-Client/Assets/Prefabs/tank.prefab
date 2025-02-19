@@ -147,8 +147,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -0, y: 0.4592196, z: 0.4610802}
-  m_LocalScale: {x: 3.4573462, y: 3.4573462, z: 21.795826}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 4.6, y: 4.6, z: 28.999352}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 391185088012637523}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
@@ -387,6 +387,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4900683280261623425}
   - component: {fileID: 5524376811357180335}
+  - component: {fileID: 307735877985916240}
   m_Layer: 0
   m_Name: tank
   m_TagString: Untagged
@@ -404,7 +405,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1814403721164218678}
@@ -434,6 +435,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.7, y: 0.4, z: 1.22}
   m_Center: {x: 0, y: 0.2, z: 0}
+--- !u!54 &307735877985916240
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5713213973998924859}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &9058826768905873805
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,7 +490,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_LocalPosition: {x: -0, y: 0.513617, z: -0.0047094673}
-  m_LocalScale: {x: 18.694977, y: 18.694977, z: 8.612944}
+  m_LocalScale: {x: 16.3, y: 18.694977, z: 8.612944}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 391185088012637523}

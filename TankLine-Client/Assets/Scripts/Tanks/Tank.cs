@@ -5,10 +5,10 @@ using UnityEngine;
 public class Tank : MonoBehaviour
 {
 
-    /// <summary>This object movement speed (base speed : 4.0)</summary>
-    public float movementSpeed = 4.0f;
-    /// <summary>This object rotation speed (base speed : pi/32)</summary>
-    public float rotationSpeed = math.PI / 32;
+    /// <summary>This object movement speed (base speed : 2.0)</summary>
+    public float movementSpeed = 3.0f;
+    /// <summary>This object rotation speed (base speed : pi/64)</summary>
+    public float rotationSpeed = math.PI / 48;
 
     protected Transform thisTank;
     protected Transform thisGun;
@@ -18,7 +18,7 @@ public class Tank : MonoBehaviour
     protected float rotationAngle = 0;
 
     /// <summary> The gun current angle in radians </summary>
-    protected float gunRotationAngle = 0;
+    public float gunRotationAngle = 0;
 
     protected virtual void Start() {
         thisTank = gameObject.transform;
@@ -53,7 +53,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="force">The rotation force</param>
     public void RotateTank(float force) {
-        rotationAngle = (rotationAngle + (force*rotationSpeed)) % (math.PI * 2);
+        rotationAngle = (rotationAngle + (force*rotationSpeed) + math.PI*2) % (math.PI * 2);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="angle">The rotation angle in radians</param>
     public void SetRotationTank(float angle) {
-        rotationAngle = (float)(angle % (Math.PI*2));
+        rotationAngle = (float)(((angle % (Math.PI*2))+math.PI*2)%(math.PI*2));
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="force">The rotation force</param>
     public void RotateGun (float force) {
-        gunRotationAngle = (gunRotationAngle + (force*rotationSpeed)) % (math.PI * 2);
+        gunRotationAngle = (gunRotationAngle + (force*rotationSpeed) + math.PI*2) % (math.PI * 2);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class Tank : MonoBehaviour
     /// <param name="angle">The rotation angle in radians</param>
     public void SetRotationGun(float angle)
     {
-        gunRotationAngle = (float)(angle % (Math.PI * 2));
+        gunRotationAngle = (float)(((angle % (Math.PI*2))+math.PI*2)%(math.PI*2));
     }
 
 
