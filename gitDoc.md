@@ -26,7 +26,7 @@ gitGraph
 ```
 
 I now have a `main` branch with 3 commits, but the `main` branch have a protection that prevents me from pushing directly to it.  
-If I want to add a new feature `amazing feature`. I will now have to create a new branch and make all the changes in this branch.  
+If I want to add a new feature `amazing feature`, I will now have to create a new branch and make all the changes in this branch.  
 
 ```mermaid
 gitGraph
@@ -42,7 +42,7 @@ gitGraph
 
 Now that I finished developing my feature and it is ready for production, I can merge the branch `amazing-feature` to the `main` one.  
 But since the `main` branch is also protected against merges, that's where I have to create a `Pull request` (or `merge request` on gitlab).  
-This will force other to review my code and validate it. Once I have two validation, i can then merge my branch to the `main` one and the feature will be added to the project permanantly !
+This will force other collaborators to review my code and approve it. Once I have two approvals, i can then merge my branch to the `main` one and the feature will be added to the project permanantly !
 
 ```mermaid
 gitGraph
