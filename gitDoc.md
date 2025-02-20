@@ -132,7 +132,7 @@ Example :
 - Added comments to function `myFunction()`
 ```
 
-Note that since unity have a lot of generated files, please indicate the files you have explicitly changed yourself.
+Note that since unity have a lot of generated files, it is always good to indicate the files you have explicitly changed yourself.
 
 Once the PR is created, you can also add Labels to help other collaborators know what type of changes you've done.
 
