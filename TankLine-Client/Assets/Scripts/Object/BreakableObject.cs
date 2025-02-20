@@ -4,13 +4,16 @@ using UnityEngine;
 // using FishNet.Object;
 // using FishNet.Object.Synchronizing;
 
+//Object that breaks after a certain number of lives, and changes texture/material with each life
 public class BreakableObject : MonoBehaviour
+// à mettre quand ajout de FishNet/multi
 // public class BreakableObject : NetworkBehaviour
 {
+    // à mettre quand ajout de FishNet/multi
     // [SyncVar(OnChange = nameof(UpdateVisualState))]
     public int health = 3; // Number of hits required to break the object
 
-    public Material[] textures; // Texture or Material table (3 = intact, 2 = damaged, 1 = almost broken)
+    public Material[] textures; // Texture (public Texture[]) or Material (public Material[]) table to represent the number of lives remaining
     private Renderer objRenderer;
 
     private void Start()
@@ -27,6 +30,7 @@ public class BreakableObject : MonoBehaviour
         // Check if the object was hit by a projectile
         if (other.CompareTag("TankShell"))
         {
+            // à mettre quand ajout de FishNet/multi
             // if (IsServer) // Only the server handles damage
             // {
             TakeDamage();
@@ -34,6 +38,7 @@ public class BreakableObject : MonoBehaviour
         }
     }
 
+    // à mettre quand ajout de FishNet/multi
     // [Server] // Ensures only the server modifies health
     void TakeDamage()
     {
@@ -50,6 +55,7 @@ public class BreakableObject : MonoBehaviour
         }
     }
 
+    // à mettre quand ajout de FishNet/multi
     // [ObserversRpc]
     void RpcBreak()
     {
