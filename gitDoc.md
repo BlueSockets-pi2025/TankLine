@@ -7,6 +7,7 @@
   - [On GitHub](#cnbGithub)
   - [On local machine](#cnbLocal)
 - [Create pull requests](#createPR)
+- [Review pull requests](#reviewPR)
 
 ## Quick explanation about branches and branches protection
 
@@ -93,3 +94,74 @@ git push -u origin [branch-name]
 ```
 
 ## <a name="createPR"></a> Create pull requests
+
+To create a new pull requests, switch to the `Pull requests` tab (on the top navigation bar) and click on the `New pull request` button.  
+
+![Screenshot_2025-02-20_11-38-31](https://github.com/user-attachments/assets/a61be356-e523-4c9b-940f-53b9ebbe80f9)
+
+You will now have to chose the origin branch (the branch with your new features or fixes) on the right, and on the left the receiving branch (usually, `main`).
+
+![Screenshot_2025-02-20_11-42-57](https://github.com/user-attachments/assets/ff984fda-90c2-4584-8234-62fccada66da)
+
+Now click on the `Create pull request` button that appeared, give it self-explanatory title, and you can write a description in markdown with every fixes you've done.  
+
+Markdown syntax :  
+```markdown
+# Big title
+## medium title
+- List element 1
+- List element 2
+  - Sub-list element 1
+  - Sub-list element 2
+- List element 3
+## another medium title
+```
+
+Example :
+```markdown
+# Fixed game crashing
+## Files changed
+- `path/to/file/changed/1`
+- `path/to/file/changed/2`
+## Major change
+- Fixed division by 0
+  - Division by 0 in the score couting system
+  - Division by 0 in the player movement
+- Added an error handling in function `myFunction()`
+## Minor change
+- Added comments to function `myFunction()`
+```
+
+Note that since unity have a lot of generated files, please indicate the files you have explicitly changed yourself.
+
+Once the PR is created, you can also add Labels to help other collaborators know what type of changes you've done.
+
+![Screenshot_2025-02-20_11-55-45](https://github.com/user-attachments/assets/a6d399f1-bad0-47f5-9222-b1bed1c3b128)
+
+
+## <a name="reviewPR"></a> Review Pull requests
+
+To review pull requets, you need to go to the `Files changed` section of the pull request you reviewing.
+
+![Screenshot_2025-02-20_12-12-19](https://github.com/user-attachments/assets/dcdc72e5-6cd0-451c-81a4-1983a3540dca)
+
+You can add comments to a line of a specific file by clicking the `+` icon at the beggining of the line, and then click the `Start a review` button (or `add review comment` button if you already made a comment elsewhere).  
+
+![Screenshot_2025-02-20_13-35-27](https://github.com/user-attachments/assets/ce2a9ed9-04c5-474f-b56f-14edc41b242e)
+
+Once you're done reviewing every changes, you can post your review by clicking `Finish your review (nb_comments)` on the top right of the page. Here you can leave a general comment about the review you have done, and select if you approve the merge request, or if changes must be made or if you are just leaving a comment.
+
+![Screenshot_2025-02-20_13-41-59](https://github.com/user-attachments/assets/0982e8b6-a3ba-488f-9c6c-952041ccf2d8)
+
+If you don't have any comments to make and just wan't to approve the PR, you can directly click on the `Finish your review` button (which should be called `Review changes`).
+
+
+## <a name="closePR"></a> Close Pull requests
+
+Once your Pull request is approved, you can close it by merging the two branches from the main page of the pull request.
+
+![Screenshot_2025-02-20_13-46-20](https://github.com/user-attachments/assets/f2193877-e60e-4e9b-be61-26260370c20e)
+
+If the fix or feature you were doing is also finished with the pull request you made, you can then directly delete the source branch of the pull request.
+
+![Screenshot_2025-02-20_13-48-45](https://github.com/user-attachments/assets/ea73112d-d19b-48a5-b086-554b4965ef29)
