@@ -15,9 +15,18 @@ public class BreakableObject : MonoBehaviour
 
     public Material[] textures; // Texture (public Texture[]) or Material (public Material[]) table to represent the number of lives remaining
     private Renderer objRenderer;
+    private Rigidbody rb;
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
+
         objRenderer = GetComponent<Renderer>();
         if (objRenderer == null)
         {
@@ -25,6 +34,7 @@ public class BreakableObject : MonoBehaviour
         }
         UpdateVisualState(health, health, true); // Apply the correct texture at the start
     }
+
     private void OnTriggerEnter(Collider other)
     {
         // Check if the object was hit by a projectile
