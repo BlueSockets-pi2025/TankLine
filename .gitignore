@@ -31,6 +31,9 @@
 *.pidb.meta
 *.pdb.meta
 
+# Unity3D generated logs
+*.log
+
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
 
