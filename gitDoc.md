@@ -25,7 +25,7 @@ gitGraph
   commit id: 'Branches Protections !'
 ```
 
-I now have a `main` branch with 3 commits, and the `main` branch have a protection that prevents me from pushing directly to it.  
+I now have a `main` branch with 3 commits, but the `main` branch have a protection that prevents me from pushing directly to it.  
 If I want to add a new feature `amazing feature`. I will now have to create a new branch and make all the changes in this branch.  
 
 ```mermaid
