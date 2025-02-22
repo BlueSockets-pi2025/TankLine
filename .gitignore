@@ -44,3 +44,10 @@ sysinfo.txt
 # Crashlytics generated file
 */Assets/StreamingAssets/crashlytics-build.properties
 
+# App settings files
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+
+# Environment-specific configuration files
+.env
