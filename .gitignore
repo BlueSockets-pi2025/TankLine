@@ -51,3 +51,7 @@ appsettings.Production.json
 
 # Environment-specific configuration files
 .env
+
+# Directories with .NET build files
+obj/
+bin/
