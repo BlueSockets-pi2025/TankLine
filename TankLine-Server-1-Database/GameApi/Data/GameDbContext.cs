@@ -17,9 +17,24 @@ namespace GameApi.Data
         {
             modelBuilder.Entity<UserAccount>().ToTable("user_accounts");
             modelBuilder.Entity<Achievement>().ToTable("achievement");
-            modelBuilder.Entity<FriendList>().ToTable("friend_lists");
             modelBuilder.Entity<Leaderboard>().ToTable("leaderboard");
             modelBuilder.Entity<GeneratedMap>().ToTable("generated_maps");
+		
+	    // Definition of the composite key because [Key] cannot be defined twice in the C# class:
+	    modelBuilder.Entity<FriendList>()
+		.HasKey(f => new { f.User1, f.User2 });    
+
+	    modelBuilder.Entity<FriendList>()
+                .HasOne(f => f.UserAccount1)
+                .WithMany()
+                .HasForeignKey(f => f.User1)
+                .OnDelete(DeleteBehavior.Cascade); 
+
+            modelBuilder.Entity<FriendList>()
+                .HasOne(f => f.UserAccount2)
+                .WithMany()
+                .HasForeignKey(f => f.User2)
+                .OnDelete(DeleteBehavior.Cascade); 
 	}
     }
 }

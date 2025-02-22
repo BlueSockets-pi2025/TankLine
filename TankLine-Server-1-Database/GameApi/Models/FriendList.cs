@@ -7,11 +7,9 @@ namespace GameApi.Models
     [Table("friend_lists")]
     public class FriendList
     {
-        [Key]
         [Column("user1")]
         public string User1 { get; set; } = string.Empty;
 
-        [Key]
         [Column("user2")]
         public string User2 { get; set; } = string.Empty;
 
