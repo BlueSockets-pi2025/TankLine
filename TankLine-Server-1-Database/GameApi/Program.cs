@@ -1,27 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using GameApi.Data;
-using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Download and install the SSL certificate locally
-var certInstaller = new CertInstaller();
-certInstaller.InstallCertificateFromFile("certificat.pem"); 
-
-// Load Kestrel configuration from the appsettings.json file
+// Charger la configuration Kestrel depuis le fichier appsettings.json
 builder.WebHost.ConfigureKestrel(options =>
 {
     var kestrelConfig = builder.Configuration.GetSection("Kestrel");
-    options.Configure(kestrelConfig); // Apply Kestrel configuration from the appsettings.json file
+    options.Configure(kestrelConfig); // Appliquer la configuration Kestrel depuis le fichier appsettings.json
 
-    // Load the SSL certificate for HTTPS
+    // Charger le certificat SSL pour HTTPS
     var certificatePath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"];
     var privateKeyPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:KeyPath"];
     var privateKeyPassword = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Password"];
 
     if (string.IsNullOrEmpty(certificatePath) || string.IsNullOrEmpty(privateKeyPath) || string.IsNullOrEmpty(privateKeyPassword))
     {
-        throw new ArgumentException("The path to the certificate, private key, or private key password is missing in the configuration.");
+        throw new ArgumentException("Le chemin vers le certificat, la clé privée ou le mot de passe de la clé privée est manquant dans la configuration.");
     }
 
     var certLoader = new CertLoader();
@@ -29,37 +24,37 @@ builder.WebHost.ConfigureKestrel(options =>
 
     options.ConfigureHttpsDefaults(httpsOptions =>
     {
-        httpsOptions.ServerCertificate = certificate; // Apply the SSL certificate
+        httpsOptions.ServerCertificate = certificate; // Appliquer le certificat SSL
     });
 });
 
-// Add necessary services to the application
+// Ajouter les services nécessaires à l'application
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure the connection to the PostgreSQL database
+// Configurer la connexion à la base de données PostgreSQL
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add controllers
+// Ajouter les contrôleurs
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Force HTTPS redirection if it's not already done by Kestrel
+// Forcer la redirection HTTPS si ce n'est pas déjà fait par Kestrel
 app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
-    // Enable Swagger in development mode for the API
+    // Activer Swagger en mode développement pour l'API
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseAuthorization();
 
-// Map controllers
+// Mapper les contrôleurs
 app.MapControllers();
 
-// Run the application
+// Lancer l'application
 app.Run();
