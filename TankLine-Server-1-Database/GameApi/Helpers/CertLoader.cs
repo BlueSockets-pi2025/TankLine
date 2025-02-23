@@ -7,37 +7,37 @@ public class CertLoader
 {
     public X509Certificate2 LoadCertificate(string certificatePath, string privateKeyPath, string password)
     {
-        // Charger le certificat public à partir du fichier PEM
+        // Load the public certificate from the PEM file
         var certificatePem = File.ReadAllText(certificatePath);
 
-        // Charger le certificat via X509Certificate2Loader
+        // Load the certificate using X509Certificate2Loader
         var certLoader = new X509Certificate2Collection();
         certLoader.ImportFromPem(certificatePem);
 
-        // Charger la clé privée à partir du fichier PEM
+        // Load the private key from the PEM file
         var privateKeyPem = File.ReadAllText(privateKeyPath);
 
-        // Supprimer les balises de la clé privée (si elles existent) 
-        // ==> SANS CETTE PARTIE ON RENCONTRE UNE INCOMPATIBILITÉ AVEC BASE64
+        // Remove the tags from the private key (if they exist) 
+        // ==> WITHOUT THIS PART WE ENCOUNTER A BASE64 INCOMPATIBILITY
         privateKeyPem = privateKeyPem.Replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "").Replace("-----END ENCRYPTED PRIVATE KEY-----", "");
 
-        // Convertir la clé privée en tableau de bytes
+        // Convert the private key to a byte array
         var privateKeyBytes = Convert.FromBase64String(privateKeyPem);
 
-        // Créer un RSA et importer la clé privée
+        // Create an RSA and import the private key
         var rsaKey = RSA.Create();
         if (!string.IsNullOrEmpty(password))
         {
-            // Si la clé est protégée par mot de passe, déchiffrer
+            // If the key is password-protected, decrypt it
             rsaKey.ImportEncryptedPkcs8PrivateKey(password, privateKeyBytes, out _);
         }
         else
         {
-            // Si la clé n'est pas protégée, l'importer directement
+            // If the key is not password-protected, import it directly
             rsaKey.ImportPkcs8PrivateKey(privateKeyBytes, out _);
         }
 
-        // Attacher la clé privée au certificat
+        // Attach the private key to the certificate
         var certificate = certLoader[0];
         return certificate.CopyWithPrivateKey(rsaKey);
     }

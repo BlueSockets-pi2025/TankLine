@@ -16,19 +16,17 @@ namespace GameApi.Controllers
             _context = context;
         }
 
-        // Action pour tester la connexion au serveur
         [HttpGet("test-connection")]
         public async Task<IActionResult> TestConnection()
         {
             try
             {
-                // Effectuer une requête simple pour vérifier la connexion
                 await _context.Database.CanConnectAsync();
-                return Ok("Connexion au serveur réussie.");
+                return Ok("SUCCESS : CONNECTION SUCCESSFUL");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Erreur de connexion : {ex.Message}");
+                return StatusCode(500, $"ERROR : FAILED CONNECTION {ex.Message}");
             }
         }
 
