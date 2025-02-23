@@ -55,3 +55,6 @@ appsettings.Production.json
 # Directories with .NET build files
 obj/
 bin/
+
+# .DS_Store file
+.DS_Store
