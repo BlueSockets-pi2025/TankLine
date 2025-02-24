@@ -53,7 +53,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="force">The rotation force</param>
     public void RotateTank(float force) {
-        tankRotation = (tankRotation + (force*rotationSpeed) + math.PI*2) % (math.PI * 2);
+        tankRotation = Mathf.Repeat(tankRotation + (force*rotationSpeed), math.PI*2);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="angle">The rotation angle in radians</param>
     public void SetRotationTank(float angle) {
-        tankRotation = (float)(((angle % (Math.PI*2))+math.PI*2)%(math.PI*2));
+        tankRotation = Mathf.Repeat(angle, Mathf.PI * 2);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="force">The rotation force</param>
     public void RotateGun (float force) {
-        gunRotation = (gunRotation + (force*rotationSpeed) + math.PI*2) % (math.PI * 2);
+        gunRotation = Mathf.Repeat(gunRotation + (force*rotationSpeed), math.PI*2);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class Tank : MonoBehaviour
     /// <param name="angle">The rotation angle in radians</param>
     public void SetRotationGun(float angle)
     {
-        gunRotation = (float)(((angle % (Math.PI*2))+math.PI*2)%(math.PI*2));
+        gunRotation = Mathf.Repeat(angle, Mathf.PI * 2);
     }
 
 
@@ -91,7 +91,7 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="position">The new position</param>
     public void SetPosition(Vector3 position) {
-        thisTank.transform.Translate(position);
+        thisTank.position = position;
     }
 
     /// <summary>
@@ -99,6 +99,6 @@ public class Tank : MonoBehaviour
     /// </summary>
     /// <param name="force">The movement force (between -1 and 1)</param>
     public void GoForward(float force) {
-        thisTank.Translate(force * movementSpeed * Time.deltaTime * Vector3.forward);
+        thisTank.Translate(force * movementSpeed * Time.deltaTime * thisTank.forward, Space.World);
     }
 }

@@ -7,6 +7,7 @@ public class Tank_Player : Tank
     public const int LEFT_CLICK = 0;
     public const int LAYER_MAP_OBJECT = 3;
     public const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI/2;
+    protected float movementToMake = 0;
 
     protected override void Start()
     {
@@ -19,34 +20,37 @@ public class Tank_Player : Tank
     }
 
     /// <summary>
-    /// Automatically called by unity every frame before the physic engine
+    /// Automatically called by unity every frame after the physic engine
     /// </summary>
-    protected override void FixedUpdate() {
-        float y = Input.GetAxis("Vertical");
-        float x = Input.GetAxis("Horizontal");
-
+    protected void Update() {
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
+    }
+
+    /// <summary>
+    /// Automatically called by unity every frame before the physic engine
+    /// </summary>
+    protected override void FixedUpdate() {
+        // process rotation input
+        float y = Input.GetAxis("Vertical");
+        float x = Input.GetAxis("Horizontal");
+        movementToMake = this.FaceDirection(x, y);
 
         // process movement input
-        float movementToMake = this.FaceDirection(x,y);
         this.GoForward(movementToMake);
-        this.ApplyRotation();
 
-        // process mouse click to fire a bullet
-        if (Input.GetMouseButtonDown(LEFT_CLICK)) {
-            Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
-            Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
+        /* ------------------------------------------------------
+            Old rotation system, might re-use later as an option
+           ------------------------------------------------------
 
-            // use a raycast to prevent selfshooting if a wall is too close
-            if (Physics.Raycast(origin, direction, 1.3f)) {
-                Debug.Log("Prevent self-shooting");
-            } else {
-                Debug.Log("Fire !");
-            }
-            Debug.DrawRay(origin, direction*1.3f, Color.red, 1);
-        }
+            float acceleration = Input.GetAxis("Vertical");
+            float rotation = Input.GetAxis("Horizontal");
+
+            // process movement input
+            this.GoForward(acceleration);
+            this.RotateTank(rotation);
+           ------------------------------------------------------ */
     }
 
     /// <summary>
@@ -160,30 +164,49 @@ public class Tank_Player : Tank
         }
 
         float targetDirection;
-
-        // the direction we want to face in [0, 2*pi]
-        float targetDirection1 = (math.atan2(x, y) + math.PI2) % math.PI2;
-
-        // if already in this direction, return
-        if (targetDirection1 == tankRotation) {
-            return 1;
-        }
+        float angle = Mathf.Repeat(math.atan2(x, y), math.PI2);
+        int isBackward = 1;
 
         // check for more than pi/2 and less than 0 to avoid useless 360°
-        float targetDirection2 = (math.atan2(x, y) + math.PI2) % math.PI2 + math.PI2;
-        float targetDirection3 = (math.atan2(x, y) + math.PI2) % math.PI2 - math.PI2;
+        float angle2 = angle + math.PI2;
+        float angle3 = angle - math.PI2;
 
         // find closest rotation
-        if (math.abs(tankRotation - targetDirection1) < math.abs(tankRotation - targetDirection2)) {
-            if (math.abs(tankRotation - targetDirection1) < math.abs(tankRotation - targetDirection3)) {
-                targetDirection = targetDirection1;
+        if (math.abs(tankRotation - angle) < math.abs(tankRotation - angle2)) {
+            if (math.abs(tankRotation - angle) < math.abs(tankRotation - angle3)) {
+                targetDirection = angle;
             } else {
-                targetDirection = targetDirection3;
+                targetDirection = angle3;
             }
-        } else if (math.abs(tankRotation - targetDirection2) < math.abs(tankRotation - targetDirection3)) {
-            targetDirection = targetDirection2;
+        } else if (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3)) {
+            targetDirection = angle2;
         } else {
-            targetDirection = targetDirection3;
+            targetDirection = angle3;
+        }
+
+        // check if moving backward is faster than rotating then moving forward
+        float angle1 = Mathf.Repeat(angle+math.PI, math.PI2);
+        angle2 = Mathf.Repeat(angle+math.PI, math.PI2) + math.PI2;
+        angle3 = Mathf.Repeat(angle+math.PI, math.PI2) - math.PI2;
+
+        if (math.abs(tankRotation - angle1) < math.abs(tankRotation - angle2)) {
+            if (math.abs(tankRotation - angle1) > math.abs(tankRotation - angle3)) {
+                angle1 = angle3;
+            }
+        } else if (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3)) {
+            angle1 = angle2;
+        } else {
+            angle1 = angle3;
+        }
+
+        if (math.abs(tankRotation - targetDirection) > math.abs(tankRotation - angle1)) {
+            isBackward = -1;
+            targetDirection = angle1;
+        }
+
+        // if already in this direction, return
+        if (math.abs(targetDirection - tankRotation) <= 0.0001f) {
+            return math.max(math.abs(x), math.abs(y)) * isBackward;
         }
 
         // apply rotation
@@ -202,11 +225,24 @@ public class Tank_Player : Tank
             return 0;
         } else {
             // else, set the movement force proportionally inverse to the difference between the target angle and the current angle
-            if (math.abs(targetDirection - tankRotation) == 0) { // avoid division by 0
-                return 1;
+            if (math.abs(targetDirection - tankRotation) < 0.0001f) { // avoid division by 0
+                return math.max(math.abs(x),math.abs(y)) * isBackward;
             } else {
-                return 1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT);
+                return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT),0,1) * math.max(math.abs(x),math.abs(y)) * isBackward;
             }
+        }
+    }
+
+    protected bool canShoot() {
+        Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
+        Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
+        Debug.DrawRay(origin, direction * 1.3f, Color.red, 1); // DEBUG ONLY
+
+        // use a raycast to prevent selfshooting if a wall is too close
+        if (Physics.Raycast(origin, direction, 1.3f)) {
+            return false;
+        } else {
+            return true;
         }
     }
 }
