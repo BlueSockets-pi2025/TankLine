@@ -612,7 +612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 3
   rotationSpeed: 0.06544985
-  gunRotationAngle: 0
+  gunRotation: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
