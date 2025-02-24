@@ -8,8 +8,8 @@ namespace GameApi.Data
 	public GameDbContext(DbContextOptions<GameDbContext> options) : base(options) { }
 	
 	public DbSet<UserAccount> UserAccounts { get; set; }
-        public DbSet<Achievement> Achievements { get; set; }
-        public DbSet<FriendList> FriendLists { get; set; }
+    public DbSet<Achievement> Achievements { get; set; }
+    public DbSet<FriendList> FriendLists { get; set; }
 	public DbSet<Leaderboard> Leaderboards { get; set; }
 	public DbSet<GeneratedMap> GeneratedMaps { get; set; }	
 

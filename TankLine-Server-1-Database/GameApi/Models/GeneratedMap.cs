@@ -13,7 +13,7 @@ namespace GameApi.Models
         [Column("nb_player")]
         public int NbPlayer { get; set; }
 
-        [Column("backgroundType")]
+        [Column("backgroundtype")]
         public int BackgroundType { get; set; }
 
         [Column("data")]
