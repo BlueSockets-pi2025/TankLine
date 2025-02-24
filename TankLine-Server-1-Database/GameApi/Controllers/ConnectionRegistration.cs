@@ -7,7 +7,7 @@ using GameApi.Models ;
 
 
 [ApiController]
-[Route("api/player")]
+[Route("api/auth")]
 public class ConnectionRegistrationController : Controller
 {
     private readonly GameDbContext _context;
