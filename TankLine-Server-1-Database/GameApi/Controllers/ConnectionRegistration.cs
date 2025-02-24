@@ -8,11 +8,11 @@ using GameApi.Models ;
 
 [ApiController]
 [Route("api/player")]
-public class UserController : Controller
+public class ConnectionRegistrationController : Controller
 {
     private readonly GameDbContext _context;
 
-    public UserController(GameDbContext context)
+    public ConnectionRegistrationController(GameDbContext context)
     {
         _context = context;
     }
