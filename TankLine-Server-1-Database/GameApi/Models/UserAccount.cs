@@ -1,22 +1,28 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GameApi.Models
+public class UserAccount
 {
-    [Table("user_accounts")]
-    public class UserAccount
-    {
-        [Key]
-        [Column("username")]
-        public string Username { get; set; } = string.Empty;
+    [Key]
+    [Required]
+    [RegularExpression(@"^\S*$", ErrorMessage = "Invalid username.")]
+    public required string Username { get; set; }
 
-        [Column("email")]
-        public string Email { get; set; } = string.Empty;
+    [Required]
+    [EmailAddress]
+    [RegularExpression(@"^\S*$", ErrorMessage = "Email cannot contain white spaces.")]
+    public required string Email { get; set; }
 
-        [Column("password_hash")]
-        public string PasswordHash { get; set; } = string.Empty;
+    [Required]
+    [StringLength(100, MinimumLength = 8)] // Password length 
+    [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
+    public required string PasswordHash { get; set; }
 
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    }
+    [MaxLength(50)] 
+    public string? FirstName { get; set; }
+
+    [MaxLength(50)]
+    public string? LastName { get; set; }
+
+    [DataType(DataType.Date)]
+    public DateTime? BirthDate { get; set; }
 }
