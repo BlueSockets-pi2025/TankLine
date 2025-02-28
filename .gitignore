@@ -40,8 +40,10 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-*/Demo/
-*/Demos/
+*[Dd]emo/
+*[Dd]emos/
+*[Dd]emo
+*[Dd]emos
 
 # Crashlytics generated file
 */Assets/StreamingAssets/crashlytics-build.properties
