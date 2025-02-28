@@ -612,7 +612,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 3
   rotationSpeed: 0.06544985
-  gunRotation: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,7 +1363,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2051531955580695772, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.679
       objectReference: {fileID: 0}
     - target: {fileID: 2051531955580695772, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1401,6 +1400,18 @@ PrefabInstance:
     - target: {fileID: 2376455214160315203, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
       propertyPath: m_Name
       value: Bullet
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884394805394460611, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
+      propertyPath: bulletSpeed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884394805394460611, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
+      propertyPath: direction.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884394805394460611, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
+      propertyPath: direction.z
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
