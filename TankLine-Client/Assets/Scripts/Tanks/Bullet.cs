@@ -1,4 +1,5 @@
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour {
@@ -10,11 +11,12 @@ public class Bullet : MonoBehaviour {
     /// <summary> This bullet speed movement (READONLY) </summary>
     public float bulletSpeed = 6;
     /// <summary> The tank that shot this bullet </summary>
-    public GameObject tankOwner;
+    public GameObject tankOwner = null;
 
 
     /// <summary> The layer number for unbreakable walls </summary>
     public const int UNBREAKABLE_LAYER = 3;
+    public const int PLAYER_LAYER = 10;
 
 
     /// <summary> This bullet GameObject </summary>
@@ -44,6 +46,13 @@ public class Bullet : MonoBehaviour {
             // if all bounces have been made, delete
             if (nbRebounds <= 0) {
                 Destroy(thisBullet);
+
+                // decrease the nb of bullet shot from the tank that shot this bullet
+                if (tankOwner != null) {
+                    Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
+                    playerOwner.DecreaseNbBulletShot();
+                }
+
                 return;
             }
             nbRebounds--;
@@ -54,11 +63,15 @@ public class Bullet : MonoBehaviour {
             // right-left direction
             if (math.abs(relativeCollision.x) > 0.0001f) {
                 direction.x = -direction.x;
-            } else 
+            }
 
             // up-down direction
-            if (math.abs(relativeCollision.z) > 0.0001f) {
+            else if (math.abs(relativeCollision.z) > 0.0001f) {
                 direction.z = -direction.z;
+            }
+
+            else {
+                Debug.LogError("Collision detected but not direction.");
             }
         }
     }
