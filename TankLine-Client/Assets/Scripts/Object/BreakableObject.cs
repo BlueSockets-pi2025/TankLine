@@ -22,8 +22,8 @@ public class BreakableObject : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.isKinematic = true;
-            rb.useGravity = false;
+            // rb.isKinematic = true;
+            // rb.useGravity = false;
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
 
@@ -35,10 +35,10 @@ public class BreakableObject : MonoBehaviour
         UpdateVisualState(health, health, true); // Apply the correct texture at the start
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other) //need a rigibody on the TankShell and no trigger
     {
         // Check if the object was hit by a projectile
-        if (other.CompareTag("TankShell"))
+        if (other.collider.CompareTag("TankShell"))
         {
             // à mettre quand ajout de FishNet/multi
             // if (IsServer) // Only the server handles damage
@@ -57,7 +57,7 @@ public class BreakableObject : MonoBehaviour
             var oldHealth = health;
             health--;
             UpdateVisualState(oldHealth, health, true);
-            Debug.Log($"{gameObject.name} health: {health}");
+            // Debug.Log($"{gameObject.name} health: {health}"); //pour vérifier lors du multi
             if (health == 0)
             {
                 RpcBreak(); // Destroys the object on all clients
@@ -69,7 +69,7 @@ public class BreakableObject : MonoBehaviour
     // [ObserversRpc]
     void RpcBreak()
     {
-        Debug.Log($"{gameObject.name} has been broken!");
+        // Debug.Log($"{gameObject.name} has been broken!"); //pour vérifier lors du multi
         Destroy(gameObject);
     }
 
