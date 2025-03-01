@@ -20,7 +20,7 @@ public class UserAccount
     [MaxLength(50)] 
     public string? FirstName { get; set; }
 
-    [MaxLength(50)]
+    [MaxLength(50)] // Limite à 50 caractères
     public string? LastName { get; set; }
 
     [DataType(DataType.Date)]
