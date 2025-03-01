@@ -7,11 +7,11 @@ namespace GameApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class GeneratedMapsController : ControllerBase
     {
         private readonly GameDbContext _context;
 
-        public UserController(GameDbContext context)
+        public GeneratedMapsController(GameDbContext context)
         {
             _context = context;
         }
@@ -30,13 +30,14 @@ namespace GameApi.Controllers
             }
         }
 
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetUser(string username)
+        [HttpGet("{map_Id}")]
+        public async Task<IActionResult> GetMap(string map_Id)
         {
-            var user = await _context.UserAccounts.FindAsync(username);
-            if (user == null)
+            var map = await _context.GeneratedMaps.FindAsync(map_Id);
+            if (map == null)
                 return NotFound();
-            return Ok(user);
+            return Ok(map);
         }
+     
     }
 }
