@@ -2,6 +2,10 @@ using GameApi.Data;
 using GameApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace GameApi.Controllers
 {
@@ -29,13 +33,45 @@ namespace GameApi.Controllers
                 return StatusCode(500, $"ERROR : FAILED CONNECTION {ex.Message}\n");
             }
         }
-
+    
         [HttpGet("{username}")]
         public async Task<IActionResult> GetUser(string username)
         {
             var user = await _context.UserAccounts.FindAsync(username);
             if (user == null)
                 return NotFound();
+            return Ok(user);
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            foreach (var claim in allClaims)
+            {
+                Console.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
+            }
+
+            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            if (subClaim == null)
+            {
+                return Unauthorized($"Invalid token or missing user information. Claim '{JwtRegisteredClaimNames.Sub}' is missing.");
+            }
+
+            var username = subClaim.Value;
+            if (string.IsNullOrEmpty(username))
+            {
+                return Unauthorized($"Invalid token or missing user information. Claim '{JwtRegisteredClaimNames.Sub}' is empty.");
+            }
+
+            var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
             return Ok(user);
         }
     }

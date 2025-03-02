@@ -106,14 +106,18 @@ public class ConnectionRegistrationController : Controller
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username ?? string.Empty), // Utilisation du Username comme identifiant
-            new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
+            new Claim(ClaimTypes.Name, user.Username ?? string.Empty), // Ensure that Username is not null
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty), // Ensure that Email is not null
+
+            new Claim(JwtRegisteredClaimNames.Sub, user.Username ?? string.Empty), // Add a unique identifier
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            // Add other claims if necessary, such as roles, permissions, etc.
         };
 
         var secretKey = _configuration["JwtSettings:SecretKey"] ?? string.Empty;
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+        
         var token = new JwtSecurityToken(
             issuer: _configuration["JwtSettings:Issuer"] ?? string.Empty,
             audience: _configuration["JwtSettings:Audience"] ?? string.Empty,

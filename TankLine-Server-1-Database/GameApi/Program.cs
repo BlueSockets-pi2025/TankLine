@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using GameApi.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,8 +40,37 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add controllers
+// Add controllers :
 builder.Services.AddControllers();
+
+// JWT configuration : 
+var jwtKey = builder.Configuration["JwtSettings:SecretKey"];
+
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new ArgumentNullException("JwtSettings:SecretKey", "JWT key is missing from the configuration.");
+}
+
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
+var jwtAudience = builder.Configuration["JwtSettings:Audience"];
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true, // Validate the audience
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            NameClaimType = ClaimTypes.NameIdentifier,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)) // Guarantee that jwtKey is not null
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -51,6 +84,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Mapping controllers
