@@ -2,6 +2,7 @@ using GameApi.Data;
 using GameApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GameApi.Controllers
 {   
@@ -31,6 +32,7 @@ namespace GameApi.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{map_Id}")]
         public async Task<IActionResult> GetMap(string map_Id)
         {
@@ -38,7 +40,6 @@ namespace GameApi.Controllers
             if (map == null)
                 return NotFound();
             return Ok(map);
-        }
-     
+        }    
     }
 }

@@ -128,9 +128,6 @@ public class ConnectionRegistrationController : Controller
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
-
-
 }
 
 // DTO for login (with username or email and password)
