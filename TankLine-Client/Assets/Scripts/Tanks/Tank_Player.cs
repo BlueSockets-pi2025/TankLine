@@ -248,12 +248,17 @@ public class Tank_Player : Tank
         }
     }
 
+    /// <summary>
+    /// Test if this player can shoot. <br/>
+    /// Used to prevent bug and insta-self shooting when close to a wall
+    /// </summary>
+    /// <returns>True if there isn't a wall too close where the player is trying to shoot.</returns>
     protected bool CanShoot() {
         Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
         Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
         Debug.DrawRay(origin, direction * 1.3f, Color.red, 1); // DEBUG ONLY
 
-        // use a raycast to prevent selfshooting if a wall is too close
+        // use a raycast to prevent self-shooting if a wall is too close
         if (Physics.Raycast(origin, direction, 1.3f)) {
             return false;
         } else {
@@ -266,7 +271,7 @@ public class Tank_Player : Tank
             Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
             Vector3 dir = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
 
-            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.7f*dir, Quaternion.identity);
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.8f*dir, Quaternion.identity);
             Bullet newBullet = newBulletObject.GetComponent<Bullet>();
             newBullet.direction = dir;
             newBullet.tankOwner = gameObject;

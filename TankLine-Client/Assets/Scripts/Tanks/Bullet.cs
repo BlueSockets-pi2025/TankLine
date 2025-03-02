@@ -39,8 +39,10 @@ public class Bullet : MonoBehaviour {
     /// </summary>
 
     void OnCollisionEnter(Collision collision) {
-        
-        // if collision with unbreakable wall, bounce or destroy
+
+        /* 
+            ############################## WALL COLLISIONS ############################## 
+        */
         if (collision.gameObject.layer == UNBREAKABLE_LAYER) {
 
             // if all bounces have been made, delete
@@ -55,6 +57,8 @@ public class Bullet : MonoBehaviour {
 
                 return;
             }
+
+            // else, decrease the number of rebound that are left to make
             nbRebounds--;
 
             Vector3 relativeCollision = collision.GetContact(0).point - thisBullet.transform.position;
@@ -73,6 +77,27 @@ public class Bullet : MonoBehaviour {
             else {
                 Debug.LogError("Collision detected but not direction.");
             }
+        }
+
+        /* 
+            ############################## PLAYER COLLISIONS ############################## 
+        */
+        else if (collision.gameObject.layer == PLAYER_LAYER) {
+            Tank hitTank = collision.gameObject.GetComponent<Tank>();
+            
+            if (hitTank != null) {
+                hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
+            }
+
+            Destroy(thisBullet); // this bullet is destroy
+
+            // decrease the nb of bullet shot from the tank that shot this bullet
+            if (tankOwner != null) {
+                Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
+                playerOwner.DecreaseNbBulletShot();
+            }
+
+            return;
         }
     }
 }
