@@ -35,6 +35,6 @@ namespace GameApi.Data
                 .WithMany()
                 .HasForeignKey(f => f.User2)
                 .OnDelete(DeleteBehavior.Cascade); 
-	}
+	    }
     }
 }

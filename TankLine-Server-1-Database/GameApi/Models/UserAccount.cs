@@ -22,9 +22,6 @@ public class UserAccount
     [Column("password_hash")]
     public required string PasswordHash { get; set; }
 
-    [MaxLength(50)] // 
-    public string? LastName { get; set; }
-
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
