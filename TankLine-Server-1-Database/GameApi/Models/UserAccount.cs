@@ -1,6 +1,6 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 
 public class UserAccount
 {
@@ -22,15 +22,9 @@ public class UserAccount
     [Column("password_hash")]
     public required string PasswordHash { get; set; }
 
-
-<<<<<<< HEAD
-    [MaxLength(50)] // Limite à 50 caractères
+    [MaxLength(50)] // 
     public string? LastName { get; set; }
 
-    [DataType(DataType.Date)]
-    public DateTime? BirthDate { get; set; }
-=======
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
->>>>>>> bd0047afc7f2b0081a7f9e5d249afec9bb8a2c59
 }
