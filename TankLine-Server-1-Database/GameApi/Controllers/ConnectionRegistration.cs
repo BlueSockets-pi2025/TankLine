@@ -10,6 +10,7 @@ using GameApi.Data;
 using GameApi.Models;
 using System;
 
+
 [ApiController]
 [Route("api/auth")]
 public class ConnectionRegistrationController : Controller
@@ -70,7 +71,7 @@ public class ConnectionRegistrationController : Controller
 
         var user = _context.UserAccounts.FirstOrDefault(u =>
             u.Username == loginRequest.UsernameOrEmail ||
-            u.Email == loginRequest.UsernameOrEmail); // Check if the input is a username or an email
+            u.Email == loginRequest.UsernameOrEmail);
 
         if (user == null || !PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
@@ -79,7 +80,25 @@ public class ConnectionRegistrationController : Controller
 
         // Generate JWT Token
         var token = GenerateJwtToken(user);
-        return Ok(new { Token = token });
+
+        // Store the token in an HTTP-only and secure cookie
+        Response.Cookies.Append("AuthToken", token, new CookieOptions
+        {
+            HttpOnly = true, // Prevents access to the cookie via JavaScript (XSS protection)
+            Secure = true, // Ensures the cookie is only sent over HTTPS
+            SameSite = SameSiteMode.Strict, // Prevents the cookie from being sent to third-party sites
+            Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryHours"])) // Cookie expiration time
+        });
+
+        return Ok("Login successful");
+    }
+
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("AuthToken");
+        return Ok("Logged out successfully.");
     }
 
     // Helper method to generate a JWT token
@@ -87,25 +106,26 @@ public class ConnectionRegistrationController : Controller
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username ?? string.Empty), // Ensure that Username is not null
-            new Claim(ClaimTypes.Email, user.Email ?? string.Empty), // Ensure that Email is not null
-            // Add other claims if necessary, such as roles, permissions, etc.
+            new Claim(ClaimTypes.Name, user.Username ?? string.Empty), // Utilisation du Username comme identifiant
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
         };
 
-        var secretKey = _configuration["JwtSettings:SecretKey"] ?? string.Empty; // Provide a default value if null
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)); // Your secret key
+        var secretKey = _configuration["JwtSettings:SecretKey"] ?? string.Empty;
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["JwtSettings:Issuer"] ?? string.Empty, // Provide a default value if null
-            audience: _configuration["JwtSettings:Audience"] ?? string.Empty, // Provide a default value if null
+            issuer: _configuration["JwtSettings:Issuer"] ?? string.Empty,
+            audience: _configuration["JwtSettings:Audience"] ?? string.Empty,
             claims: claims,
-            expires: DateTime.Now.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryHours"])), // Token expires in 1 hour (from config)
+            expires: DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryHours"])),
             signingCredentials: creds
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token); // Generate the token as a string
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+
 
 }
 
