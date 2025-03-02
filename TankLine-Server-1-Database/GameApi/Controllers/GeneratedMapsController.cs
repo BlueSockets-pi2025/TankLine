@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameApi.Controllers
-{
+{   
     [ApiController]
     [Route("api/[controller]")]
     public class GeneratedMapsController : ControllerBase
