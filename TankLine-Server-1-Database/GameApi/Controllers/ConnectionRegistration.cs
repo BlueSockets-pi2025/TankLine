@@ -80,8 +80,8 @@ public class ConnectionRegistrationController : Controller
 
         // Generate JWT Token
         var token = GenerateJwtToken(user);
-
-        // Store the token in an HTTP-only and secure cookie
+        
+        // Store the token in an HTTP-only and secure cookie (not currently in use)
         Response.Cookies.Append("AuthToken", token, new CookieOptions
         {
             HttpOnly = true, // Prevents access to the cookie via JavaScript (XSS protection)
@@ -90,7 +90,7 @@ public class ConnectionRegistrationController : Controller
             Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryHours"])) // Cookie expiration time
         });
 
-        return Ok("Login successful");
+        return Ok(new { Token = token }); // Or: return Ok("Login successful"); // For cookie management
     }
 
 
