@@ -14,16 +14,21 @@ public class Bullet : MonoBehaviour {
     public GameObject tankOwner = null;
 
 
-    /// <summary> The layer number for unbreakable walls </summary>
-    public const int UNBREAKABLE_LAYER = 3;
+    public const string BREAKABLE_TAG = "BreakableWall";
+
+    public const int WALL_LAYER = 3;
+    public const int SHELL_LAYER = 9;
     public const int PLAYER_LAYER = 10;
 
 
     /// <summary> This bullet GameObject </summary>
     protected GameObject thisBullet;
+    /// <summary> This bullet mesh renderer </summary>
+    protected Transform meshTransform;
 
     void Start() {
         thisBullet = gameObject;
+        meshTransform = thisBullet.transform.Find("shell");
     }
 
     /// <summary>
@@ -32,6 +37,7 @@ public class Bullet : MonoBehaviour {
     void FixedUpdate() {
         direction.Normalize();
         thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
+        meshTransform.rotation = Quaternion.Euler(0,(math.atan2(-direction.z, direction.x) + math.PI/2) * Mathf.Rad2Deg, 9.648f);
     }
 
     /// <summary>
@@ -43,39 +49,44 @@ public class Bullet : MonoBehaviour {
         /* 
             ############################## WALL COLLISIONS ############################## 
         */
-        if (collision.gameObject.layer == UNBREAKABLE_LAYER) {
+        if (collision.gameObject.layer == WALL_LAYER) {
 
-            // if all bounces have been made, delete
-            if (nbRebounds <= 0) {
-                Destroy(thisBullet);
+            // if breakable wall
+            if (collision.gameObject.CompareTag(BREAKABLE_TAG)) {
+                BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
-                // decrease the nb of bullet shot from the tank that shot this bullet
-                if (tankOwner != null) {
-                    Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
-                    playerOwner.DecreaseNbBulletShot();
+                wall.TakeDamage();
+                Destroy(gameObject);
+            } 
+            
+            // if static wall
+            else {
+
+                // if all bounces have been made, delete
+                if (nbRebounds <= 0) {
+                    Destroy(thisBullet);
+                    return;
                 }
 
-                return;
-            }
+                // else, decrease the number of rebound that are left to make
+                nbRebounds--;
 
-            // else, decrease the number of rebound that are left to make
-            nbRebounds--;
+                Vector3 relativeCollision = collision.GetContact(0).point - thisBullet.transform.position;
 
-            Vector3 relativeCollision = collision.GetContact(0).point - thisBullet.transform.position;
+                // get the contact point direction
+                // right-left direction
+                if (math.abs(relativeCollision.x) > 0.0001f) {
+                    direction.x = -direction.x;
+                }
 
-            // get the contact point direction
-            // right-left direction
-            if (math.abs(relativeCollision.x) > 0.0001f) {
-                direction.x = -direction.x;
-            }
+                // up-down direction
+                else if (math.abs(relativeCollision.z) > 0.0001f) {
+                    direction.z = -direction.z;
+                }
 
-            // up-down direction
-            else if (math.abs(relativeCollision.z) > 0.0001f) {
-                direction.z = -direction.z;
-            }
-
-            else {
-                Debug.LogError("Collision detected but not direction.");
+                else {
+                    Debug.LogError("Collision detected but not direction.");
+                }
             }
         }
 
@@ -91,13 +102,29 @@ public class Bullet : MonoBehaviour {
 
             Destroy(thisBullet); // this bullet is destroy
 
-            // decrease the nb of bullet shot from the tank that shot this bullet
-            if (tankOwner != null) {
-                Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
-                playerOwner.DecreaseNbBulletShot();
-            }
-
             return;
+        }
+
+        /* 
+            ############################## SHELL COLLISIONS ############################## 
+        */
+        else if (collision.gameObject.layer == SHELL_LAYER) {
+            Destroy(collision.gameObject);
+            Destroy(gameObject);
+            return;
+        }
+
+    }
+
+    /// <summary>
+    /// Function called by unity before destroying the object. <br/>
+    /// Used to decrease the number of shot fired by the tank owner when a bullet dies.
+    /// </summary>
+    public void OnDestroy() {
+        // decrease the nb of bullet shot from the tank that shot this bullet
+        if (tankOwner != null) {
+            Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
+            playerOwner.DecreaseNbBulletShot();
         }
     }
 }

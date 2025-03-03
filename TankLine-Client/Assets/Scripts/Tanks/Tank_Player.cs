@@ -277,7 +277,6 @@ public class Tank_Player : Tank
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
         }
-        Debug.Log(nbBulletShot);
     }
 
     public void DecreaseNbBulletShot() {
