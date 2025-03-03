@@ -5,31 +5,28 @@ using System;
 
 public class ServerSettings : MonoBehaviour
 {
-  private void Start()
+  private void Awake()
   {
-    if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
+    if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) // verify if the server is headless
     {
       NetworkManager nm = FindObjectOfType<NetworkManager>();
       if (nm)
       {
-        Tugboat transport = nm.GetComponent<Tugboat>();
+        Tugboat transport = nm.GetComponent<Tugboat>(); 
 
-        // Ensure transport is enabled
-        if (transport != null)
-        {
-          int serverPort = GetServerPort();
+        int serverPort = GetServerPort();
 
-          Debug.Log($"[SERVER] Starting Tugboat on port {serverPort}...");
+        transport.SetPort((ushort)serverPort); 
 
-          nm.ServerManager.StartConnection();
-        }
+        nm.ServerManager.StartConnection(); // start the server connection
       }
     }
   }
 
+  //get the server port from the environment variable
   private int GetServerPort()
   {
     string port = Environment.GetEnvironmentVariable("GAME_SERVER_PORT");
-    return int.TryParse(port, out int result) ? result : 7777; // Default port
+    return int.TryParse(port, out int result) ? result : 7770; // Default port
   }
 }
