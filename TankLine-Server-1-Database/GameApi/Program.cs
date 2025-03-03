@@ -74,6 +74,18 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Middleware to extract the token from the cookie and add it to the Authorization header
+app.Use(async (context, next) =>
+{
+    var token = context.Request.Cookies["AuthToken"];
+    if (!string.IsNullOrEmpty(token))
+    {
+        // Add the token to the Authorization header as a Bearer token
+        context.Request.Headers["Authorization"] = $"Bearer {token}";
+    }
+    await next();
+});
+
 // Force HTTPS redirection if not already done by Kestrel
 app.UseHttpsRedirection();
 

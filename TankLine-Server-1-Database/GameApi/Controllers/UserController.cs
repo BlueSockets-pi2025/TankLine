@@ -33,7 +33,7 @@ namespace GameApi.Controllers
                 return StatusCode(500, $"ERROR : FAILED CONNECTION {ex.Message}\n");
             }
         }
-    
+        [Authorize]
         [HttpGet("{username}")]
         public async Task<IActionResult> GetUser(string username)
         {
@@ -47,6 +47,15 @@ namespace GameApi.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
         {
+            Console.WriteLine("GET CURRENT USER..................."); // Debug
+
+            var token = Request.Cookies["AuthToken"]; // Debug 
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("Token is missing in the cookies.");
+            }
+            Console.WriteLine(token);
+            
             var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
             foreach (var claim in allClaims)
             {
