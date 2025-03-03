@@ -35,7 +35,7 @@ public class BreakableObject : MonoBehaviour
         UpdateVisualState(health, health, true); // Apply the correct texture at the start
     }
 
-    private void OnCollisionEnter(Collision other) //need a rigibody on the TankShell and no trigger
+    /* private void OnCollisionEnter(Collision other) //need a rigibody on the TankShell and no trigger
     {
         // Check if the object was hit by a projectile
         if (other.collider.CompareTag("TankShell"))
@@ -46,11 +46,11 @@ public class BreakableObject : MonoBehaviour
             TakeDamage();
             // }
         }
-    }
+    } */
 
     // à mettre quand ajout de FishNet/multi
     // [Server] // Ensures only the server modifies health
-    void TakeDamage()
+    public void TakeDamage()
     {
         if (health > 0)
         {
