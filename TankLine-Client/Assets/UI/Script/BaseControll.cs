@@ -6,11 +6,12 @@ using System.Text.RegularExpressions;
 
 public class BaseControll : MonoBehaviour
 {
-    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score;
+    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame;
     public TMP_InputField LogEmail,LogPW,ForMail,Month,Year,Day,Fname,Lname,Nname,Email,Mdp,Cmdp,code;
     public TMP_Text ErrText;
     public void OpenPagePrincipal()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -26,6 +27,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenReset_Your_Password()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -41,6 +43,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et1()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -56,6 +59,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et2()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -71,6 +75,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et3()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -86,6 +91,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenMenu()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -101,6 +107,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPlay()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -116,6 +123,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenCreateRoom()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -131,6 +139,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenJoinRoom()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(false);
@@ -146,6 +155,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenCredits()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
         credits.SetActive(true);
@@ -161,6 +171,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenOption()
     {
+        InGame.SetActive(false);
         option.SetActive(true);
         score.SetActive(false);
         credits.SetActive(false);
@@ -176,8 +187,25 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenScore()
     {
+        InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(true);
+        credits.SetActive(false);
+        JoinRoom.SetActive(false);
+        CreateRoom.SetActive(false);
+        Menu.SetActive(false);
+        Play.SetActive(false);
+        PagePrincipal.SetActive(false);
+        Reset_Your_Password.SetActive(false);
+        Page_sign_up_et1.SetActive(false);
+        Page_sign_up_et2.SetActive(false);
+        Page_sign_up_et3.SetActive(false);
+    }
+    public void OpenInGame()
+    {
+        InGame.SetActive(true);
+        option.SetActive(false);
+        score.SetActive(false);
         credits.SetActive(false);
         JoinRoom.SetActive(false);
         CreateRoom.SetActive(false);
