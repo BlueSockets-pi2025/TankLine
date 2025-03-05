@@ -5,20 +5,27 @@ using UnityEngine;
 public class Bullet : MonoBehaviour {
 
     /// <summary> Number of rebound left to make </summary>
+    [Range(0,100)]
     public int nbRebounds = 1;
+
+    [HideInInspector]
     /// <summary> This bullet direction </summary>
     public Vector3 direction;
+
     /// <summary> This bullet speed movement (READONLY) </summary>
+    [Range(1,10)]
     public float bulletSpeed = 6;
+
     /// <summary> The tank that shot this bullet </summary>
+    [HideInInspector]
     public GameObject tankOwner = null;
 
 
-    public const string BREAKABLE_TAG = "BreakableWall";
+    const string BREAKABLE_TAG = "BreakableWall";
 
-    public const int WALL_LAYER = 3;
-    public const int SHELL_LAYER = 9;
-    public const int PLAYER_LAYER = 10;
+    const int WALL_LAYER = 3;
+    const int SHELL_LAYER = 9;
+    const int PLAYER_LAYER = 10;
 
 
     /// <summary> This bullet GameObject </summary>
