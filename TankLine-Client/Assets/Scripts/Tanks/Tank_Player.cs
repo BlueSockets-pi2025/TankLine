@@ -4,14 +4,20 @@ using UnityEngine;
 public class Tank_Player : Tank
 {
     /// <summary> The bullet prefab </summary>
+    [HideInInspector]
     public GameObject bulletPrefab;
+
+
     /// <summary> The number of bullet already shot </summary>
+    [HideInInspector]
     public int nbBulletShot = 0;
+
     /// <summary> The maximum number of bullet shot at the same time and still on the map </summary>
+    [Range(1,50)]
     public int MaxBulletShot = 5;
 
-    public const int LEFT_CLICK = 0;
-    public const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI/2;
+    const int LEFT_CLICK = 0;
+    const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI/2;
 
     protected float movementToMake = 0;
 

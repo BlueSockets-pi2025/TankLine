@@ -6,10 +6,15 @@ public class Tank : MonoBehaviour
 {
 
     /// <summary>This object movement speed (base speed : 3.0)</summary>
+    [Range(1f,10f)]
     public float movementSpeed = 3.0f;
+
     /// <summary>This object rotation speed (base speed : pi/48)</summary>
+    [Range(math.PI/128, math.PI/16)]
     public float rotationSpeed = math.PI / 48;
+
     /// <summary>The number of life left for this tank</summary>
+    [Range(1,10)]
     public float nbLifeLeft = 3;
 
     protected Transform thisTank;
