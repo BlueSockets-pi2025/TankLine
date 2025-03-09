@@ -6,11 +6,12 @@ using System.Text.RegularExpressions;
 
 public class BaseControll : MonoBehaviour
 {
-    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame;
+    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame,WaintingRoom,ColorChangingPannel;
     public TMP_InputField LogEmail,LogPW,ForMail,Month,Year,Day,Fname,Lname,Nname,Email,Mdp,Cmdp,code;
     public TMP_Text ErrText;
     public void OpenPagePrincipal()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -27,6 +28,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenReset_Your_Password()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -43,6 +45,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et1()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -59,6 +62,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et2()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -75,6 +79,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et3()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -91,6 +96,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenMenu()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -107,6 +113,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPlay()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -123,6 +130,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenCreateRoom()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -139,6 +147,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenJoinRoom()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -155,6 +164,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenCredits()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(false);
@@ -171,6 +181,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenOption()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(true);
         score.SetActive(false);
@@ -187,6 +198,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenScore()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
         score.SetActive(true);
@@ -203,6 +215,7 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenInGame()
     {
+        WaintingRoom.SetActive(false);
         InGame.SetActive(true);
         option.SetActive(false);
         score.SetActive(false);
@@ -216,6 +229,31 @@ public class BaseControll : MonoBehaviour
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
+    }
+    public void OpenWaitingRoom()
+    {
+        WaintingRoom.SetActive(true);
+        InGame.SetActive(false);
+        option.SetActive(false);
+        score.SetActive(false);
+        credits.SetActive(false);
+        JoinRoom.SetActive(false);
+        CreateRoom.SetActive(false);
+        Menu.SetActive(false);
+        Play.SetActive(false);
+        PagePrincipal.SetActive(false);
+        Reset_Your_Password.SetActive(false);
+        Page_sign_up_et1.SetActive(false);
+        Page_sign_up_et2.SetActive(false);
+        Page_sign_up_et3.SetActive(false);
+    }
+    public void OpenColorChanger()
+    {
+        ColorChangingPannel.SetActive(true);
+    }
+    public void CloseColorChanger()
+    {
+        ColorChangingPannel.SetActive(false);
     }
     public void OpenRoomNumber()
     {
