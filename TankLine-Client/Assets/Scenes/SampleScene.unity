@@ -1401,6 +1401,7 @@ GameObject:
   - component: {fileID: 785498442}
   - component: {fileID: 785498441}
   - component: {fileID: 785498440}
+  - component: {fileID: 785498444}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -1482,6 +1483,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &785498444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785498439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d84bff60744b182d8ae2c19e7776ed6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &798279392
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1688,7 +1701,7 @@ Transform:
   m_GameObject: {fileID: 888543003}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
