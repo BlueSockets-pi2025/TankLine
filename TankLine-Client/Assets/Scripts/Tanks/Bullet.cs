@@ -1,8 +1,9 @@
+using FishNet.Object;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour {
+public class Bullet : NetworkBehaviour {
 
     /// <summary> Number of rebound left to make </summary>
     [Range(0,100)]
@@ -42,9 +43,10 @@ public class Bullet : MonoBehaviour {
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
     void FixedUpdate() {
-        direction.Normalize();
-        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
-        meshTransform.rotation = Quaternion.Euler(0,(math.atan2(-direction.z, direction.x) + math.PI/2) * Mathf.Rad2Deg, 9.648f);
+        if (base.IsController) {
+            thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
+            meshTransform.rotation = Quaternion.Euler(0,(math.atan2(-direction.z, direction.x) + math.PI/2) * Mathf.Rad2Deg, 9.648f);
+        }
     }
 
     /// <summary>
@@ -52,6 +54,7 @@ public class Bullet : MonoBehaviour {
     /// </summary>
 
     void OnCollisionEnter(Collision collision) {
+        if (!base.IsController) return;
 
         /* 
             ############################## WALL COLLISIONS ############################## 

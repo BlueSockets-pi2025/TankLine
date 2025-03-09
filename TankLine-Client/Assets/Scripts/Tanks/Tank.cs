@@ -1,9 +1,9 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using FishNet.Object;
 
-public class Tank : MonoBehaviour
-{
+public class Tank : NetworkBehaviour {
 
     /// <summary>This object movement speed (base speed : 3.0)</summary>
     [Range(1f,10f)]

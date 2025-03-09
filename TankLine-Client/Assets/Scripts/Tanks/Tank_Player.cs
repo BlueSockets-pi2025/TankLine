@@ -1,3 +1,4 @@
+using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -35,6 +36,8 @@ public class Tank_Player : Tank
     /// Automatically called by unity every frame after the physic engine
     /// </summary>
     protected void Update() {
+        if (!base.IsOwner) return;
+
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
@@ -53,6 +56,8 @@ public class Tank_Player : Tank
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
     protected override void FixedUpdate() {
+        if (!base.IsOwner) return;
+
         // process rotation input
         float y = Input.GetAxis("Vertical");
         float x = Input.GetAxis("Horizontal");
@@ -272,12 +277,22 @@ public class Tank_Player : Tank
         }
     }
 
+    // only call this function as server
+    [ServerRpc(RequireOwnership = true)]
     protected void Shoot() {
         if (nbBulletShot < MaxBulletShot) {
+            // compute new bullet position
             Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
-            Vector3 dir = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
 
+            // compute new bullet direction
+            float rotation = thisGun.rotation.eulerAngles.y * Mathf.Deg2Rad;
+            Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
+
+            // spawn object
             GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.8f*dir, Quaternion.identity);
+            Spawn(newBulletObject);
+
+            // change direction and tankOwner (for bullet count)
             Bullet newBullet = newBulletObject.GetComponent<Bullet>();
             newBullet.direction = dir;
             newBullet.tankOwner = gameObject;
