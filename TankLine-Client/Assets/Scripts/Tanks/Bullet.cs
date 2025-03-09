@@ -37,16 +37,14 @@ public class Bullet : NetworkBehaviour {
     void Start() {
         thisBullet = gameObject;
         meshTransform = thisBullet.transform.Find("shell");
+        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.z, direction.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
     void FixedUpdate() {
-        if (base.IsController) {
-            thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
-            meshTransform.rotation = Quaternion.Euler(0,(math.atan2(-direction.z, direction.x) + math.PI/2) * Mathf.Rad2Deg, 9.648f);
-        }
+        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
     }
 
     /// <summary>
@@ -66,7 +64,8 @@ public class Bullet : NetworkBehaviour {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
                 wall.TakeDamage();
-                Destroy(gameObject);
+                if (base.IsServerInitialized)
+                    Despawn(thisBullet);
             } 
             
             // if static wall
@@ -74,7 +73,8 @@ public class Bullet : NetworkBehaviour {
 
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0) {
-                    Destroy(thisBullet);
+                    if (base.IsServerInitialized)
+                        Despawn(thisBullet);
                     return;
                 }
 
@@ -110,7 +110,8 @@ public class Bullet : NetworkBehaviour {
                 hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
             }
 
-            Destroy(thisBullet); // this bullet is destroy
+            if (base.IsServerInitialized)
+                Despawn(thisBullet);
 
             return;
         }
@@ -119,11 +120,15 @@ public class Bullet : NetworkBehaviour {
             ############################## SHELL COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == SHELL_LAYER) {
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
+            if (base.IsServerInitialized) {
+                Despawn(collision.gameObject);
+                Despawn(thisBullet);
+            }
             return;
         }
 
+        // update the bullet rotation
+        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.z, direction.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 
     /// <summary>

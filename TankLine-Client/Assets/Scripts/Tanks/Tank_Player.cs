@@ -267,7 +267,7 @@ public class Tank_Player : Tank
     protected bool CanShoot() {
         Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
         Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
-        Debug.DrawRay(origin, direction * 1.3f, Color.red, 1); // DEBUG ONLY
+        Debug.DrawRay(origin-direction*0.5f, direction * 1.8f, Color.red, 1); // DEBUG ONLY
 
         // use a raycast to prevent self-shooting if a wall is too close
         if (Physics.Raycast(origin, direction, 1.3f)) {
@@ -289,7 +289,7 @@ public class Tank_Player : Tank
             Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
 
             // spawn object
-            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.8f*dir, Quaternion.identity);
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f*dir, Quaternion.identity);
             Spawn(newBulletObject);
 
             // change direction and tankOwner (for bullet count)

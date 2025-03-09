@@ -123,7 +123,8 @@ public class Tank : NetworkBehaviour {
 
         // if no life left, destroy
         if (nbLifeLeft <= 0) {
-            Destroy(gameObject);
+            if (base.IsServerInitialized)
+                Despawn(gameObject);
             return;
         }
     }
@@ -139,7 +140,8 @@ public class Tank : NetworkBehaviour {
 
         // if no life left, destroy
         if (nbLifeLeft <= 0) {
-            Destroy(gameObject);
+            if (base.IsServerInitialized)
+                Despawn(gameObject);
             return;
         }
     }
