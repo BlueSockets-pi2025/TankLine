@@ -25,9 +25,16 @@ public class UserAccount
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
-
     // Add IsVerified property
     [Required]
     [Column("is_verified")]
     public bool IsVerified { get; set; } = false;  // Default value set to false
+
+    // Add PasswordResetToken property
+    [Column("password_reset_token")]
+    public string? PasswordResetToken { get; set; }  // Optional field for password reset
+
+    // Add PasswordResetExpiration property
+    [Column("password_reset_expiration")]
+    public DateTime? PasswordResetExpiration { get; set; }
 }

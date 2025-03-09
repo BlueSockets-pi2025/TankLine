@@ -139,54 +139,54 @@ public class ConnectionRegistrationController : Controller
         return Ok("New verification code sent to your email.");
     }
 
-private void SendVerificationEmail(string email, string code)
-{
-    var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+    private void SendVerificationEmail(string email, string code)
     {
-        Port = int.TryParse(_configuration["EmailSettings:Port"], out var port) ? port : 587,
-        Credentials = new NetworkCredential(
-            _configuration["EmailSettings:Username"] ?? string.Empty,
-            _configuration["EmailSettings:Password"] ?? string.Empty),
-        EnableSsl = true
-    };
+        var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+        {
+            Port = int.TryParse(_configuration["EmailSettings:Port"], out var port) ? port : 587,
+            Credentials = new NetworkCredential(
+                _configuration["EmailSettings:Username"] ?? string.Empty,
+                _configuration["EmailSettings:Password"] ?? string.Empty),
+            EnableSsl = true
+        };
 
-    string htmlContent = $@"
-    <html>
-        <body style='font-family: Arial, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px;'>
-            <div style='text-align: center; padding: 20px;'>
-                <h1 style='color: #007bff; font-size: 32px; font-weight: 600;'>Welcome to TankLine</h1>
-                <p style='font-size: 18px; color: #555;'>You requested a login code to access TankLine, your epic multiplayer game.</p>
-                <p style='font-size: 22px; font-weight: bold; color: #007bff;'>Your login code is:</p>
-                <h2 style='color: #007bff; font-size: 48px; font-weight: bold;'>{code}</h2>
-                <p style='font-size: 16px; color: #555;'>This code is valid for 5 minutes. Please use it quickly.</p>
-                <p style='font-size: 14px; color: #888;'>If you did not request this code, please ignore this email.</p>
-            </div>
-            <div style='text-align: center; margin-top: 40px; font-size: 14px; color: #888;'>
-                <p>The Blue Socket Team - Creators of TankLine</p>
-                <p>TankLine | <a href='https://www.bluesocket.com' style='color: #007bff;'>bluesocket.com</a></p>
-            </div>
-        </body>
-    </html>";
+        string htmlContent = $@"
+        <html>
+            <body style='font-family: Arial, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px;'>
+                <div style='text-align: center; padding: 20px;'>
+                    <h1 style='color: #007bff; font-size: 32px; font-weight: 600;'>Welcome to TankLine</h1>
+                    <p style='font-size: 18px; color: #555;'>You requested a login code to access TankLine, your epic multiplayer game.</p>
+                    <p style='font-size: 22px; font-weight: bold; color: #007bff;'>Your login code is:</p>
+                    <h2 style='color: #007bff; font-size: 48px; font-weight: bold;'>{code}</h2>
+                    <p style='font-size: 16px; color: #555;'>This code is valid for 5 minutes. Please use it quickly.</p>
+                    <p style='font-size: 14px; color: #888;'>If you did not request this code, please ignore this email.</p>
+                </div>
+                <div style='text-align: center; margin-top: 40px; font-size: 14px; color: #888;'>
+                    <p>The Blue Socket Team - Creators of TankLine</p>
+                    <p>TankLine | <a href='https://www.bluesocket.com' style='color: #007bff;'>bluesocket.com</a></p>
+                </div>
+            </body>
+        </html>";
 
-    var mailMessage = new MailMessage
-    {
-        From = new MailAddress(_configuration["EmailSettings:FromEmail"] ?? "default@example.com"),
-        Subject = "Your Login Code for TankLine",
-        Body = htmlContent,
-        IsBodyHtml = true
-    };
-    mailMessage.To.Add(email);
+        var mailMessage = new MailMessage
+        {
+            From = new MailAddress(_configuration["EmailSettings:FromEmail"] ?? "default@example.com"),
+            Subject = "Your Login Code for TankLine",
+            Body = htmlContent,
+            IsBodyHtml = true
+        };
+        mailMessage.To.Add(email);
 
-    try
-    {
-        smtpClient.Send(mailMessage);
-        Console.WriteLine($"Email sent to {email}");
+        try
+        {
+            smtpClient.Send(mailMessage);
+            Console.WriteLine($"Email sent to {email}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending email: {ex.Message}");
+        }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error sending email: {ex.Message}");
-    }
-}
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest loginRequest)
@@ -257,108 +257,106 @@ private void SendVerificationEmail(string email, string code)
 
 
     [HttpPost("request-password-reset")]
-public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
-{
-    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-    if (user == null)
+    public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
     {
-        return BadRequest("User not found.");
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        string resetToken = Guid.NewGuid().ToString();
+        var expirationTime = DateTime.UtcNow.AddHours(1); // Token expires in 1 hour
+
+        // Store the token and expiration in memory or database
+        verificationCodes[user.Email] = (resetToken, expirationTime);
+
+        // Send password reset email with the token
+        SendPasswordResetEmail(user.Email, resetToken);
+
+        return Ok("Password reset link has been sent to your email.");
     }
 
-    string resetToken = Guid.NewGuid().ToString();
-    var expirationTime = DateTime.UtcNow.AddHours(1); // Token expires in 1 hour
-
-    // Store the token and expiration in memory or database
-    verificationCodes[user.Email] = (resetToken, expirationTime);
-
-    // Send password reset email with the token
-    SendPasswordResetEmail(user.Email, resetToken);
-
-    return Ok("Password reset link has been sent to your email.");
-}
-
-private void SendPasswordResetEmail(string email, string resetToken)
-{
-    var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+    private void SendPasswordResetEmail(string email, string resetToken)
     {
-        Port = int.TryParse(_configuration["EmailSettings:Port"], out var port) ? port : 587,
-        Credentials = new NetworkCredential(
-            _configuration["EmailSettings:Username"] ?? string.Empty,
-            _configuration["EmailSettings:Password"] ?? string.Empty),
-        EnableSsl = true
-    };
+        var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+        {
+            Port = int.TryParse(_configuration["EmailSettings:Port"], out var port) ? port : 587,
+            Credentials = new NetworkCredential(
+                _configuration["EmailSettings:Username"] ?? string.Empty,
+                _configuration["EmailSettings:Password"] ?? string.Empty),
+            EnableSsl = true
+        };
 
-    string resetLink = $"{_configuration["AppSettings:BaseUrl"]}/reset-password?token={resetToken}";
-    
-    string htmlContent = $@"
-    <html>
-        <body style='font-family: Arial, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px;'>
-            <div style='text-align: center; padding: 20px;'>
-                <h1 style='color: #007bff; font-size: 32px; font-weight: 600;'>Password Reset Request</h1>
-                <p style='font-size: 18px; color: #555;'>You requested a password reset for your account on TankLine.</p>
-                <p style='font-size: 16px; color: #555;'>Click the link below to reset your password:</p>
-                <a href='{resetLink}' style='font-size: 18px; font-weight: bold; color: #007bff;'>Reset Password</a>
-                <p style='font-size: 14px; color: #888;'>This link will expire in 1 hour.</p>
-            </div>
-            <div style='text-align: center; margin-top: 40px; font-size: 14px; color: #888;'>
-                <p>The Blue Socket Team - Creators of TankLine</p>
-                <p>TankLine | <a href='https://www.bluesocket.com' style='color: #007bff;'>bluesocket.com</a></p>
-            </div>
-        </body>
-    </html>";
+        string resetLink = $"{_configuration["AppSettings:BaseUrl"]}/reset-password?token={resetToken}";
+        
+        string htmlContent = $@"
+        <html>
+            <body style='font-family: Arial, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px;'>
+                <div style='text-align: center; padding: 20px;'>
+                    <h1 style='color: #007bff; font-size: 32px; font-weight: 600;'>Password Reset Request</h1>
+                    <p style='font-size: 18px; color: #555;'>You requested a password reset for your account on TankLine.</p>
+                    <p style='font-size: 16px; color: #555;'>Click the link below to reset your password:</p>
+                    <a href='{resetLink}' style='font-size: 18px; font-weight: bold; color: #007bff;'>Reset Password</a>
+                    <p style='font-size: 14px; color: #888;'>This link will expire in 1 hour.</p>
+                </div>
+                <div style='text-align: center; margin-top: 40px; font-size: 14px; color: #888;'>
+                    <p>The Blue Socket Team - Creators of TankLine</p>
+                    <p>TankLine | <a href='https://www.bluesocket.com' style='color: #007bff;'>bluesocket.com</a></p>
+                </div>
+            </body>
+        </html>";
 
-    var mailMessage = new MailMessage
-    {
-        From = new MailAddress(_configuration["EmailSettings:FromEmail"] ?? "default@example.com"),
-        Subject = "Password Reset Request for TankLine",
-        Body = htmlContent,
-        IsBodyHtml = true
-    };
-    mailMessage.To.Add(email);
+        var mailMessage = new MailMessage
+        {
+            From = new MailAddress(_configuration["EmailSettings:FromEmail"] ?? "default@example.com"),
+            Subject = "Password Reset Request for TankLine",
+            Body = htmlContent,
+            IsBodyHtml = true
+        };
+        mailMessage.To.Add(email);
 
-    try
-    {
-        smtpClient.Send(mailMessage);
-        Console.WriteLine($"Password reset email sent to {email}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error sending email: {ex.Message}");
-    }
-}
-
-
-[HttpPost("reset-password")]
-public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-{
-    if (!verificationCodes.ContainsKey(request.Email) || verificationCodes[request.Email].Expiration < DateTime.UtcNow)
-    {
-        return BadRequest("Invalid or expired reset token.");
+        try
+        {
+            smtpClient.Send(mailMessage);
+            Console.WriteLine($"Password reset email sent to {email}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending email: {ex.Message}");
+        }
     }
 
-    if (verificationCodes[request.Email].Code != request.Token)
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        return BadRequest("Invalid reset token.");
+        if (!verificationCodes.ContainsKey(request.Email) || verificationCodes[request.Email].Expiration < DateTime.UtcNow)
+        {
+            return BadRequest("Invalid or expired reset token.");
+        }
+
+        if (verificationCodes[request.Email].Code != request.Token)
+        {
+            return BadRequest("Invalid reset token.");
+        }
+
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        // Hash the new password and update it
+        user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
+
+        _context.UserAccounts.Update(user);
+        await _context.SaveChangesAsync();
+
+        // Remove the token after it's used
+        verificationCodes.Remove(request.Email);
+
+        return Ok("Password reset successfully.");
     }
-
-    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-    if (user == null)
-    {
-        return BadRequest("User not found.");
-    }
-
-    // Hash the new password and update it
-    user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
-
-    _context.UserAccounts.Update(user);
-    await _context.SaveChangesAsync();
-
-    // Remove the token after it's used
-    verificationCodes.Remove(request.Email);
-
-    return Ok("Password reset successfully.");
-}
-
 
 }
 

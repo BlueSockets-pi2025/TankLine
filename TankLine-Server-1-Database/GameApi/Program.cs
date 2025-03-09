@@ -2,8 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using GameApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
 using System.Text;
 using System.Security.Claims;
+using System.Net;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +38,8 @@ builder.WebHost.ConfigureKestrel(options =>
 // Add the services required for the application
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDirectoryBrowser(); // To authorize the file browser
 
 // Configuring the connection to the PostgreSQL database
 builder.Services.AddDbContext<GameDbContext>(options =>
@@ -86,6 +91,9 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// Serve static files (such as index.html)
+app.UseStaticFiles(); // This allows serving static files from the wwwroot folder
+
 // Force HTTPS redirection if not already done by Kestrel
 app.UseHttpsRedirection();
 
@@ -101,6 +109,10 @@ app.UseAuthorization();
 
 // Mapping controllers
 app.MapControllers();
+
+// Default route to serve the index.html when accessing the /reset-password URL
+app.MapFallbackToFile("wwwroot/reset-password/{**path}", "wwwroot/reset-password/index.html");  // Serve index.html on /reset-password
+// ({**path} captures all additional paths after /reset-password, and redirects to the index.html file located in wwwroot/reset-password)
 
 // Launch the application
 app.Run();
