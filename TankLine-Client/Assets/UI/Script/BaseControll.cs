@@ -6,11 +6,35 @@ using System.Text.RegularExpressions;
 
 public class BaseControll : MonoBehaviour
 {
-    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame,WaintingRoom,ColorChangingPannel;
+    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame,WaintingRoom,ColorChangingPannel,lose,win;
     public TMP_InputField LogEmail,LogPW,ForMail,Month,Year,Day,Fname,Lname,Nname,Email,Mdp,Cmdp,code;
     public TMP_Text ErrText;
+    private void Start()
+{
+    AutoLogin();
+}
+
+private void AutoLogin()
+{
+    string savedEmail = PlayerPrefs.GetString("LoggedInEmail", "");
+    string savedPassword = PlayerPrefs.GetString("LoggedInPassword", "");
+
+    if (!string.IsNullOrEmpty(savedEmail) && !string.IsNullOrEmpty(savedPassword))
+    {
+        UserDatabase userDB = UserDatabase.LoadUsers();
+        if (userDB.ValidateUser(savedEmail, savedPassword))
+        {
+            OpenMenu(); 
+            return;
+        }
+    }
+    LogEmail.text = savedEmail;
+}
+
     public void OpenPagePrincipal()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -25,9 +49,12 @@ public class BaseControll : MonoBehaviour
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
+        LogoutUser();
     }
     public void OpenReset_Your_Password()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -45,6 +72,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et1()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -62,6 +91,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et2()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -79,6 +110,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPage_sign_up_et3()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -96,6 +129,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenMenu()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -113,6 +148,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenPlay()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -130,6 +167,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenCreateRoom()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -147,6 +186,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenJoinRoom()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -164,6 +205,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenCredits()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -181,6 +224,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenOption()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(true);
@@ -198,6 +243,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenScore()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -215,6 +262,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenInGame()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(false);
         InGame.SetActive(true);
         option.SetActive(false);
@@ -232,6 +281,8 @@ public class BaseControll : MonoBehaviour
     }
     public void OpenWaitingRoom()
     {
+        win.SetActive(false);
+        lose.SetActive(false);
         WaintingRoom.SetActive(true);
         InGame.SetActive(false);
         option.SetActive(false);
@@ -271,6 +322,12 @@ public class BaseControll : MonoBehaviour
     public void CloseErr(){
         Err.SetActive(false);
     }
+    public void LogoutUser()
+{
+    PlayerPrefs.DeleteKey("LoggedInEmail");
+    PlayerPrefs.DeleteKey("LoggedInPassword");
+    PlayerPrefs.Save();
+}
 
     public void LoginUser()
 {
@@ -285,6 +342,7 @@ public class BaseControll : MonoBehaviour
         OpenErr("Invalid email format.");
         return;
     }
+
     UserDatabase userDB = UserDatabase.LoadUsers();
     if (!userDB.ValidateUser(LogEmail.text, LogPW.text))
     {
@@ -292,8 +350,14 @@ public class BaseControll : MonoBehaviour
         return;
     }
 
+    // Save login data locally
+    PlayerPrefs.SetString("LoggedInEmail", LogEmail.text);
+    PlayerPrefs.SetString("LoggedInPassword", LogPW.text);
+    PlayerPrefs.Save();
+
     OpenMenu();
 }
+
 
 
     public void ResetPassword()

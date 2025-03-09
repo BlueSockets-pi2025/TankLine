@@ -258,7 +258,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1464720207}
           m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: CloseErr
+          m_MethodName: OpenWaitingRoom
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1050,7 +1050,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1464720207}
           m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: CloseErr
+          m_MethodName: OpenWaitingRoom
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1152,7 +1152,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1464720207}
           m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: CloseErr
+          m_MethodName: OpenMenu
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -5210,7 +5210,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1464720207}
           m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: CloseErr
+          m_MethodName: OpenMenu
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -10812,8 +10812,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ccf3a692c410964fab7880fb3b1c649, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Lose: {fileID: 230713843}
+  Win: {fileID: 693591555}
   timerText: {fileID: 1690977304}
-  remTime: 3
+  remTime: 11
   xPanel: {fileID: 1828692499}
 --- !u!4 &806702984
 Transform:
@@ -12429,14 +12431,14 @@ RectTransform:
   m_GameObject: {fileID: 934547854}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 8.74654, y: 7.1697135, z: 8.74654}
+  m_LocalScale: {x: 7.1865406, y: 5.017208, z: 6.5816836}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 451879746}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 74}
+  m_AnchoredPosition: {x: 0, y: 80}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &934547856
@@ -12459,7 +12461,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: b00089fb36ac2ea4690bbe260320fc30, type: 3}
+  m_Texture: {fileID: 2800000, guid: 1cc953f7e767c484f91611d9539ce50c, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -16600,8 +16602,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4293848831
+  m_fontColor: {r: 1, g: 0.9339622, b: 0.9339622, a: 1}
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
@@ -19747,6 +19749,8 @@ MonoBehaviour:
   InGame: {fileID: 1828692499}
   WaintingRoom: {fileID: 1901238575}
   ColorChangingPannel: {fileID: 436897683}
+  lose: {fileID: 230713843}
+  win: {fileID: 693591555}
   LogEmail: {fileID: 28790751}
   LogPW: {fileID: 1842367838}
   ForMail: {fileID: 522306041}

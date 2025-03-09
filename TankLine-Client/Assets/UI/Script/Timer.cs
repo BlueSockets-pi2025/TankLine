@@ -5,10 +5,19 @@ using TMPro;
 
 public class Timer : MonoBehaviour
 {
+     public GameObject Lose,Win;
     [SerializeField] TextMeshProUGUI timerText;
     [SerializeField] float remTime;
     [SerializeField] GameObject xPanel; 
 
+    public void OpenWin()
+    {
+        Win.SetActive(true);
+    }
+    public void OpenLose()
+    {
+        Lose.SetActive(true);
+    }
     void Start()
     {
         timerText.text = "00:00";
@@ -32,6 +41,7 @@ public class Timer : MonoBehaviour
             if (remTime < 0)
             {
                 remTime=0;
+                OpenLose();
                 timerText.color = Color.red;
             }
 
@@ -45,7 +55,7 @@ public class Timer : MonoBehaviour
             {
                 int sec = Mathf.FloorToInt(remTime);
                 int ms = Mathf.FloorToInt((remTime - sec) * 100);
-                timerText.text = string.Format("{0:0},{1:00}", sec, ms);
+                timerText.text = string.Format("{0:0}:{1:00}", sec, ms);
             }
         }
     }
