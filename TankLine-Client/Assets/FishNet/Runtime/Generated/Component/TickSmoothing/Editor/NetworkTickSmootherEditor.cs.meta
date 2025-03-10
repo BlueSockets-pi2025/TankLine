@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6d15505f1b1879942bbf4d399a5267b1
+guid: f51697e093480ab429a4a2f47f545f92
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.5.8R
-  assetPath: Assets/FishNet/Runtime/Object/Prediction/TransformTickSmoother.cs
-  uploadId: 726025
+  packageVersion: 4.6.1R
+  assetPath: Assets/FishNet/Runtime/Generated/Component/TickSmoothing/Editor/NetworkTickSmootherEditor.cs
+  uploadId: 735762

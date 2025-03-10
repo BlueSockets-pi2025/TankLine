@@ -22,6 +22,10 @@ namespace FishNet.Editing
 
         internal static void CheckRemindToReview()
         {
+            //Do not show if virtual player.
+            if (Application.dataPath.ToLower().Contains("library/vp/"))
+                return;
+
             bool reminderEnabled = EditorPrefs.GetBool(IS_ENABLED, true);
             if (!reminderEnabled)
                 return;
@@ -30,11 +34,11 @@ namespace FishNet.Editing
              * to be passed before reminding. */
             int checkRemindCount = (EditorPrefs.GetInt(CHECK_REMIND_COUNT, 0) + 1);
             EditorPrefs.SetInt(CHECK_REMIND_COUNT, checkRemindCount);
-
+            
             //Not enough checks.
             if (checkRemindCount < 2)
                 return;
-
+            
             string dtStr = EditorPrefs.GetString(DATETIME_REMINDED, string.Empty);
             //Somehow got cleared. Reset.
             if (string.IsNullOrWhiteSpace(dtStr))
@@ -51,12 +55,14 @@ namespace FishNet.Editing
             }
             //Not enough time passed.
             DateTime dt = DateTime.FromBinary(binary);
+            
             if ((DateTime.Now - dt).TotalDays < 10)
                 return;
 
             //If here then the reminder can be shown.
             EditorPrefs.SetInt(CHECK_REMIND_COUNT, 0);
-
+            ResetDateTimeReminded();
+            
             ShowReminder();
         }
 
@@ -70,7 +76,7 @@ namespace FishNet.Editing
             InitializeWindow();
         }
       
-        static void InitializeWindow()
+        private static void InitializeWindow()
         {
             if (_window != null)
                 return;
@@ -86,7 +92,7 @@ namespace FishNet.Editing
             _window.position = pos;
         }
 
-        static void StyleWindow()
+        private static void StyleWindow()
         {
             InitializeWindow();
             _window._fishnetLogo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/FishNet/Runtime/Editor/Textures/UI/Logo_With_Text.png", typeof(Texture));
@@ -112,7 +118,7 @@ namespace FishNet.Editing
 
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             float thisWidth = this.position.width;
             StyleWindow();

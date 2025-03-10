@@ -1,5 +1,7 @@
 fileFormatVersion: 2
-guid: ca4b4419a238d814f87d326456649f99
+guid: dc822ae23a249704184fa571f551f9c8
+timeCreated: 1527268448
+licenseType: Store
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -13,6 +15,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.5.8R
-  assetPath: Assets/FishNet/Runtime/Serializing/Helping/QuaternionVariable.cs
-  uploadId: 726025
+  packageVersion: 4.6.1R
+  assetPath: Assets/FishNet/Runtime/Plugins/GameKit/Dependencies/Utilities/EditorTools.cs
+  uploadId: 735762

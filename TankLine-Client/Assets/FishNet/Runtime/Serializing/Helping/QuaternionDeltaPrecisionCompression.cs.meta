@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5d265649320af034b9a4e966b0a341d4
+guid: 37e43ec9c17f2dc43ac255695bd1a71f
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.5.8R
-  assetPath: Assets/FishNet/Runtime/Utility/ChildTransformTickSmoother.cs
-  uploadId: 726025
+  packageVersion: 4.6.1R
+  assetPath: Assets/FishNet/Runtime/Serializing/Helping/QuaternionDeltaPrecisionCompression.cs
+  uploadId: 735762

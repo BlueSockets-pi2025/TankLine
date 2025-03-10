@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 44552cc1667ebef44bea82950b5f8e49
+guid: 859294e5d2aaf9a47b1e00bd20772f2b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.5.8R
-  assetPath: Assets/FishNet/Runtime/Generated/Component/NetworkTransform/NetworkTransform.Pro.cs
-  uploadId: 726025
+  packageVersion: 4.6.1R
+  assetPath: Assets/FishNet/Runtime/Generated/Component/Spawning/ServerSpawner.cs
+  uploadId: 735762

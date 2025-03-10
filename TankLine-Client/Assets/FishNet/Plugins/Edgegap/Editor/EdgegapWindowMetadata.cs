@@ -84,8 +84,8 @@ namespace Edgegap.Editor
         public const string EDGEGAP_DOC_ADV_MATCHMAKER_PATH = "docs/matchmaker/advanced";
         public const string SCALING_LIFECYCLE_INFO_URL = "learn/advanced-features/deployments";
 
-        private const string DEFAULT_UTM_SOURCE_TAG = "partner_fishnet_assetstore_unity";
-        //private const string DEFAULT_UTM_SOURCE_TAG = "partner_fishnet_source_unity";        
+        //private const string DEFAULT_UTM_SOURCE_TAG = "partner_fishnet_assetstore_unity";
+        private const string DEFAULT_UTM_SOURCE_TAG = "partner_fishnet_source_unity";        
 
         private const string DEFAULT_UTM_MEDIUM_TAG = "servers_quickstart_plugin";
         private const string DEFAULT_UTM_CONTENT_TAG = "plugin_button";

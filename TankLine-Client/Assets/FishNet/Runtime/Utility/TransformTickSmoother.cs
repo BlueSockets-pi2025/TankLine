@@ -1,18 +1,20 @@
-﻿using FishNet.Managing;
+﻿using System;
+using FishNet.Managing;
 using FishNet.Managing.Timing;
+using FishNet.Object;
+using FishNet.Object.Prediction;
 using FishNet.Utility.Extension;
 using GameKit.Dependencies.Utilities;
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Scripting;
 
-namespace FishNet.Object.Prediction
+namespace FishNet.Component.Transforming
 {
     /// <summary>
     /// This class is under regular development and it's API may change at any time.
     /// </summary>
-    public sealed class ChildTransformTickSmoother : IResettable
+    [Obsolete("This class will be removed in version 5.")]
+    public sealed class TransformTickSmoother : IResettable
     {
         #region Types.
         private enum InitializeType
@@ -54,6 +56,7 @@ namespace FishNet.Object.Prediction
                 Tick = tick;
                 Properties = tp;
             }
+
             public TickTransformProperties(uint tick, TransformProperties tp, Vector3 localScale)
             {
                 Tick = tick;
@@ -212,9 +215,9 @@ namespace FishNet.Object.Prediction
         #endregion
 
         [Preserve]
-        public ChildTransformTickSmoother() { }
+        public TransformTickSmoother() { }
 
-        ~ChildTransformTickSmoother()
+        ~TransformTickSmoother()
         {
             //This is a last resort for if something didnt deinitialize right.
             ResetState();
@@ -407,7 +410,7 @@ namespace FishNet.Object.Prediction
         /// Called when the TimeManager invokes OnPostReplay.
         /// </summary>
         /// <param name="clientTick">Replay tick for the local client.</param>
-        public void OnPostReplay(uint clientTick)
+        public void OnPostReplicateReplay(uint clientTick)
         {
             if (_networkObject.IsOwner || _adaptiveInterpolation == AdaptiveInterpolationType.Off)
                 return;
@@ -532,7 +535,7 @@ namespace FishNet.Object.Prediction
                 }
                 else
                 {
-                    _transformProperties[index] = new(tick,  GetNetworkObjectWorldPropertiesWithOffset(), _graphicalObject.localScale);
+                    _transformProperties[index] = new(tick, GetNetworkObjectWorldPropertiesWithOffset(), _graphicalObject.localScale);
                 }
             }
             else
@@ -555,11 +558,11 @@ namespace FishNet.Object.Prediction
         {
             if (_graphicalObject == null)
                 return false;
-            if (_networkObject != null && _networkObject.EnablePrediction && !_networkObject.EnableStateForwarding && !_networkObject.HasAuthority)
+            if (_networkObject != null && _networkObject.EnablePrediction && !_networkObject.EnableStateForwarding && !_networkObject.IsController)
                 return false;
             if (_networkObject.IsServerOnlyStarted)
                 return false;
-            
+
             return true;
         }
 

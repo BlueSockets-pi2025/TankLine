@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 078aba059ddaceb428fc2828a34d8ca7
+guid: e3df94f7449d53c4b8b5a167b51a93dd
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
-  packageVersion: 4.5.8R
-  assetPath: Assets/FishNet/Runtime/Object/Prediction/PredictionTickSmoother.cs
-  uploadId: 726025
+  packageVersion: 4.6.1R
+  assetPath: Assets/FishNet/Runtime/Serializing/Helping/QuaternionPrecisionCompression.cs
+  uploadId: 735762
