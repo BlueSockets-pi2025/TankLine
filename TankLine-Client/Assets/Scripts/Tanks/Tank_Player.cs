@@ -3,10 +3,22 @@ using UnityEngine;
 
 public class Tank_Player : Tank
 {
+    /// <summary> The bullet prefab </summary>
+    [HideInInspector]
+    public GameObject bulletPrefab;
 
-    public const int LEFT_CLICK = 0;
-    public const int LAYER_MAP_OBJECT = 3;
-    public const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI/2;
+
+    /// <summary> The number of bullet already shot </summary>
+    [HideInInspector]
+    public int nbBulletShot = 0;
+
+    /// <summary> The maximum number of bullet shot at the same time and still on the map </summary>
+    [Range(1,50)]
+    public int MaxBulletShot = 5;
+
+    const int LEFT_CLICK = 0;
+    const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI/2;
+
     protected float movementToMake = 0;
 
     protected override void Start()
@@ -26,6 +38,15 @@ public class Tank_Player : Tank
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
+
+        // if left click recorded, try to shoot
+        if (Input.GetMouseButtonDown(LEFT_CLICK)) {
+            if (this.CanShoot()) {
+                this.Shoot();
+            } else {
+                Debug.Log("Prevent self-shoot. TODO : animation");
+            }
+        }
     }
 
     /// <summary>
@@ -233,16 +254,38 @@ public class Tank_Player : Tank
         }
     }
 
-    protected bool canShoot() {
+    /// <summary>
+    /// Test if this player can shoot. <br/>
+    /// Used to prevent bug and insta-self shooting when close to a wall
+    /// </summary>
+    /// <returns>True if there isn't a wall too close where the player is trying to shoot.</returns>
+    protected bool CanShoot() {
         Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
         Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
         Debug.DrawRay(origin, direction * 1.3f, Color.red, 1); // DEBUG ONLY
 
-        // use a raycast to prevent selfshooting if a wall is too close
+        // use a raycast to prevent self-shooting if a wall is too close
         if (Physics.Raycast(origin, direction, 1.3f)) {
             return false;
         } else {
             return true;
         }
+    }
+
+    protected void Shoot() {
+        if (nbBulletShot < MaxBulletShot) {
+            Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
+            Vector3 dir = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
+
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.8f*dir, Quaternion.identity);
+            Bullet newBullet = newBulletObject.GetComponent<Bullet>();
+            newBullet.direction = dir;
+            newBullet.tankOwner = gameObject;
+            nbBulletShot++;
+        }
+    }
+
+    public void DecreaseNbBulletShot() {
+        nbBulletShot--;
     }
 }

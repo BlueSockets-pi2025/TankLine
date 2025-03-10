@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1805496521371473903}
   - component: {fileID: 216296463254350863}
   - component: {fileID: 4236273183555251873}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: BushWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: ead0749cda37f454c9e3d1a8fad165c5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -122,7 +122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c84b5448e076ed49a9f71e392e28d21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transparency: 0.5
 --- !u!54 &4236273183555251873
 Rigidbody:
   m_ObjectHideFlags: 0
