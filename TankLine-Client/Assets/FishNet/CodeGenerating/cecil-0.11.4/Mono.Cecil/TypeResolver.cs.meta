@@ -13,6 +13,12 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
+<<<<<<< HEAD
   packageVersion: 4.6.1R
   assetPath: Assets/FishNet/CodeGenerating/cecil-0.11.4/Mono.Cecil/TypeResolver.cs
   uploadId: 735762
+=======
+  packageVersion: 4.6.2R
+  assetPath: Assets/FishNet/CodeGenerating/cecil-0.11.4/Mono.Cecil/TypeResolver.cs
+  uploadId: 737117
+>>>>>>> 3457b6c8c44cd596e29e342480e322f2f9eee84b

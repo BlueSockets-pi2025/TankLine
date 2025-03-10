@@ -1,8 +1,9 @@
+using FishNet.Object;
 using Unity.Mathematics;
-using Unity.VisualScripting;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour {
+public class Bullet : NetworkBehaviour {
 
     /// <summary> Number of rebound left to make </summary>
     [Range(0,100)]
@@ -10,7 +11,11 @@ public class Bullet : MonoBehaviour {
 
     [HideInInspector]
     /// <summary> This bullet direction </summary>
+<<<<<<< HEAD
     public Vector3 direction;
+=======
+    public readonly SyncVar<Vector3> direction = new(new SyncTypeSettings(.1f));
+>>>>>>> 3457b6c8c44cd596e29e342480e322f2f9eee84b
 
     /// <summary> This bullet speed movement (READONLY) </summary>
     [Range(1,10)]
@@ -33,18 +38,24 @@ public class Bullet : MonoBehaviour {
     /// <summary> This bullet mesh renderer </summary>
     protected Transform meshTransform;
 
-    void Start() {
+    void Awake() {
+        direction.Value = new Vector3(0,0,0);
+        direction.OnChange += OnDirectionChange;
+
         thisBullet = gameObject;
         meshTransform = thisBullet.transform.Find("shell");
+    }
+
+    void Start() {
+        //meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.Value.z, direction.Value.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
     void FixedUpdate() {
-        direction.Normalize();
-        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
-        meshTransform.rotation = Quaternion.Euler(0,(math.atan2(-direction.z, direction.x) + math.PI/2) * Mathf.Rad2Deg, 9.648f);
+        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.Value);
+        
     }
 
     /// <summary>
@@ -63,7 +74,8 @@ public class Bullet : MonoBehaviour {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
                 wall.TakeDamage();
-                Destroy(gameObject);
+                if (base.IsServerInitialized)
+                    Despawn(thisBullet);
             } 
             
             // if static wall
@@ -71,7 +83,8 @@ public class Bullet : MonoBehaviour {
 
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0) {
-                    Destroy(thisBullet);
+                    if (base.IsServerInitialized)
+                        Despawn(thisBullet);
                     return;
                 }
 
@@ -83,12 +96,12 @@ public class Bullet : MonoBehaviour {
                 // get the contact point direction
                 // right-left direction
                 if (math.abs(relativeCollision.x) > 0.0001f) {
-                    direction.x = -direction.x;
+                    direction.Value = new Vector3(-direction.Value.x, 0, direction.Value.z);
                 }
 
                 // up-down direction
                 else if (math.abs(relativeCollision.z) > 0.0001f) {
-                    direction.z = -direction.z;
+                    direction.Value = new Vector3(direction.Value.x, 0, -direction.Value.z);
                 }
 
                 else {
@@ -107,7 +120,8 @@ public class Bullet : MonoBehaviour {
                 hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
             }
 
-            Destroy(thisBullet); // this bullet is destroy
+            if (base.IsServerInitialized)
+                Despawn(thisBullet);
 
             return;
         }
@@ -116,11 +130,12 @@ public class Bullet : MonoBehaviour {
             ############################## SHELL COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == SHELL_LAYER) {
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
+            if (base.IsServerInitialized) {
+                Despawn(collision.gameObject);
+                Despawn(thisBullet);
+            }
             return;
         }
-
     }
 
     /// <summary>
@@ -133,5 +148,10 @@ public class Bullet : MonoBehaviour {
             Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
             playerOwner.DecreaseNbBulletShot();
         }
+    }
+
+    public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer) {
+        // update the bullet rotation
+        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.Value.z, direction.Value.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 }

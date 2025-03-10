@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: 5d265649320af034b9a4e966b0a341d4
+<<<<<<< HEAD
+guid: ecf03df72c983164586a22e695d17905
+=======
+guid: d6f3c1b275ace20e78a1fc747c57437a
+>>>>>>> 3457b6c8c44cd596e29e342480e322f2f9eee84b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -13,6 +17,18 @@ AssetOrigin:
   serializedVersion: 1
   productId: 207815
   packageName: 'FishNet: Networking Evolved'
+<<<<<<< HEAD
+<<<<<<<< HEAD:TankLine-Client/Assets/FishNet/Runtime/Utility/TransformTickSmoother.cs.meta
   packageVersion: 4.6.1R
   assetPath: Assets/FishNet/Runtime/Utility/TransformTickSmoother.cs
   uploadId: 735762
+========
+  packageVersion: 4.6.2R
+  assetPath: Assets/FishNet/Runtime/Editor/Configuring/BetaModeMenu.cs
+  uploadId: 737117
+>>>>>>>> 3457b6c8c44cd596e29e342480e322f2f9eee84b:TankLine-Client/Assets/FishNet/Runtime/Editor/Configuring/BetaModeMenu.cs.meta
+=======
+  packageVersion: 4.6.2R
+  assetPath: Assets/FishNet/Runtime/Utility/TransformTickSmoother.cs
+  uploadId: 737117
+>>>>>>> 3457b6c8c44cd596e29e342480e322f2f9eee84b
