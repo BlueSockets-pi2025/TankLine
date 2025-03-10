@@ -1,0 +1,85 @@
+{
+  "name": "NewMap4",
+  "objects": [
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "position": {
+        "x": 0.0,
+        "y": 1.063,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "position": {
+        "x": 4.56,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "position": {
+        "x": 0.9371872,
+        "y": 1.0,
+        "z": 4.21
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "WaterWall",
+      "materialName": "Lit",
+      "position": {
+        "x": 3.91,
+        "y": 0.05,
+        "z": 4.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 0.1,
+        "z": 1.0
+      },
+      "children": []
+    }
+  ]
+}
