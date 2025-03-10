@@ -2,11 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using GameApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.FileProviders;
 using System.Text;
 using System.Security.Claims;
-using System.Net;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +34,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 // Add the services required for the application
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDirectoryBrowser(); // To authorize the file browser
+//builder.Services.AddSwaggerGen();
 
 // Configuring the connection to the PostgreSQL database
 builder.Services.AddDbContext<GameDbContext>(options =>
@@ -91,17 +86,14 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// Serve static files (such as index.html)
-// app.UseStaticFiles(); // This allows serving static files from the wwwroot folder
-
 // Force HTTPS redirection if not already done by Kestrel
 app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
     // Activate Swagger in development mode for the API
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
 
 app.UseAuthentication();

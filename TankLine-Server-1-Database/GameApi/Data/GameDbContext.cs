@@ -14,12 +14,14 @@ namespace GameApi.Data
 	public DbSet<GeneratedMap> GeneratedMaps { get; set; }	
 
     public DbSet<VerificationCode> VerificationCodes { get; set; }
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserAccount>().ToTable("user_accounts");
             modelBuilder.Entity<Achievement>().ToTable("achievement");
             modelBuilder.Entity<Leaderboard>().ToTable("leaderboard");
             modelBuilder.Entity<GeneratedMap>().ToTable("generated_maps");
+            modelBuilder.Entity<VerificationCode>().ToTable("verification_codes");
 		
 	    // Definition of the composite key because [Key] cannot be defined twice in the C# class:
 	    modelBuilder.Entity<FriendList>()

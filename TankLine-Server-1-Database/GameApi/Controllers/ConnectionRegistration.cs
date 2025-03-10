@@ -11,7 +11,8 @@ using GameApi.Models;
 using System;
 using System.Net.Mail;
 using System.Net;
-using System.Collections.Generic; // Added for in-memory verification code management
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore; // Added for in-memory verification code management
 
 [ApiController]
 [Route("api/auth")]
@@ -30,8 +31,7 @@ public class ConnectionRegistrationController : Controller
         _configuration = configuration;
     }
 
-    // Register a new user
-    [HttpPost("register")]
+   [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserAccount user)
     {
         if (!ModelState.IsValid)
@@ -47,17 +47,22 @@ public class ConnectionRegistrationController : Controller
         try
         {
             string verificationCode = new Random().Next(100000, 999999).ToString();
-            
-            // Hash password before saving it
             user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
-
             _context.UserAccounts.Add(user);
             await _context.SaveChangesAsync();
 
-            verificationCodes[user.Email] = (verificationCode, DateTime.UtcNow.AddMinutes(1)); 
+            var verificationEntry = new VerificationCode
+            {
+                Email = user.Email,
+                Code = verificationCode,
+                Expiration = DateTime.UtcNow.AddMinutes(10),
+            };
+            _context.VerificationCodes.Add(verificationEntry);
+
+            verificationEntry.Expiration = DateTime.SpecifyKind(verificationEntry.Expiration, DateTimeKind.Utc);
+            await _context.SaveChangesAsync();
 
             Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
-
             SendVerificationEmail(user.Email, verificationCode);
 
             return Ok("Verification code sent to your email.");
@@ -68,45 +73,31 @@ public class ConnectionRegistrationController : Controller
         }
     }
 
-
     [HttpPost("verify")]
     public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
     {   
-        // Search for the user in the database
         var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
         if (user == null)
         {
             return BadRequest("Invalid user.");
         }
-        if (!verificationCodes.ContainsKey(request.Email))
+
+        var verificationEntry = await _context.VerificationCodes
+            .FirstOrDefaultAsync(v => v.Email == request.Email && v.Code == request.Code);
+
+        if (verificationEntry == null || verificationEntry.Expiration < DateTime.UtcNow)
         {
-            return BadRequest("No verification code.");
+            return BadRequest("Invalid or expired verification code.");
         }
 
-        // Retrieve code and expiration time
-        var (code, expiration) = verificationCodes[request.Email];
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
 
-        if (DateTime.UtcNow > expiration)
-        {
-            verificationCodes.Remove(request.Email); // Delete expired code
-            return BadRequest("Verification code expired.");
-        }
-
-        if (code != request.Code)
-        {
-            return BadRequest("Invalid verification code.");
-        }
-
-        // Account verified, update user in memory (not in DB)
-        user.IsVerified = true; // Do not persist, just change in memory for the session
+        user.IsVerified = true;
         _context.UserAccounts.Update(user);
-
-        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt.ToUniversalTime(), DateTimeKind.Utc);
-
+        _context.VerificationCodes.Remove(verificationEntry);
         await _context.SaveChangesAsync();
 
-        // Delete verification code after validation
-        verificationCodes.Remove(request.Email);
+        Console.WriteLine($"Account verified successfully for {request.Email}");
 
         return Ok("Account verified successfully.");
     }
