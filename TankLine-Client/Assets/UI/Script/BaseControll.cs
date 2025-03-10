@@ -6,9 +6,11 @@ using System.Text.RegularExpressions;
 
 public class BaseControll : MonoBehaviour
 {
-    public GameObject PagePrincipal,Reset_Your_Password,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame,WaintingRoom,ColorChangingPannel,lose,win;
+    public GameObject PagePrincipal,Reset_Your_Password,Reset_Your_Password2,Page_sign_up_et1,Page_sign_up_et2,Page_sign_up_et3,Menu,Play,CreateRoom,JoinRoom, RoomNum,Err,credits,option,score,InGame,WaintingRoom,ColorChangingPannel,lose,win;
     public TMP_InputField LogEmail,LogPW,ForMail,Month,Year,Day,Fname,Lname,Nname,Email,Mdp,Cmdp,code;
+    public TMP_InputField Re_Mdp,Re_Cmdp,Re_code;
     public TMP_Text ErrText;
+    public TMP_Text nicknameText, MenuBadge;
     private void Start()
 {
     AutoLogin();
@@ -24,6 +26,8 @@ private void AutoLogin()
         UserDatabase userDB = UserDatabase.LoadUsers();
         if (userDB.ValidateUser(savedEmail, savedPassword))
         {
+            nicknameText.text=userDB.GetNickname(savedEmail);
+            MenuBadge.text=nicknameText.text;
             OpenMenu(); 
             return;
         }
@@ -46,6 +50,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(true);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -66,6 +71,27 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(true);
+        Reset_Your_Password2.SetActive(false);
+        Page_sign_up_et1.SetActive(false);
+        Page_sign_up_et2.SetActive(false);
+        Page_sign_up_et3.SetActive(false);
+    }
+    public void OpenReset_Your_Password2()
+    {
+        win.SetActive(false);
+        lose.SetActive(false);
+        WaintingRoom.SetActive(false);
+        InGame.SetActive(false);
+        option.SetActive(false);
+        score.SetActive(false);
+        credits.SetActive(false);
+        JoinRoom.SetActive(false);
+        CreateRoom.SetActive(false);
+        Menu.SetActive(false);
+        Play.SetActive(false);
+        PagePrincipal.SetActive(false);
+        Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(true);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -85,6 +111,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(true);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -104,6 +131,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(true);
         Page_sign_up_et3.SetActive(false);
@@ -123,6 +151,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(true);
@@ -142,6 +171,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -161,6 +191,7 @@ private void AutoLogin()
         Play.SetActive(true);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -180,6 +211,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -199,6 +231,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -218,6 +251,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -237,6 +271,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -256,6 +291,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -275,6 +311,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -294,6 +331,7 @@ private void AutoLogin()
         Play.SetActive(false);
         PagePrincipal.SetActive(false);
         Reset_Your_Password.SetActive(false);
+        Reset_Your_Password2.SetActive(false);
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
@@ -350,15 +388,14 @@ private void AutoLogin()
         return;
     }
 
-    // Save login data locally
+    nicknameText.text=userDB.GetNickname(LogEmail.text);
+    MenuBadge.text=nicknameText.text;
     PlayerPrefs.SetString("LoggedInEmail", LogEmail.text);
     PlayerPrefs.SetString("LoggedInPassword", LogPW.text);
     PlayerPrefs.Save();
 
     OpenMenu();
 }
-
-
 
     public void ResetPassword()
     {
@@ -371,6 +408,26 @@ private void AutoLogin()
         if (!IsValidEmail(ForMail.text))
         {
             OpenErr("Invalid email format.");
+            return;
+        }
+        OpenReset_Your_Password2();
+    }
+        public void ResetPassword2()
+    {
+        if (string.IsNullOrEmpty(Re_Cmdp.text) || string.IsNullOrEmpty(Re_Mdp.text) || string.IsNullOrEmpty(Re_code.text))
+        {
+            OpenErr("cannot be empty.");
+            return;
+        }
+
+        if (Re_Cmdp.text != Re_Mdp.text)
+        {
+            OpenErr("Passwords do not match.");
+            return;
+        }
+         if(Re_code.text!="123456")
+        {
+            OpenErr("Code do not match.");
             return;
         }
         OpenPagePrincipal();
@@ -411,11 +468,7 @@ private void AutoLogin()
         OpenErr("Passwords do not match.");
         return;
     }
-
-    // Load user database
     UserDatabase userDB = UserDatabase.LoadUsers();
-
-    // Check if email is already registered
     if (userDB.UserExists(Email.text))
     {
         OpenErr("Email already exists. Please log in.");
@@ -442,6 +495,11 @@ private void AutoLogin()
         if (string.IsNullOrEmpty(code.text))
         {
             OpenErr("Code empty");
+            return;
+        }
+        if(code.text!="123456")
+        {
+            OpenErr("Code do not match.");
             return;
         }
         OpenPagePrincipal();

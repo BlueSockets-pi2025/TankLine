@@ -48,4 +48,10 @@ public class UserDatabase
         users.Add(newUser);
         SaveUsers();
     }
+    public string GetNickname(string email)
+{
+    User user = users.Find(u => u.email == email);
+    return user != null ? user.nickname : string.Empty;
+}
+
 }
