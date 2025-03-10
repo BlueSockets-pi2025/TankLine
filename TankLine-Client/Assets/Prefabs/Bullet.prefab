@@ -255,24 +255,24 @@ MonoBehaviour:
     Position: 1
     Rotation: 1
     Scale: 0
-  _interpolation: 250
-  _extrapolation: 0
-  _enableTeleport: 1
+  _interpolation: 125
+  _extrapolation: 10
+  _enableTeleport: 0
   _teleportThreshold: 0.2
-  _clientAuthoritative: 1
+  _clientAuthoritative: 0
   _sendToOwner: 1
   _interval: 1
-  _synchronizePosition: 1
+  _synchronizePosition: 0
   _positionSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeRotation: 1
+    X: 1
+    Y: 1
+    Z: 1
+  _synchronizeRotation: 0
   _rotationSnapping:
     X: 0
     Y: 0
     Z: 0
-  _synchronizeScale: 1
+  _synchronizeScale: 0
   _scaleSnapping:
     X: 0
     Y: 0
