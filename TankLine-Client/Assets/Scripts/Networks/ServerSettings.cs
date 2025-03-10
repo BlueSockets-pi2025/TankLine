@@ -14,19 +14,12 @@ public class ServerSettings : MonoBehaviour
       {
         Tugboat transport = nm.GetComponent<Tugboat>(); 
 
-        int serverPort = GetServerPort();
+        int serverPort = 10001; // set the server port open in the VM
 
         transport.SetPort((ushort)serverPort); 
 
         nm.ServerManager.StartConnection(); // start the server connection
       }
     }
-  }
-
-  //get the server port from the environment variable
-  private int GetServerPort()
-  {
-    string port = Environment.GetEnvironmentVariable("GAME_SERVER_PORT");
-    return int.TryParse(port, out int result) ? result : 7770; // Default port
   }
 }
