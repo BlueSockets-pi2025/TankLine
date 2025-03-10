@@ -92,7 +92,7 @@ app.Use(async (context, next) =>
 });
 
 // Serve static files (such as index.html)
-app.UseStaticFiles(); // This allows serving static files from the wwwroot folder
+// app.UseStaticFiles(); // This allows serving static files from the wwwroot folder
 
 // Force HTTPS redirection if not already done by Kestrel
 app.UseHttpsRedirection();
@@ -109,10 +109,6 @@ app.UseAuthorization();
 
 // Mapping controllers
 app.MapControllers();
-
-// Default route to serve the index.html when accessing the /reset-password URL
-app.MapFallbackToFile("wwwroot/reset-password/{**path}", "wwwroot/reset-password/index.html");  // Serve index.html on /reset-password
-// ({**path} captures all additional paths after /reset-password, and redirects to the index.html file located in wwwroot/reset-password)
 
 // Launch the application
 app.Run();

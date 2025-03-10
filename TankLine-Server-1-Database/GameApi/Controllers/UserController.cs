@@ -47,7 +47,7 @@ namespace GameApi.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            Console.WriteLine("GET CURRENT USER..................."); // Debug
+            Console.WriteLine("GET CURRENT USER..."); // Debug
 
             var token = Request.Cookies["AuthToken"]; // Debug 
             if (string.IsNullOrEmpty(token))

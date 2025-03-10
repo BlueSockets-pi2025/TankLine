@@ -101,7 +101,7 @@ public class ConnectionRegistrationController : Controller
         user.IsVerified = true; // Do not persist, just change in memory for the session
         _context.UserAccounts.Update(user);
 
-        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt.ToUniversalTime(), DateTimeKind.Utc);
 
         await _context.SaveChangesAsync();
 
@@ -265,19 +265,21 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("User not found.");
         }
 
-        string resetToken = Guid.NewGuid().ToString();
-        var expirationTime = DateTime.UtcNow.AddHours(1); // Token expires in 1 hour
+        // Générer un code de 6 chiffres
+        string resetCode = new Random().Next(100000, 999999).ToString();
+        var expirationTime = DateTime.UtcNow.AddMinutes(5); // Expiration en 5 minutes
 
-        // Store the token and expiration in memory or database
-        verificationCodes[user.Email] = (resetToken, expirationTime);
+        // Stocker le code en mémoire
+        verificationCodes[user.Email] = (resetCode, expirationTime);
 
-        // Send password reset email with the token
-        SendPasswordResetEmail(user.Email, resetToken);
+        // Envoyer l'email avec le code
+        SendPasswordResetEmail(user.Email, resetCode);
 
-        return Ok("Password reset link has been sent to your email.");
+        return Ok("Password reset code has been sent to your email.");
     }
 
-    private void SendPasswordResetEmail(string email, string resetToken)
+
+    private void SendPasswordResetEmail(string email, string resetCode)
     {
         var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
         {
@@ -288,17 +290,15 @@ public class ConnectionRegistrationController : Controller
             EnableSsl = true
         };
 
-        string resetLink = $"{_configuration["AppSettings:BaseUrl"]}/reset-password?token={resetToken}";
-        
         string htmlContent = $@"
         <html>
             <body style='font-family: Arial, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px;'>
                 <div style='text-align: center; padding: 20px;'>
                     <h1 style='color: #007bff; font-size: 32px; font-weight: 600;'>Password Reset Request</h1>
-                    <p style='font-size: 18px; color: #555;'>You requested a password reset for your account on TankLine.</p>
-                    <p style='font-size: 16px; color: #555;'>Click the link below to reset your password:</p>
-                    <a href='{resetLink}' style='font-size: 18px; font-weight: bold; color: #007bff;'>Reset Password</a>
-                    <p style='font-size: 14px; color: #888;'>This link will expire in 1 hour.</p>
+                    <p style='font-size: 18px; color: #555;'>Use the following code to reset your password:</p>
+                    <h2 style='color: #007bff; font-size: 48px; font-weight: bold;'>{resetCode}</h2>
+                    <p style='font-size: 16px; color: #555;'>This code is valid for 5 minutes.</p>
+                    <p style='font-size: 14px; color: #888;'>If you did not request this, please ignore this email.</p>
                 </div>
                 <div style='text-align: center; margin-top: 40px; font-size: 14px; color: #888;'>
                     <p>The Blue Socket Team - Creators of TankLine</p>
@@ -310,7 +310,7 @@ public class ConnectionRegistrationController : Controller
         var mailMessage = new MailMessage
         {
             From = new MailAddress(_configuration["EmailSettings:FromEmail"] ?? "default@example.com"),
-            Subject = "Password Reset Request for TankLine",
+            Subject = "Your Password Reset Code for TankLine",
             Body = htmlContent,
             IsBodyHtml = true
         };
@@ -319,7 +319,7 @@ public class ConnectionRegistrationController : Controller
         try
         {
             smtpClient.Send(mailMessage);
-            Console.WriteLine($"Password reset email sent to {email}");
+            Console.WriteLine($"Password reset code sent to {email}");
         }
         catch (Exception ex)
         {
@@ -327,18 +327,11 @@ public class ConnectionRegistrationController : Controller
         }
     }
 
+
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        if (!verificationCodes.ContainsKey(request.Email) || verificationCodes[request.Email].Expiration < DateTime.UtcNow)
-        {
-            return BadRequest("Invalid or expired reset token.");
-        }
-
-        if (verificationCodes[request.Email].Code != request.Token)
-        {
-            return BadRequest("Invalid reset token.");
-        }
+        Console.WriteLine($"In reset-password");
 
         var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
         if (user == null)
@@ -346,13 +339,33 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("User not found.");
         }
 
-        // Hash the new password and update it
-        user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
+        if (!verificationCodes.ContainsKey(request.Email))
+        {
+            return BadRequest("No reset code found.");
+        }
 
+        var (storedCode, expiration) = verificationCodes[request.Email];
+
+        if (DateTime.UtcNow > expiration)
+        {
+            verificationCodes.Remove(request.Email);
+            return BadRequest("Reset code expired.");
+        }
+
+        if (storedCode != request.Code)
+        {
+            return BadRequest("Invalid reset code.");
+        }
+
+        // Hacher le nouveau mot de passe et l'enregistrer
+        user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
         _context.UserAccounts.Update(user);
+        
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+
         await _context.SaveChangesAsync();
 
-        // Remove the token after it's used
+        // Supprimer le code après utilisation
         verificationCodes.Remove(request.Email);
 
         return Ok("Password reset successfully.");
@@ -368,10 +381,9 @@ public class PasswordResetRequest
 public class ResetPasswordRequest
 {
     public required string Email { get; set; }
-    public required string Token { get; set; }
+    public required string Code { get; set; } 
     public required string NewPassword { get; set; }
 }
-
 
 
 

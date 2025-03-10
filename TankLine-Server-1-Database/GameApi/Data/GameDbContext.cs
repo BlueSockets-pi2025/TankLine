@@ -13,6 +13,7 @@ namespace GameApi.Data
 	public DbSet<Leaderboard> Leaderboards { get; set; }
 	public DbSet<GeneratedMap> GeneratedMaps { get; set; }	
 
+    public DbSet<VerificationCode> VerificationCodes { get; set; }
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserAccount>().ToTable("user_accounts");
