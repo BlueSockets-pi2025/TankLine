@@ -290,13 +290,14 @@ public class Tank_Player : Tank
 
             // spawn object
             GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f*dir, Quaternion.identity);
-            Spawn(newBulletObject);
 
             // change direction and tankOwner (for bullet count)
             Bullet newBullet = newBulletObject.GetComponent<Bullet>();
-            newBullet.direction = dir;
+            newBullet.direction.Value = dir;
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
+
+            Spawn(newBulletObject);
         }
     }
 

@@ -1,6 +1,6 @@
 using FishNet.Object;
 using Unity.Mathematics;
-using Unity.VisualScripting;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
 public class Bullet : NetworkBehaviour {
@@ -11,7 +11,7 @@ public class Bullet : NetworkBehaviour {
 
     [HideInInspector]
     /// <summary> This bullet direction </summary>
-    public Vector3 direction;
+    public readonly SyncVar<Vector3> direction = new(new SyncTypeSettings(.1f));
 
     /// <summary> This bullet speed movement (READONLY) </summary>
     [Range(1,10)]
@@ -34,17 +34,24 @@ public class Bullet : NetworkBehaviour {
     /// <summary> This bullet mesh renderer </summary>
     protected Transform meshTransform;
 
-    void Start() {
+    void Awake() {
+        direction.Value = new Vector3(0,0,0);
+        direction.OnChange += OnDirectionChange;
+
         thisBullet = gameObject;
         meshTransform = thisBullet.transform.Find("shell");
-        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.z, direction.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
+    }
+
+    void Start() {
+        //meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.Value.z, direction.Value.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
     void FixedUpdate() {
-        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
+        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.Value);
+        
     }
 
     /// <summary>
@@ -52,7 +59,6 @@ public class Bullet : NetworkBehaviour {
     /// </summary>
 
     void OnCollisionEnter(Collision collision) {
-        if (!base.IsController) return;
 
         /* 
             ############################## WALL COLLISIONS ############################## 
@@ -86,12 +92,12 @@ public class Bullet : NetworkBehaviour {
                 // get the contact point direction
                 // right-left direction
                 if (math.abs(relativeCollision.x) > 0.0001f) {
-                    direction.x = -direction.x;
+                    direction.Value = new Vector3(-direction.Value.x, 0, direction.Value.z);
                 }
 
                 // up-down direction
                 else if (math.abs(relativeCollision.z) > 0.0001f) {
-                    direction.z = -direction.z;
+                    direction.Value = new Vector3(direction.Value.x, 0, -direction.Value.z);
                 }
 
                 else {
@@ -126,9 +132,6 @@ public class Bullet : NetworkBehaviour {
             }
             return;
         }
-
-        // update the bullet rotation
-        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.z, direction.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 
     /// <summary>
@@ -141,5 +144,10 @@ public class Bullet : NetworkBehaviour {
             Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
             playerOwner.DecreaseNbBulletShot();
         }
+    }
+
+    public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer) {
+        // update the bullet rotation
+        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.Value.z, direction.Value.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 }
