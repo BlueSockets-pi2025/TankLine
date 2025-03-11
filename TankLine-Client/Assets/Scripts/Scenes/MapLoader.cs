@@ -28,10 +28,12 @@ public class MapLoader : MonoBehaviour
         {
             string json = File.ReadAllText(path);
             MapData map = JsonConvert.DeserializeObject<MapData>(json);
+            Debug.Log(map.objects.Count);
 
             foreach (var objData in map.objects)
             {
                 InstantiateObject(objData, null);
+                Debug.Log("!!!!!!!!!!!!!!!!!!!!!!! objData : " + objData.prefabName);
             }
         }
         else
@@ -56,15 +58,15 @@ public class MapLoader : MonoBehaviour
             // Si aucun modèle n'est trouvé dans les ressources, crée un objet Unity de base
             if (prefab == null)
             {
-                // prefab = CreatePrimitiveObject(objData.modelName);
-                prefab = new GameObject(objData.modelName);
+                prefab = CreatePrimitiveObject(objData.modelName);
+                // prefab = new GameObject(objData.modelName);
             }
         }
 
         // Vérifie que le prefab est valide
         if (prefab == null)
         {
-            Debug.LogError("Prefab est null pour : " + objData.prefabName);
+            // Debug.LogError("Prefab est null pour : " + objData.prefabName);
             return null;
         }
 
@@ -76,7 +78,61 @@ public class MapLoader : MonoBehaviour
         instance.transform.localScale = objData.scale.ToVector3();
         instance.transform.SetParent(parent);
 
-        ApplyMaterial(instance, objData.materialName);
+        if (objData.cameraData != null)
+        {
+            Camera cam = instance.AddComponent<Camera>();
+            cam.fieldOfView = objData.cameraData.fieldOfView;
+            cam.nearClipPlane = objData.cameraData.nearClipPlane;
+            cam.farClipPlane = objData.cameraData.farClipPlane;
+
+            if (objData.cameraData.hasAudioListener)
+            {
+                instance.AddComponent<AudioListener>();
+            }
+
+            if (objData.cameraData.isAdditionalCamera)
+            {
+                instance.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            }
+        }
+
+        if (objData.lightData != null)
+        {
+            Light light = instance.AddComponent<Light>();
+            light.type = objData.lightData.type;
+            light.intensity = objData.lightData.intensity;
+            light.color = objData.lightData.color.ToColor();
+            light.shadows = objData.lightData.shadows ? LightShadows.Soft : LightShadows.None;
+
+            if (objData.lightData.isAdditionalLight)
+            {
+                instance.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalLightData>();
+            }
+        }
+
+        if (objData.isAudioVolume)
+        {
+            instance.AddComponent<UnityEngine.Rendering.Volume>();
+        }
+
+
+        foreach (string scriptName in objData.scripts)
+        {
+            System.Type scriptType = System.Type.GetType(scriptName);
+            if (scriptType != null)
+            {
+                if (instance.GetComponent(scriptType) == null)
+                {
+                    instance.AddComponent(scriptType);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Script non trouvé : " + scriptName);
+            }
+        }
+
+        // ApplyMaterial(instance, objData.materialName);
 
         foreach (var childData in objData.children)
         {
@@ -96,10 +152,10 @@ public class MapLoader : MonoBehaviour
         if (!string.IsNullOrEmpty(modelName))
         {
             // Essaye de charger le modèle à partir du dossier Resources/Models/
-            GameObject model = Resources.Load<GameObject>("Models/" + modelName);
+            GameObject model = Resources.Load<GameObject>("3D_Models/" + modelName);
             if (model != null)
             {
-                // Debug.Log("Modèle trouvé dans les ressources : " + modelName);
+                Debug.Log("Modèle trouvé dans les ressources : " + modelName);
                 return model;
             }
             else
@@ -135,14 +191,9 @@ public class MapLoader : MonoBehaviour
 
         // Si le modèle n'est pas reconnu ou trouvé, on crée un objet vide
         // pb si juste gameobjectvide donc parent, ou si pas reconnu, mis en double ??
+        Debug.LogWarning("Modèle inconnu pas deux fois " + modelName);
         return new GameObject(modelName);
     }
-
-    // Renderer renderer = instance.GetComponent<Renderer>();
-    // if (renderer && Resources.Load<Material>(objData.materialName))
-    // {
-    //     renderer.material = Resources.Load<Material>(objData.materialName);
-    // }
 
     // Applique un matériau à l'instance si un nom de matériau est fourni
     void ApplyMaterial(GameObject instance, string materialName)

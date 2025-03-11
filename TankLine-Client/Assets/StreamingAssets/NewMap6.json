@@ -385,7 +385,7 @@
     {
       "prefabName": "tank",
       "materialName": "",
-      "modelName": "player",
+      "modelName": "tank",
       "position": {
         "x": 2.22,
         "y": 0.0,
@@ -401,135 +401,7 @@
         "y": 1.0,
         "z": 1.0
       },
-      "children": [
-        {
-          "prefabName": "base",
-          "materialName": "Lit",
-          "modelName": "base",
-          "position": {
-            "x": 2.21529055,
-            "y": 0.173759758,
-            "z": 4.656613E-10
-          },
-          "rotation": {
-            "x": 270.0,
-            "y": 90.0,
-            "z": 0.0
-          },
-          "scale": {
-            "x": 28.5,
-            "y": 28.9434814,
-            "z": 29.0226574
-          },
-          "children": []
-        },
-        {
-          "prefabName": "chenilles D",
-          "materialName": "Lit",
-          "modelName": "chenilles D",
-          "position": {
-            "x": 2.21529055,
-            "y": 0.121535912,
-            "z": -0.297
-          },
-          "rotation": {
-            "x": 270.0,
-            "y": 90.0,
-            "z": 0.0
-          },
-          "scale": {
-            "x": 6.0,
-            "y": 1.5,
-            "z": 2.10000014
-          },
-          "children": []
-        },
-        {
-          "prefabName": "chenilles G",
-          "materialName": "Lit",
-          "modelName": "chenilles G",
-          "position": {
-            "x": 2.21529055,
-            "y": 0.121535912,
-            "z": 0.297000051
-          },
-          "rotation": {
-            "x": 270.0,
-            "y": 90.0,
-            "z": 0.0
-          },
-          "scale": {
-            "x": 6.0,
-            "y": 1.5,
-            "z": 2.10000014
-          },
-          "children": []
-        },
-        {
-          "prefabName": "tankGun",
-          "materialName": "",
-          "modelName": "Unknown",
-          "position": {
-            "x": 2.22,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "rotation": {
-            "x": 0.0,
-            "y": 90.0,
-            "z": 0.0
-          },
-          "scale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "children": [
-            {
-              "prefabName": "canon",
-              "materialName": "Lit",
-              "modelName": "canon",
-              "position": {
-                "x": 2.68108034,
-                "y": 0.4592196,
-                "z": -5.96046448E-08
-              },
-              "rotation": {
-                "x": 0.0,
-                "y": 270.0,
-                "z": 0.0
-              },
-              "scale": {
-                "x": 4.6,
-                "y": 4.6,
-                "z": 28.9993515
-              },
-              "children": []
-            },
-            {
-              "prefabName": "top",
-              "materialName": "Lit",
-              "modelName": "top",
-              "position": {
-                "x": 2.21529055,
-                "y": 0.513617,
-                "z": 4.656613E-10
-              },
-              "rotation": {
-                "x": 270.0,
-                "y": 270.0,
-                "z": 0.0
-              },
-              "scale": {
-                "x": 18.0,
-                "y": 18.0,
-                "z": 8.0
-              },
-              "children": []
-            }
-          ]
-        }
-      ]
+      "children": []
     },
     {
       "prefabName": "StaticWall",

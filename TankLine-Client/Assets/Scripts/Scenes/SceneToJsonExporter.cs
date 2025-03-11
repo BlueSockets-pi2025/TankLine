@@ -29,6 +29,52 @@ public class MapData
 }
 
 [System.Serializable]
+public class CameraData
+{
+    public float fieldOfView;
+    public float nearClipPlane;
+    public float farClipPlane;
+    public bool hasAudioListener;
+    public bool isAdditionalCamera; // URP Support
+}
+
+[System.Serializable]
+public class SerializableColor
+{
+    public float r, g, b, a;
+
+    public SerializableColor(Color color)
+    {
+        r = color.r;
+        g = color.g;
+        b = color.b;
+        a = color.a;
+    }
+
+    public Color ToColor()
+    {
+        return new Color(r, g, b, a);
+    }
+}
+
+[System.Serializable]
+public class LightData
+{
+    public LightType type;
+    public float intensity;
+    public SerializableColor color;
+    public bool shadows;
+    public bool isAdditionalLight; // URP Support
+}
+
+[System.Serializable]
+public class VolumeData
+{
+    public string volumeProfilePath; // Chemin du Volume Profile
+}
+
+
+[System.Serializable]
 public class GameObjectData
 {
     public string prefabName;
@@ -37,7 +83,12 @@ public class GameObjectData
     public SerializableVector3 position;
     public SerializableVector3 rotation;
     public SerializableVector3 scale;
+    public List<string> scripts = new List<string>();
     public List<GameObjectData> children = new List<GameObjectData>();
+    public CameraData cameraData;
+    public LightData lightData;
+    public bool isAudioVolume;
+    public VolumeData volumeData;
 }
 
 public class SceneToJsonExporter : MonoBehaviour
@@ -53,10 +104,6 @@ public class SceneToJsonExporter : MonoBehaviour
         // foreach (GameObject obj in FindObjectsByType<GameObject>(FindObjectsSortMode.None))
         foreach (GameObject obj in rootObjects)
         {
-            if (obj.name == "Main Camera")
-            {
-                continue; // Ignore la caméra principale
-            }
             if (obj.transform.parent == null) // Ne prendre que les objets racines
             {
                 mapData.objects.Add(ExportGameObject(obj));
@@ -81,8 +128,60 @@ public class SceneToJsonExporter : MonoBehaviour
             position = new SerializableVector3(obj.transform.position),
             rotation = new SerializableVector3(obj.transform.eulerAngles),
             scale = new SerializableVector3(obj.transform.localScale),
-            children = new List<GameObjectData>()
+            children = new List<GameObjectData>(),
+            scripts = new List<string>()
         };
+
+        Camera cam = obj.GetComponent<Camera>();
+        if (cam != null)
+        {
+            objData.cameraData = new CameraData
+            {
+                fieldOfView = cam.fieldOfView,
+                nearClipPlane = cam.nearClipPlane,
+                farClipPlane = cam.farClipPlane,
+                hasAudioListener = obj.GetComponent<AudioListener>() != null
+            };
+
+            // Vérifie si l'objet a UniversalAdditionalCameraData (URP)
+            var additionalCamData = obj.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            if (additionalCamData != null)
+            {
+                objData.cameraData.isAdditionalCamera = true;
+            }
+        }
+
+        Light light = obj.GetComponent<Light>();
+        if (light != null)
+        {
+            objData.lightData = new LightData
+            {
+                type = light.type,
+                intensity = light.intensity,
+                color = new SerializableColor(light.color),
+                shadows = light.shadows != LightShadows.None
+            };
+
+            var additionalLightData = obj.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalLightData>();
+            if (additionalLightData != null)
+            {
+                objData.lightData.isAdditionalLight = true;
+            }
+        }
+
+        if (obj.GetComponent<UnityEngine.Rendering.Volume>() != null)
+        {
+            objData.isAudioVolume = true;
+        }
+
+        foreach (MonoBehaviour script in obj.GetComponents<MonoBehaviour>())
+        {
+            if (script != null)
+            {
+                objData.scripts.Add(script.GetType().Name);
+            }
+        }
+
 
         foreach (Transform child in obj.transform)
         {
