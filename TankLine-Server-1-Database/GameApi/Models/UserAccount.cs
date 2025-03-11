@@ -25,9 +25,22 @@ public class UserAccount
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
-    // Add IsVerified property
     [Required]
     [Column("is_verified")]
     public bool IsVerified { get; set; } = false;  // Default value set to false
 
+    // New fields
+    [Required]
+    [Column("first_name")]
+    [StringLength(50)]
+    public required string FirstName { get; set; }
+
+    [Required]
+    [Column("last_name")]
+    [StringLength(50)]
+    public required string LastName { get; set; }
+
+    [Required]
+    [Column("birth_date")]
+    public DateTime BirthDate { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 }

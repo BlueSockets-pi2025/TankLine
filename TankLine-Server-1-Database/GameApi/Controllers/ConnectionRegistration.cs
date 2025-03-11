@@ -31,37 +31,75 @@ public class ConnectionRegistrationController : Controller
         _configuration = configuration;
     }
 
-   [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserAccount user)
+    
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest("Invalid data");
+            return BadRequest("Invalid data.");
         }
 
-        if (_context.UserAccounts.Any(u => u.Username == user.Username || u.Email == user.Email))
+        if (_context.UserAccounts.Any(u => u.Username == request.Username || u.Email == request.Email))
         {
             return BadRequest("Username or email already exists.");
+        }
+
+        // Verifying first name and last name
+        if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
+        {
+            return BadRequest("First name and last name are required.");
+        }
+
+        if (request.BirthDate == default)
+        {
+            return BadRequest("Invalid birth date.");
+        }
+
+        // Verifying minimum age (CONSIDERED 13 )
+        var minBirthDate = DateTime.UtcNow.AddYears(-13);
+        if (request.BirthDate > minBirthDate)
+        {
+            return BadRequest("You must be at least 13 years old to register.");
+        }
+
+        // Verifying the correspondance between Password and ConfirmPassword
+        if (request.Password != request.ConfirmPassword)
+        {
+            return BadRequest("Password and Confirm Password do not match.");
         }
 
         try
         {
             string verificationCode = new Random().Next(100000, 999999).ToString();
-            user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
+
+            var user = new UserAccount
+            {
+                Username = request.Username,
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                BirthDate = request.BirthDate,
+                PasswordHash = PasswordHelper.HashPassword(request.Password)
+            };
+
             _context.UserAccounts.Add(user);
+            user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
             await _context.SaveChangesAsync();
 
+            // Creating the entry in the VerificationCode table
             var verificationEntry = new VerificationCode
             {
                 Email = user.Email,
                 Code = verificationCode,
                 Expiration = DateTime.UtcNow.AddMinutes(10),
             };
-            _context.VerificationCodes.Add(verificationEntry);
 
-            verificationEntry.Expiration = DateTime.SpecifyKind(verificationEntry.Expiration, DateTimeKind.Utc);
+            _context.VerificationCodes.Add(verificationEntry);
             await _context.SaveChangesAsync();
 
+            //sending the verification code by email 
             Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
             SendVerificationEmail(user.Email, verificationCode);
 
@@ -72,6 +110,7 @@ public class ConnectionRegistrationController : Controller
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
 
     [HttpPost("verify")]
     public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
@@ -362,6 +401,17 @@ public class ConnectionRegistrationController : Controller
         return Ok("Password reset successfully.");
     }
 
+}
+
+public class RegisterRequest
+{
+    public required string Username { get; set; }
+    public required string Email { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required DateTime BirthDate { get; set; }
+    public required string Password { get; set; }
+    public required string ConfirmPassword { get; set; }
 }
 
 public class PasswordResetRequest
