@@ -1,0 +1,300 @@
+{
+  "name": "NewMap10",
+  "objects": [
+    {
+      "prefabName": "Main Camera",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "MainCamera",
+      "position": {
+        "x": 0.0,
+        "y": 18.0,
+        "z": -8.0
+      },
+      "rotation": {
+        "x": 70.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": {
+        "fieldOfView": 60.0,
+        "nearClipPlane": 0.3,
+        "farClipPlane": 1000.0,
+        "hasAudioListener": true,
+        "isAdditionalCamera": true
+      },
+      "lightData": null
+    },
+    {
+      "prefabName": "Directional Light",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": 0.0,
+        "y": 3.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 50.0,
+        "y": 330.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": {
+        "type": 1,
+        "intensity": 2.0,
+        "color": {
+          "r": 1.0,
+          "g": 1.0,
+          "b": 1.0,
+          "a": 1.0
+        },
+        "shadows": true,
+        "isAdditionalLight": true
+      }
+    },
+    {
+      "prefabName": "map",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [
+        {
+          "prefabName": "floor",
+          "materialName": "Lit",
+          "modelName": "Plane",
+          "tag": "Untagged",
+          "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 3.0,
+            "y": 1.0,
+            "z": 3.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "topWall",
+          "materialName": "Lit",
+          "modelName": "tank",
+          "tag": "Untagged",
+          "position": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 10.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 29.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "leftWall",
+          "materialName": "Lit",
+          "modelName": "tank",
+          "tag": "Untagged",
+          "position": {
+            "x": -14.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 19.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "rightWall",
+          "materialName": "Lit",
+          "modelName": "tank",
+          "tag": "Untagged",
+          "position": {
+            "x": 14.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 19.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "bottomWall",
+          "materialName": "Lit",
+          "modelName": "tank",
+          "tag": "Untagged",
+          "position": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": -10.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 29.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        }
+      ],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "tank",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Player",
+      "position": {
+        "x": 2.22,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 90.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.1,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "Tank_Player"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 0.9371872,
+        "y": 1.0,
+        "z": 4.21
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "WaterWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 3.91,
+        "y": 0.05,
+        "z": 4.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 0.1,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    }
+  ]
+}

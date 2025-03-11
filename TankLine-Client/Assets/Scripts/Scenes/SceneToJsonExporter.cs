@@ -68,18 +68,12 @@ public class LightData
 }
 
 [System.Serializable]
-public class VolumeData
-{
-    public string volumeProfilePath; // Chemin du Volume Profile
-}
-
-
-[System.Serializable]
 public class GameObjectData
 {
     public string prefabName;
     public string materialName;
     public string modelName;
+    public string tag;
     public SerializableVector3 position;
     public SerializableVector3 rotation;
     public SerializableVector3 scale;
@@ -87,8 +81,6 @@ public class GameObjectData
     public List<GameObjectData> children = new List<GameObjectData>();
     public CameraData cameraData;
     public LightData lightData;
-    public bool isAudioVolume;
-    public VolumeData volumeData;
 }
 
 public class SceneToJsonExporter : MonoBehaviour
@@ -129,7 +121,8 @@ public class SceneToJsonExporter : MonoBehaviour
             rotation = new SerializableVector3(obj.transform.eulerAngles),
             scale = new SerializableVector3(obj.transform.localScale),
             children = new List<GameObjectData>(),
-            scripts = new List<string>()
+            scripts = new List<string>(),
+            tag = obj.tag
         };
 
         Camera cam = obj.GetComponent<Camera>();
@@ -169,11 +162,6 @@ public class SceneToJsonExporter : MonoBehaviour
             }
         }
 
-        if (obj.GetComponent<UnityEngine.Rendering.Volume>() != null)
-        {
-            objData.isAudioVolume = true;
-        }
-
         foreach (MonoBehaviour script in obj.GetComponents<MonoBehaviour>())
         {
             if (script != null)
@@ -181,7 +169,6 @@ public class SceneToJsonExporter : MonoBehaviour
                 objData.scripts.Add(script.GetType().Name);
             }
         }
-
 
         foreach (Transform child in obj.transform)
         {

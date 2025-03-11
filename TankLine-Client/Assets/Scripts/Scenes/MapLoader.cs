@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 
 public class MapLoader : MonoBehaviour
@@ -8,6 +9,11 @@ public class MapLoader : MonoBehaviour
     public string mapFileName;
     public PrefabManager prefabManager;
     public Dictionary<string, GameObject> prefabDictionary;
+    static string bundlePath = Path.Combine(Application.dataPath, "../AssetBundles/save&load.test");
+    //For build ! and move AssetBundles to StreamingAssets/
+    // string bundlePath = Path.Combine(Application.streamingAssetsPath, "/AssetBundles/save&load.test");
+    private AssetBundle myBundle;
+
     void Start()
     {
         if (prefabManager == null)
@@ -17,6 +23,12 @@ public class MapLoader : MonoBehaviour
         if (prefabManager.prefabDictionary.Count == 0)
         {
             Debug.LogError("Le dictionnaire de prefabs est vide!");
+        }
+        myBundle = AssetBundle.LoadFromFile(bundlePath);
+        if (myBundle == null)
+        {
+            Debug.LogError("Échec du chargement de l'AssetBundle !");
+            return;
         }
         LoadMap(mapFileName);
     }
@@ -28,12 +40,10 @@ public class MapLoader : MonoBehaviour
         {
             string json = File.ReadAllText(path);
             MapData map = JsonConvert.DeserializeObject<MapData>(json);
-            Debug.Log(map.objects.Count);
 
             foreach (var objData in map.objects)
             {
                 InstantiateObject(objData, null);
-                Debug.Log("!!!!!!!!!!!!!!!!!!!!!!! objData : " + objData.prefabName);
             }
         }
         else
@@ -55,18 +65,19 @@ public class MapLoader : MonoBehaviour
         {
             prefab = LoadModelFromResources(objData.modelName);
 
-            // Si aucun modèle n'est trouvé dans les ressources, crée un objet Unity de base
+            // Si aucun modèle n'est trouvé dans les ressources, crée un objet  Unity de base
             if (prefab == null)
             {
                 prefab = CreatePrimitiveObject(objData.modelName);
-                // prefab = new GameObject(objData.modelName);
+                Destroy(prefab);
+                // return Instantiate(CreatePrimitiveObject(objData.modelName), objData.position.ToVector3(), Quaternion.Euler(objData.rotation.ToVector3()), parent);
             }
         }
 
         // Vérifie que le prefab est valide
         if (prefab == null)
         {
-            // Debug.LogError("Prefab est null pour : " + objData.prefabName);
+            Debug.LogError("Prefab est null pour : " + objData.prefabName);
             return null;
         }
 
@@ -74,9 +85,10 @@ public class MapLoader : MonoBehaviour
         //Instancier l'objet
         GameObject instance = Instantiate(prefab, objData.position.ToVector3(), Quaternion.Euler(objData.rotation.ToVector3()), parent);
         // Debug.Log("Prefab instancié : " + instance.name);
-        instance.name = objData.prefabName;
+        // instance.name = objData.prefabName;
         instance.transform.localScale = objData.scale.ToVector3();
         instance.transform.SetParent(parent);
+        instance.tag = objData.tag;
 
         if (objData.cameraData != null)
         {
@@ -110,12 +122,6 @@ public class MapLoader : MonoBehaviour
             }
         }
 
-        if (objData.isAudioVolume)
-        {
-            instance.AddComponent<UnityEngine.Rendering.Volume>();
-        }
-
-
         foreach (string scriptName in objData.scripts)
         {
             System.Type scriptType = System.Type.GetType(scriptName);
@@ -132,13 +138,12 @@ public class MapLoader : MonoBehaviour
             }
         }
 
-        // ApplyMaterial(instance, objData.materialName);
+        ApplyMaterial(instance, objData.materialName);
 
         foreach (var childData in objData.children)
         {
             if (childData != null)
             {
-                Debug.Log("Enfant instancié : " + childData.prefabName);
                 InstantiateObject(childData, instance.transform);
             }
         }
@@ -149,13 +154,12 @@ public class MapLoader : MonoBehaviour
     // Méthode pour charger un modèle à partir des ressources
     GameObject LoadModelFromResources(string modelName)
     {
-        if (!string.IsNullOrEmpty(modelName))
+        if (!string.IsNullOrEmpty(modelName) && myBundle != null)
         {
-            // Essaye de charger le modèle à partir du dossier Resources/Models/
-            GameObject model = Resources.Load<GameObject>("3D_Models/" + modelName);
+            // Essaye de charger le modèle à partir du dossier Resources/3D_Models/
+            GameObject model = myBundle.LoadAsset<GameObject>(modelName);
             if (model != null)
             {
-                Debug.Log("Modèle trouvé dans les ressources : " + modelName);
                 return model;
             }
             else
@@ -184,14 +188,12 @@ public class MapLoader : MonoBehaviour
                 case "capsule":
                     return GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 default:
-                    Debug.LogWarning("Modèle inconnu : " + modelName);
+                    // Debug.LogWarning("Modèle inconnu : " + modelName);
                     break;
             }
         }
 
         // Si le modèle n'est pas reconnu ou trouvé, on crée un objet vide
-        // pb si juste gameobjectvide donc parent, ou si pas reconnu, mis en double ??
-        Debug.LogWarning("Modèle inconnu pas deux fois " + modelName);
         return new GameObject(modelName);
     }
 
@@ -199,9 +201,10 @@ public class MapLoader : MonoBehaviour
     void ApplyMaterial(GameObject instance, string materialName)
     {
         Renderer renderer = instance.GetComponent<Renderer>();
-        if (renderer && !string.IsNullOrEmpty(materialName))
+        if (renderer && !string.IsNullOrEmpty(materialName) && myBundle != null)
         {
-            Material material = Resources.Load<Material>("Materials/" + materialName);
+            Material material = myBundle.LoadAsset<Material>(materialName);
+
             if (material != null)
             {
                 renderer.material = material;
