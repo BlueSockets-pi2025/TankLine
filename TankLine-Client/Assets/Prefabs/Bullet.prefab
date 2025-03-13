@@ -213,6 +213,7 @@ MonoBehaviour:
   nbRebounds: 1
   bulletSpeed: 5
   tankOwner: {fileID: 0}
+  correctionSmoothness: 0.992
 --- !u!135 &2219632991942527035
 SphereCollider:
   m_ObjectHideFlags: 0
