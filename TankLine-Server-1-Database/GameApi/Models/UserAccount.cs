@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 public class UserAccount
 {
     [Key]
@@ -29,7 +28,6 @@ public class UserAccount
     [Column("is_verified")]
     public bool IsVerified { get; set; } = false;  // Default value set to false
 
-    // New fields
     [Required]
     [Column("first_name")]
     [StringLength(50)]
@@ -42,5 +40,12 @@ public class UserAccount
 
     [Required]
     [Column("birth_date")]
-    public DateTime BirthDate { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
+    public DateTime BirthDate { get; set; } = DateTime.UtcNow.Date;
+
+    // New fields for password reset
+    [Column("password_reset_token")]
+    public string? PasswordResetToken { get; set; }
+
+    [Column("password_reset_expiration")]
+    public DateTime? PasswordResetExpiration { get; set; }
 }
