@@ -21,10 +21,6 @@ public class ConnectionRegistrationController : Controller
     private readonly GameDbContext _context;
     private readonly IConfiguration _configuration;
 
-    // Dictionary to temporarily store verification codes in memory
-    private static Dictionary<string, (string Code, DateTime Expiration)> verificationCodes = new();
-
-
     public ConnectionRegistrationController(GameDbContext context, IConfiguration configuration)
     {
         _context = context;
@@ -32,53 +28,53 @@ public class ConnectionRegistrationController : Controller
     }
 
     // Register a new user
-[HttpPost("register")]
-public async Task<IActionResult> Register([FromBody] UserAccount user)
-{
-    if (!ModelState.IsValid)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] UserAccount user)
     {
-        return BadRequest("Invalid data");
-    }
-
-    if (_context.UserAccounts.Any(u => u.Username == user.Username || u.Email == user.Email))
-    {
-        return BadRequest("Username or email already exists.");
-    }
-
-    try
-    {
-        string verificationCode = new Random().Next(100000, 999999).ToString();
-
-        // Hash password before saving it
-        user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
-        user.BirthDate = user.BirthDate.ToUniversalTime();
-
-        // Add the user to the database
-        _context.UserAccounts.Add(user);
-        await _context.SaveChangesAsync();
-
-        // Create a VerificationCode object and add it to the database
-        var verificationCodeEntity = new VerificationCode
+        if (!ModelState.IsValid)
         {
-            Email = user.Email,
-            Code = verificationCode,
-            Expiration = DateTime.UtcNow.AddMinutes(5) // Set expiration to 5 minutes from now
-        };
+            return BadRequest("Invalid data");
+        }
 
-        _context.VerificationCodes.Add(verificationCodeEntity);
-        await _context.SaveChangesAsync(); // Save the verification code to the database
+        if (_context.UserAccounts.Any(u => u.Username == user.Username || u.Email == user.Email))
+        {
+            return BadRequest("Username or email already exists.");
+        }
 
-        Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
+        try
+        {
+            string verificationCode = new Random().Next(100000, 999999).ToString();
 
-        SendVerificationEmail(user.Email, verificationCode);
+            // Hash password before saving it
+            user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
+            user.BirthDate = user.BirthDate.ToUniversalTime();
 
-        return Ok("Verification code sent to your email.");
+            // Add the user to the database
+            _context.UserAccounts.Add(user);
+            await _context.SaveChangesAsync();
+
+            // Create a VerificationCode object and add it to the database
+            var verificationCodeEntity = new VerificationCode
+            {
+                Email = user.Email,
+                Code = verificationCode,
+                Expiration = DateTime.UtcNow.AddMinutes(5) // Set expiration to 5 minutes from now
+            };
+
+            _context.VerificationCodes.Add(verificationCodeEntity);
+            await _context.SaveChangesAsync(); // Save the verification code to the database
+
+            Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
+
+            SendVerificationEmail(user.Email, verificationCode);
+
+            return Ok("Verification code sent to your email.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
-    catch (Exception ex)
-    {
-        return StatusCode(500, $"Internal server error: {ex.Message}");
-    }
-}
 
     [HttpPost("verify")]
     public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
@@ -199,6 +195,7 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         Response.Cookies.Delete("AuthToken");
         return Ok("Logged out successfully.");
     }
+
     [HttpPost("resend-verification-code")]
     public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerificationRequest request)
     {
@@ -217,7 +214,15 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         string newVerificationCode = new Random().Next(100000, 999999).ToString();
         
         // Update code and expiration date
-        verificationCodes[user.Email] = (newVerificationCode, DateTime.UtcNow.AddMinutes(5)); 
+        var verificationCodeEntity = new VerificationCode
+        {
+            Email = user.Email,
+            Code = newVerificationCode,
+            Expiration = DateTime.UtcNow.AddMinutes(5) // Set expiration to 5 minutes from now
+        };
+
+        _context.VerificationCodes.Add(verificationCodeEntity);
+        await _context.SaveChangesAsync(); // Save the verification code to the database
 
         Console.WriteLine($"New verification code for {user.Email}: {newVerificationCode}");
 
@@ -263,11 +268,11 @@ public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRe
         return BadRequest("User not found.");
     }
 
-    // Générer un code de 6 chiffres
+    
     string resetCode = new Random().Next(100000, 999999).ToString();
-    var expirationTime = DateTime.UtcNow.AddMinutes(5); // Expiration en 5 minutes
+    var expirationTime = DateTime.UtcNow.AddMinutes(5); // Expiration in 5 minutes
 
-    // Mise à jour des informations du compte utilisateur avec le token et son expiration
+    // Update user account information with token and expiration date
     user.PasswordResetToken = resetCode;
     user.PasswordResetExpiration = expirationTime;
 
@@ -279,11 +284,11 @@ public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRe
     user.BirthDate = DateTime.UtcNow.Date;
 
 
-    // Sauvegarder les changements dans la base de données
+    // Save changes to the database
     _context.UserAccounts.Update(user);
     await _context.SaveChangesAsync();
 
-    // Envoyer l'email avec le code
+    // Send email with code
     SendPasswordResetEmail(user.Email, resetCode);
 
     return Ok("Password reset code has been sent to your email.");
@@ -344,14 +349,14 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest r
 {
     Console.WriteLine($"In reset-password");
 
-    // Rechercher l'utilisateur par email
+    // Search user by email
     var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.Email == request.Email);
     if (user == null)
     {
         return BadRequest("User not found.");
     }
 
-    // Vérifier si le code de réinitialisation est correct
+    // Check that the reset code is correct
     if (user.PasswordResetToken == null)
     {
         return BadRequest("No reset code found.");
@@ -359,22 +364,22 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest r
 
     if (DateTime.UtcNow > user.PasswordResetExpiration)
     {
-        user.PasswordResetToken = null; // Supprimer le code expiré
-        user.PasswordResetExpiration = null; // Supprimer l'expiration
+        user.PasswordResetToken = null; // Delete expired code
+        user.PasswordResetExpiration = null; // Delete expiration
         await _context.SaveChangesAsync();
         return BadRequest("Reset code expired.");
     }
 
-    // Vérifier que le code correspond
+    // Check that the code matches
     if (user.PasswordResetToken != request.Code)
     {
         return BadRequest("Invalid reset code.");
     }
 
-    // Hacher le nouveau mot de passe et l'enregistrer
+    // Hash the new password and save it
     user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
     
-    // Supprimer le code après utilisation
+    // Delete code after use
     user.PasswordResetToken = null;
     user.PasswordResetExpiration = null;
 
