@@ -11,11 +11,7 @@ public class Bullet : NetworkBehaviour {
 
     [HideInInspector]
     /// <summary> This bullet direction </summary>
-<<<<<<< HEAD
-    public Vector3 direction;
-=======
     public readonly SyncVar<Vector3> direction = new(new SyncTypeSettings(.1f));
->>>>>>> 3457b6c8c44cd596e29e342480e322f2f9eee84b
 
     /// <summary> This bullet speed movement (READONLY) </summary>
     [Range(1,10)]

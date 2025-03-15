@@ -5,9 +5,10 @@ using System;
 
 public class ClientSettings : MonoBehaviour
 {
+    private NetworkManager nm;
     private void Start()
     {
-        NetworkManager nm = FindObjectOfType<NetworkManager>();
+        nm = FindObjectOfType<NetworkManager>();
         if (nm)
         {
             Tugboat transport = nm.GetComponent<Tugboat>();
@@ -18,14 +19,9 @@ public class ClientSettings : MonoBehaviour
                 int serverPort = GetServerPort();
 
                 transport.SetClientAddress(serverIP);
-                transport.SetPort((ushort)serverPort); 
+                transport.SetPort((ushort)serverPort);
 
-                Debug.Log($"[CLIENT] Connecting to {serverIP}:{serverPort}...");
                 nm.ClientManager.StartConnection();
-            }
-            else
-            {
-                Debug.LogError("Tugboat transport not found on the NetworkManager.");
             }
         }
     }
@@ -33,12 +29,12 @@ public class ClientSettings : MonoBehaviour
     private string GetServerIP()
     {
         string ip = Environment.GetEnvironmentVariable("GAME_SERVER_IP");
-        return string.IsNullOrEmpty(ip) ? "127.0.0.1" : ip; 
+        return string.IsNullOrEmpty(ip) ? "127.0.0.0" : ip; // localhost if no env variable
     }
 
     private int GetServerPort()
     {
         string port = Environment.GetEnvironmentVariable("GAME_SERVER_PORT");
-        return int.TryParse(port, out int result) ? result : 7777; // Default port
+        return int.TryParse(port, out int result) ? result : 7770; // Default port if no env variable
     }
 }

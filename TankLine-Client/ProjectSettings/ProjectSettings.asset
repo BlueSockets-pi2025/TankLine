@@ -819,6 +819,7 @@ PlayerSettings:
   webWasm2023: 0
   scriptingDefineSymbols:
     Server: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
+    Standalone: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -917,11 +918,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: dfc32cba-0a05-4851-ac75-0fee86130862
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: TankLine-Client 2025-03-14_10-16-02
+  organizationId: jeer0
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

@@ -9,7 +9,7 @@ public class ConnectionManager : MonoBehaviour
         #if UNITY_EDITOR
         InstanceFinder.ServerManager.StartConnection();
         #else
-        InstanceFinder.ClientManager.StartConnection();
+        InstanceFinder.ServerManager.StartConnection();
         #endif
     }
 
