@@ -432,7 +432,6 @@ GameObject:
   - component: {fileID: 4900683280261623425}
   - component: {fileID: 5524376811357180335}
   - component: {fileID: 307735877985916240}
-  - component: {fileID: 8575061480058094335}
   - component: {fileID: -3410860999414902105}
   - component: {fileID: -1598429286657545220}
   m_Layer: 10
@@ -509,27 +508,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8575061480058094335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5713213973998924859}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b166510f9b64fc4aaae047c22d68eef8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 0
-  _addedNetworkObject: {fileID: -1598429286657545220}
-  _networkObjectCache: {fileID: -1598429286657545220}
-  movementSpeed: 3
-  rotationSpeed: 0.06544985
-  nbLifeLeft: 3
-  bulletPrefab: {fileID: 2376455214160315203, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
-  nbBulletShot: 0
-  MaxBulletShot: 5
 --- !u!114 &-3410860999414902105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -613,7 +591,7 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
-  - {fileID: 8575061480058094335}
+  - {fileID: 0}
   - {fileID: -3410860999414902105}
   - {fileID: 3318211169300821891}
   InitializedParentNetworkBehaviour: {fileID: 0}
