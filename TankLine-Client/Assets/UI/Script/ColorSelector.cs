@@ -8,7 +8,7 @@ public class ColorSelector : MonoBehaviour
     public Button c1, c2, c3;
     private Button selectedButton;
     private Color originalColor = Color.white;
-
+ 
     private void Start()
     {
         c1.onClick.AddListener(() => SetColor(Color.red, c1));
