@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 259068394}
   - component: {fileID: 259068393}
   m_Layer: 0
-  m_Name: jsontest
+  m_Name: LoadSceneFromJSON
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01bbadf26f1ef7a4b911301c7165fc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapFileName: NewMap10.json
+  mapFileName: MapSpring1.JSON
   prefabManager: {fileID: 836237275}
 --- !u!4 &259068394
 Transform:
@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 836237276}
   - component: {fileID: 836237275}
   m_Layer: 0
-  m_Name: objPrefabManager
+  m_Name: PrefabManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

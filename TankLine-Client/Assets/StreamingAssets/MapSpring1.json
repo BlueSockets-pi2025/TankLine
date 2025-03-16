@@ -1,0 +1,2080 @@
+{
+  "name": "MapSpring1",
+  "objects": [
+    {
+      "prefabName": "Main Camera",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "MainCamera",
+      "position": {
+        "x": 0.0,
+        "y": 15.0,
+        "z": -6.0
+      },
+      "rotation": {
+        "x": 70.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": {
+        "fieldOfView": 60.0,
+        "nearClipPlane": 0.3,
+        "farClipPlane": 1000.0,
+        "hasAudioListener": true,
+        "isAdditionalCamera": true
+      },
+      "lightData": null
+    },
+    {
+      "prefabName": "Directional Light",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": 0.0,
+        "y": 3.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 50.0,
+        "y": 330.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": {
+        "type": 1,
+        "intensity": 2.0,
+        "color": {
+          "r": 1.0,
+          "g": 1.0,
+          "b": 1.0,
+          "a": 1.0
+        },
+        "shadows": true,
+        "isAdditionalLight": true
+      }
+    },
+    {
+      "prefabName": "map",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [
+        {
+          "prefabName": "floor",
+          "materialName": "Lit",
+          "modelName": "Plane",
+          "tag": "Untagged",
+          "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 3.0,
+            "y": 1.0,
+            "z": 3.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "topWall",
+          "materialName": "Lit",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 6.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 18.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "leftWall",
+          "materialName": "Lit",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -9.5,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 14.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "rightWall",
+          "materialName": "Lit",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 9.5,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 14.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "bottomWall",
+          "materialName": "Lit",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": -6.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 18.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        }
+      ],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BushGroupe1",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": -6.88529,
+        "y": 1.0,
+        "z": 3.93968248
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BushGroup"
+      ],
+      "children": [
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -7.5,
+            "y": 1.0,
+            "z": 4.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -7.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -7.5,
+            "y": 1.0,
+            "z": 2.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -6.5,
+            "y": 1.0,
+            "z": 4.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -6.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -5.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -6.5,
+            "y": 1.0,
+            "z": 2.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        }
+      ],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BushGroupe2",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": -4.564973,
+        "y": -0.113714486,
+        "z": -4.25526428
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BushGroup"
+      ],
+      "children": [
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -5.5,
+            "y": 1.0,
+            "z": -3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -5.5,
+            "y": 1.0,
+            "z": -4.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -5.5,
+            "y": 1.0,
+            "z": -5.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -4.5,
+            "y": 1.0,
+            "z": -3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -4.5,
+            "y": 1.0,
+            "z": -4.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": -4.5,
+            "y": 1.0,
+            "z": -5.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        }
+      ],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BushGroupe3",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Untagged",
+      "position": {
+        "x": 5.435027,
+        "y": -0.113714486,
+        "z": 3.74473572
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BushGroup"
+      ],
+      "children": [
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 4.5,
+            "y": 1.0,
+            "z": 4.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 4.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 2.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 3.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 1.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 4.5,
+            "y": 1.0,
+            "z": 2.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 3.5,
+            "y": 1.0,
+            "z": 2.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 5.5,
+            "y": 1.0,
+            "z": 4.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 5.5,
+            "y": 1.0,
+            "z": 3.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        },
+        {
+          "prefabName": "BushWall",
+          "materialName": "BushTest",
+          "modelName": "Cube",
+          "tag": "Untagged",
+          "position": {
+            "x": 5.5,
+            "y": 1.0,
+            "z": 2.5
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 1.0
+          },
+          "scripts": [
+            "BushObject"
+          ],
+          "children": [],
+          "cameraData": null,
+          "lightData": null
+        }
+      ],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -5.5,
+        "y": 1.0,
+        "z": 2.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "tank",
+      "materialName": "",
+      "modelName": "Unknown",
+      "tag": "Player",
+      "position": {
+        "x": 2.0,
+        "y": 0.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 90.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.1,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "Tank_Player"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -7.5,
+        "y": 1.0,
+        "z": 1.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -6.5,
+        "y": 1.0,
+        "z": -2.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -3.5,
+        "y": 1.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 1.5,
+        "y": 1.0,
+        "z": -2.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -7.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -6.5,
+        "y": 1.0,
+        "z": -3.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -3.5,
+        "y": 1.0,
+        "z": -5.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 1.5,
+        "y": 1.0,
+        "z": -3.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 3.5,
+        "y": 1.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 4.5,
+        "y": 1.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 5.5,
+        "y": 1.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 5.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 4.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 3.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 6.5,
+        "y": 1.0,
+        "z": -3.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -5.5,
+        "y": 1.0,
+        "z": -0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -1.5,
+        "y": 1.0,
+        "z": -0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -2.5,
+        "y": 1.0,
+        "z": 3.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 1.5,
+        "y": 1.0,
+        "z": 4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -4.5,
+        "y": 1.0,
+        "z": -0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -0.5,
+        "y": 1.0,
+        "z": -0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": -1.5,
+        "y": 1.0,
+        "z": 3.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 2.5,
+        "y": 1.0,
+        "z": 4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 3.5,
+        "y": 1.0,
+        "z": 4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "BreakableWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "BreakableWall",
+      "position": {
+        "x": 0.5,
+        "y": 1.0,
+        "z": -0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [
+        "BreakableObject"
+      ],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -7.5,
+        "y": 1.0,
+        "z": -2.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -1.5,
+        "y": 1.0,
+        "z": -3.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -2.5,
+        "y": 1.0,
+        "z": -0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 0.5,
+        "y": 1.0,
+        "z": -1.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 0.5,
+        "y": 1.0,
+        "z": 1.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 1.5,
+        "y": 1.0,
+        "z": -1.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 4.5,
+        "y": 1.0,
+        "z": -2.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 6.5,
+        "y": 1.0,
+        "z": -1.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 6.5,
+        "y": 1.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 6.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 7.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 1.5,
+        "y": 1.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -2.5,
+        "y": 1.0,
+        "z": 0.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -2.5,
+        "y": 1.0,
+        "z": 1.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -1.5,
+        "y": 1.0,
+        "z": 4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": -0.5,
+        "y": 1.0,
+        "z": 4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    },
+    {
+      "prefabName": "StaticWall",
+      "materialName": "Lit",
+      "modelName": "Cube",
+      "tag": "StaticWall",
+      "position": {
+        "x": 6.5,
+        "y": 1.0,
+        "z": 4.5
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "scripts": [],
+      "children": [],
+      "cameraData": null,
+      "lightData": null
+    }
+  ]
+}
