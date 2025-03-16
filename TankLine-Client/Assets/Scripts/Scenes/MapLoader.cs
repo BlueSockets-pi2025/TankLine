@@ -9,38 +9,49 @@ public class MapLoader : MonoBehaviour
     public string mapFileName;
     public PrefabManager prefabManager;
     public Dictionary<string, GameObject> prefabDictionary;
+
+    //"save&load.test" is the name of an AssetBundles. We need to create one to bundle all the files needed for loading.
+#if UNITY_EDITOR
+    // In Editor mode, load from an external folder.
     static string bundlePath = Path.Combine(Application.dataPath, "../AssetBundles/save&load.test");
-    //For build ! and move AssetBundles to StreamingAssets/
-    // string bundlePath = Path.Combine(Application.streamingAssetsPath, "/AssetBundles/save&load.test");
+#else
+    // In Build, load from StreamingAssets (we need to move the folder "AssetBundles" in the folder "StreamingAssets").
+    static string bundlePath = Path.Combine(Application.streamingAssetsPath, "AssetBundles/save&load.test");
+#endif
+
     private AssetBundle myBundle;
 
     void Start()
     {
+        //Path verification
         if (prefabManager == null)
         {
-            Debug.LogError("PrefabManager n'est pas assigné!");
+            Debug.LogError("PrefabManager is not assigned.");
         }
         if (prefabManager.prefabDictionary.Count == 0)
         {
-            Debug.LogError("Le dictionnaire de prefabs est vide!");
+            Debug.LogError("The prefabs dictionary is empty.");
         }
         myBundle = AssetBundle.LoadFromFile(bundlePath);
         if (myBundle == null)
         {
-            Debug.LogError("Échec du chargement de l'AssetBundle !");
+            Debug.LogError("AssetBundle failed to load.");
             return;
         }
+        //Load the map from the name of the file
         LoadMap(mapFileName);
     }
 
     void LoadMap(string fileName)
     {
+        //Load the JSON file from the StreamingAssets folder.
         string path = Path.Combine(Application.streamingAssetsPath, fileName);
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
             MapData map = JsonConvert.DeserializeObject<MapData>(json);
 
+            //Foreach objects in the JSON file, instantiate the object. (Reminder: these are only the parent objects)
             foreach (var objData in map.objects)
             {
                 InstantiateObject(objData, null);
@@ -48,48 +59,51 @@ public class MapLoader : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Fichier JSON non trouvé : " + path);
+            Debug.LogError("JSON file not found: " + path);
         }
     }
 
+    //To Instantiate any Object
     GameObject InstantiateObject(GameObjectData objData, Transform parent)
     {
         GameObject prefab = null;
 
-        // Vérifie si un prefab existe dans le dictionnaire
+        // Checks if a prefab exists in the dictionary (see PrefabManager.cs).
         if (prefabManager.prefabDictionary.ContainsKey(objData.prefabName))
         {
+            //Takes the existing prefab.
             prefab = prefabManager.prefabDictionary[objData.prefabName];
         }
         else
         {
+            //Search if there is a 3D Model.
             prefab = LoadModelFromResources(objData.modelName);
 
-            // Si aucun modèle n'est trouvé dans les ressources, crée un objet  Unity de base
+            // If no model is found in the resources, creates a base Unity object.
             if (prefab == null)
             {
                 prefab = CreatePrimitiveObject(objData.modelName);
+                //CreatePrimitive creates a GameObjectEmpty. Destroy this GameObject to instantiate only the one needed.
                 Destroy(prefab);
-                // return Instantiate(CreatePrimitiveObject(objData.modelName), objData.position.ToVector3(), Quaternion.Euler(objData.rotation.ToVector3()), parent);
             }
         }
 
-        // Vérifie que le prefab est valide
+        // Check that the prefab is valid.
         if (prefab == null)
         {
-            Debug.LogError("Prefab est null pour : " + objData.prefabName);
+            Debug.LogError("Prefab is null for: " + objData.prefabName);
             return null;
         }
 
-        Debug.Log("Instanciation de : " + objData.prefabName);
-        //Instancier l'objet
+        //Instantiate the object.
         GameObject instance = Instantiate(prefab, objData.position.ToVector3(), Quaternion.Euler(objData.rotation.ToVector3()), parent);
-        // Debug.Log("Prefab instancié : " + instance.name);
-        // instance.name = objData.prefabName;
+        //Set the name to the prefabName of the original scene and not the name of the prefab to be instantiated.
+        instance.name = objData.prefabName;
         instance.transform.localScale = objData.scale.ToVector3();
         instance.transform.SetParent(parent);
         instance.tag = objData.tag;
 
+        //If the gameObject is a camera, instantiate the data.
         if (objData.cameraData != null)
         {
             Camera cam = instance.AddComponent<Camera>();
@@ -108,6 +122,7 @@ public class MapLoader : MonoBehaviour
             }
         }
 
+        //If the gameObject is a light, instantiate the data.
         if (objData.lightData != null)
         {
             Light light = instance.AddComponent<Light>();
@@ -122,6 +137,7 @@ public class MapLoader : MonoBehaviour
             }
         }
 
+        //Foreach scripts, if there is any, add them to the gameObject.
         foreach (string scriptName in objData.scripts)
         {
             System.Type scriptType = System.Type.GetType(scriptName);
@@ -134,12 +150,14 @@ public class MapLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Script non trouvé : " + scriptName);
+                Debug.LogWarning("Script not found: " + scriptName);
             }
         }
 
+        //Apply the material if there is one.
         ApplyMaterial(instance, objData.materialName);
 
+        //Instantiate all the children, if there is any.
         foreach (var childData in objData.children)
         {
             if (childData != null)
@@ -151,12 +169,12 @@ public class MapLoader : MonoBehaviour
         return instance;
     }
 
-    // Méthode pour charger un modèle à partir des ressources
+    //Load a model from resources.
     GameObject LoadModelFromResources(string modelName)
     {
         if (!string.IsNullOrEmpty(modelName) && myBundle != null)
         {
-            // Essaye de charger le modèle à partir du dossier Resources/3D_Models/
+            //Try loading the model from the "Resources/3D_Models/" folder
             GameObject model = myBundle.LoadAsset<GameObject>(modelName);
             if (model != null)
             {
@@ -164,18 +182,18 @@ public class MapLoader : MonoBehaviour
             }
             else
             {
-                // Debug.LogWarning("Modèle non trouvé dans les ressources : " + modelName);
+                // Debug.LogWarning("Model not found in resources: " + modelName);
             }
         }
         return null;
     }
 
-    // Méthode pour créer un objet Unity de base (Cube, Sphère, etc.)
+    //Create a basic Unity object (Cube, Sphere, etc.) or an EmptyGameObject
     GameObject CreatePrimitiveObject(string modelName)
     {
         if (!string.IsNullOrEmpty(modelName))
         {
-            switch (modelName.ToLower()) // Utilise ToLower pour gérer la casse
+            switch (modelName.ToLower())
             {
                 case "cube":
                     return GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -188,16 +206,15 @@ public class MapLoader : MonoBehaviour
                 case "capsule":
                     return GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 default:
-                    // Debug.LogWarning("Modèle inconnu : " + modelName);
                     break;
             }
         }
 
-        // Si le modèle n'est pas reconnu ou trouvé, on crée un objet vide
+        //If the model is not recognized or found, an EmptyGameObject is created
         return new GameObject(modelName);
     }
 
-    // Applique un matériau à l'instance si un nom de matériau est fourni
+    //Applies a material to the instance if a material name is provided
     void ApplyMaterial(GameObject instance, string materialName)
     {
         Renderer renderer = instance.GetComponent<Renderer>();
@@ -211,7 +228,7 @@ public class MapLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Matériau non trouvé : " + materialName);
+                // Debug.LogWarning("Material not found: " + materialName);
             }
         }
     }

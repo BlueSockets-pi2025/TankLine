@@ -5,6 +5,7 @@ using UnityEditor;
 using System.IO;
 using Newtonsoft.Json;
 
+//To save position, rotation, and size.
 [System.Serializable]
 public class SerializableVector3
 {
@@ -21,6 +22,7 @@ public class SerializableVector3
     }
 }
 
+//Name of the file/Scene.
 [System.Serializable]
 public class MapData
 {
@@ -28,6 +30,7 @@ public class MapData
     public List<GameObjectData> objects = new List<GameObjectData>();
 }
 
+//To save the data of the camera.
 [System.Serializable]
 public class CameraData
 {
@@ -38,6 +41,7 @@ public class CameraData
     public bool isAdditionalCamera; // URP Support
 }
 
+//To save the color of the light if needed.
 [System.Serializable]
 public class SerializableColor
 {
@@ -57,6 +61,7 @@ public class SerializableColor
     }
 }
 
+//To save the data of the light.
 [System.Serializable]
 public class LightData
 {
@@ -67,6 +72,7 @@ public class LightData
     public bool isAdditionalLight; // URP Support
 }
 
+//To save the data of any object (parameters in JSON).
 [System.Serializable]
 public class GameObjectData
 {
@@ -85,18 +91,19 @@ public class GameObjectData
 
 public class SceneToJsonExporter : MonoBehaviour
 {
-    public string mapName = "NewMap.json";
+    // You can also change the name in the Unity Editor when saving. 
+    public string mapName = "NameScene.json";
 
+    //Foreach of the GameObjects in the Scene who are root objects, export the object annd put them in JSON
     public void ExportScene()
     {
         MapData mapData = new MapData { name = mapName };
         GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
         List<GameObjectData> objects = new List<GameObjectData>();
 
-        // foreach (GameObject obj in FindObjectsByType<GameObject>(FindObjectsSortMode.None))
         foreach (GameObject obj in rootObjects)
         {
-            if (obj.transform.parent == null) // Ne prendre que les objets racines
+            if (obj.transform.parent == null) //Take only root objects
             {
                 mapData.objects.Add(ExportGameObject(obj));
             }
@@ -106,10 +113,10 @@ public class SceneToJsonExporter : MonoBehaviour
         string path = Path.Combine(Application.streamingAssetsPath, mapName + ".json");
 
         File.WriteAllText(path, json);
-        Debug.Log("Scene exported to " + path);
     }
 
 
+    //Export all the parameters of the GameObject.
     GameObjectData ExportGameObject(GameObject obj)
     {
         GameObjectData objData = new GameObjectData
@@ -125,6 +132,7 @@ public class SceneToJsonExporter : MonoBehaviour
             tag = obj.tag
         };
 
+        //If the gameObject is a camera, export its parameters, and data if there is any.
         Camera cam = obj.GetComponent<Camera>();
         if (cam != null)
         {
@@ -136,7 +144,7 @@ public class SceneToJsonExporter : MonoBehaviour
                 hasAudioListener = obj.GetComponent<AudioListener>() != null
             };
 
-            // Vérifie si l'objet a UniversalAdditionalCameraData (URP)
+            //Checks if the object has UniversalAdditionalCameraData (URP)
             var additionalCamData = obj.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
             if (additionalCamData != null)
             {
@@ -144,6 +152,7 @@ public class SceneToJsonExporter : MonoBehaviour
             }
         }
 
+        //If the gameObject is a light, export its parameters, and data if there is any.
         Light light = obj.GetComponent<Light>();
         if (light != null)
         {
@@ -162,6 +171,7 @@ public class SceneToJsonExporter : MonoBehaviour
             }
         }
 
+        //If there are scripts, add them to a list.
         foreach (MonoBehaviour script in obj.GetComponents<MonoBehaviour>())
         {
             if (script != null)
@@ -170,6 +180,7 @@ public class SceneToJsonExporter : MonoBehaviour
             }
         }
 
+        //If there are children, export them too (by recursive).
         foreach (Transform child in obj.transform)
         {
             objData.children.Add(ExportGameObject(child.gameObject));
@@ -177,19 +188,23 @@ public class SceneToJsonExporter : MonoBehaviour
 
         return objData;
     }
+
+    //To get the prefab's name instead of the name of the object in the scene (to match with the prefab when loading the scene).
     string GetPrefabName(GameObject obj)
     {
+        //Only available when you are using Unity Editor.
 #if UNITY_EDITOR
         GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(obj);
         if (prefab != null)
         {
-            return prefab.name; // 🔥 Retourne le nom du prefab au lieu du nom de l'objet dans la scène
+            return prefab.name; // Returns the name of the prefab instead of the name of the object in the scene
         }
 #endif
-        return obj.name; // Si ce n'est pas un prefab, on garde son nom actuel
+        return obj.name; // If it is not a prefab, we keep its current name
     }
 }
 
+//To have the button to export in the Unity Editor only.
 #if UNITY_EDITOR
 [CustomEditor(typeof(SceneToJsonExporter))]
 public class SceneToJsonExporterEditor : Editor
