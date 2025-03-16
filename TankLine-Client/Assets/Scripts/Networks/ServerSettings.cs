@@ -8,12 +8,12 @@ public class ServerSettings : MonoBehaviour
   private NetworkManager nm;
   private void Awake()
   {
+    // check if the script is running on the server with the env variable "IS_DEDICATED_SERVER"
     string isDedicatedServer = Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER");
-    Debug.Log($"Env variable : ${isDedicatedServer}");
 
+    if (String.Compare(isDedicatedServer, "true") == 0) {
+      Debug.Log("[SERVER] Server initialized");
 
-    if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) // verify if the server is headless
-    {
       nm = FindFirstObjectByType<NetworkManager>();
       if (nm)
       {
