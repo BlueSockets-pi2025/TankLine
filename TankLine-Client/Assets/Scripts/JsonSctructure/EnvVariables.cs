@@ -1,6 +1,6 @@
 
 [System.Serializable]
-public class envVariables
+public class EnvVariables
 {
     public string GAME_SERVER_IP;
     public string GAME_SERVER_PORT;

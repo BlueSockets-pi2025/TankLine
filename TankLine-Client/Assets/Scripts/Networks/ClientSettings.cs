@@ -2,9 +2,12 @@ using UnityEngine;
 using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using System;
+using System.IO;
 
 public class ClientSettings : MonoBehaviour
 {
+    public const string PathToEnvFile = "/Scripts/.env";
+    public EnvVariables serverConfig;
     private NetworkManager nm;
     private void Start()
     {
@@ -15,26 +18,20 @@ public class ClientSettings : MonoBehaviour
 
             if (transport != null)
             {
-                string serverIP = GetServerIP();
-                int serverPort = GetServerPort();
+                LoadServerConfig();
+                Debug.Log(serverConfig);
 
-                transport.SetClientAddress(serverIP);
-                transport.SetPort((ushort)serverPort);
+                transport.SetClientAddress(string.IsNullOrEmpty(serverConfig.GAME_SERVER_IP) ? "127.0.0.0" : serverConfig.GAME_SERVER_IP);
+                transport.SetPort((ushort) (int.TryParse(serverConfig.GAME_SERVER_PORT, out int result) ? result : 7770));
 
                 nm.ClientManager.StartConnection();
             }
         }
     }
 
-    private string GetServerIP()
+    private void LoadServerConfig()
     {
-        string ip = Environment.GetEnvironmentVariable("GAME_SERVER_IP");
-        return string.IsNullOrEmpty(ip) ? "127.0.0.0" : ip; // localhost if no env variable
-    }
-
-    private int GetServerPort()
-    {
-        string port = Environment.GetEnvironmentVariable("GAME_SERVER_PORT");
-        return int.TryParse(port, out int result) ? result : 7770; // Default port if no env variable
+        string jsonEnv = File.ReadAllText(Application.dataPath + PathToEnvFile);
+        serverConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
     }
 }
