@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6377404430806257987}
   - component: {fileID: 3585466365582590129}
   - component: {fileID: 7080833071844431531}
-  - component: {fileID: 1826135212300688159}
+  - component: {fileID: -331273795571827515}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -47,13 +47,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c95dfde7d73b54dbbdc23155d35d36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _logging: {fileID: 0}
+  _spawnablePrefabs: {fileID: 11400000, guid: 9fb6efb1e4feb4cb4b2866b97ead025d, type: 2}
   _refreshDefaultPrefabs: 0
   _runInBackground: 1
   _dontDestroyOnLoad: 1
   _objectPool: {fileID: 0}
   _persistence: 0
-  _logging: {fileID: 0}
-  _spawnablePrefabs: {fileID: 11400000, guid: 9fb6efb1e4feb4cb4b2866b97ead025d, type: 2}
 --- !u!114 &3585466365582590129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,7 +94,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
---- !u!114 &1826135212300688159
+--- !u!114 &-331273795571827515
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -103,6 +103,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7002734967816552031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a78e21b8cd46ef4cbfdf0683f68225d, type: 3}
+  m_Script: {fileID: 11500000, guid: de3db45ac640019d78cce6578fcbfbcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serverConfig:
+    GAME_SERVER_IP: 
+    GAME_SERVER_PORT: 

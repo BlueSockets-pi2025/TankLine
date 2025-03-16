@@ -5,7 +5,6 @@ using UnityEngine;
 public class Tank_Player : Tank
 {
     /// <summary> The bullet prefab </summary>
-    [HideInInspector]
     public GameObject bulletPrefab;
 
 

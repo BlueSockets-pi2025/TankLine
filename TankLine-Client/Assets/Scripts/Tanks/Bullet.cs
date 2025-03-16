@@ -74,7 +74,6 @@ public class Bullet : NetworkBehaviour {
             } else {
                 thisBullet.transform.Translate(correctionWithServer);
             }
-            Debug.Log($"Correction : {correctionWithServer}, position : {thisBullet.transform.position}, virtualPosition : {virtualServerPosition}");
         }
 
         // move the bullet
