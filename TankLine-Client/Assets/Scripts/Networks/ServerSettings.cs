@@ -8,9 +8,13 @@ public class ServerSettings : MonoBehaviour
   private NetworkManager nm;
   private void Awake()
   {
+    string isDedicatedServer = Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER");
+    Debug.Log($"Env variable : ${isDedicatedServer}");
+
+
     if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) // verify if the server is headless
     {
-      nm = FindObjectOfType<NetworkManager>();
+      nm = FindFirstObjectByType<NetworkManager>();
       if (nm)
       {
         Tugboat transport = nm.GetComponent<Tugboat>();
