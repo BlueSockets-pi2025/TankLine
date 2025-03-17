@@ -80,41 +80,54 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
     }
 }
 
-[HttpPost("verify")]
-public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
-{   
-    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-    if (user == null)
-    {
-        return BadRequest("Invalid user.");
+
+
+    [HttpPost("verify")]
+    public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
+    {   
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+        {
+            return BadRequest("Invalid user.");
+        }
+
+        if (user.IsVerified)
+        {
+            return BadRequest("Account already verified.");
+        }
+
+        // Check if the verification code is correct and not expired
+        if (user.VerificationCode != request.Code || user.VerificationExpiration < DateTime.UtcNow)
+        {
+            return BadRequest("Invalid or expired verification code.");
+        }
+
+        // Mark the user as verified
+        user.IsVerified = true;
+        user.VerificationCode = null; // Remove the code after verification
+        user.VerificationExpiration = null;
+        user.BirthDate = user.BirthDate.ToUniversalTime();
+
+        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+
+        _context.UserAccounts.Update(user);
+        await _context.SaveChangesAsync();
+
+        // Create a default entry in user_statistics
+        var userStatistics = new UserStatistic
+        {
+            Username = user.Username // Use the username from UserAccount
+        };
+
+        _context.UserStatistics.Add(userStatistics);
+        
+        await _context.SaveChangesAsync();
+
+        Console.WriteLine($"Account verified successfully for {request.Email}");
+
+        return Ok("Account verified successfully.");
     }
 
-    if (user.IsVerified)
-    {
-        return BadRequest("Account already verified.");
-    }
-
-    // Check if the verification code is correct and not expired
-    if (user.VerificationCode != request.Code || user.VerificationExpiration < DateTime.UtcNow)
-    {
-        return BadRequest("Invalid or expired verification code.");
-    }
-
-    // Mark the user as verified
-    user.IsVerified = true;
-    user.VerificationCode = null; // Remove the code after verification
-    user.VerificationExpiration = null;
-    user.BirthDate = user.BirthDate.ToUniversalTime();
-
-    user.CreatedAt = user.CreatedAt.ToUniversalTime();
-
-    _context.UserAccounts.Update(user);
-    await _context.SaveChangesAsync();
-
-    Console.WriteLine($"Account verified successfully for {request.Email}");
-
-    return Ok("Account verified successfully.");
-}
 
     private void SendVerificationEmail(string email, string code)
     {

@@ -83,5 +83,28 @@ namespace GameApi.Controllers
 
             return Ok(user);
         }
+        
+        [Authorize]
+        [HttpGet("me/statistics")]
+        public async Task<IActionResult> GetCurrentUserStatistics()
+        {
+            Console.WriteLine("GET CURRENT USER STATISTICS..."); // Debug
+
+            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
+            {
+                return Unauthorized("Invalid token or missing user information.");
+            }
+
+            var username = subClaim.Value;
+            var statistics = await _context.UserStatistics.FirstOrDefaultAsync(s => s.Username == username);
+            
+            if (statistics == null)
+            {
+                return NotFound("User statistics not found.");
+            }
+
+            return Ok(statistics);
+        }
     }
 }
