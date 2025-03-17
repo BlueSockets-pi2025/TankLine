@@ -1,21 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
-// using FishNet.Object;
-// using FishNet.Object.Synchronizing;
 
 //Object that breaks after a certain number of lives, and changes texture/material with each life
-public class BreakableObject : MonoBehaviour
-// à mettre quand ajout de FishNet/multi
-// public class BreakableObject : NetworkBehaviour
+public class BreakableObject : NetworkBehaviour
 {
-    // à mettre quand ajout de FishNet/multi
-    // [SyncVar(OnChange = nameof(UpdateVisualState))]
-    public int health = 3; // Number of hits required to break the object
+    private readonly SyncVar<int> health = new(new SyncTypeSettings(1f)); // Number of hits required to break the object
+
+    public int nbStartingLife = 3;
 
     public Material[] textures; // Texture (public Texture[]) or Material (public Material[]) table to represent the number of lives remaining
     private Renderer objRenderer;
     private Rigidbody rb;
+
+    private void Awake()
+    {
+        objRenderer = GetComponent<Renderer>();
+        if (objRenderer == null)
+        {
+            Debug.LogError("Renderer not found on " + gameObject.name);
+        }
+
+        health.Value = nbStartingLife;
+        health.OnChange += OnHealthChange;
+    }
 
     private void Start()
     {
@@ -27,50 +35,22 @@ public class BreakableObject : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
 
-        objRenderer = GetComponent<Renderer>();
-        if (objRenderer == null)
-        {
-            Debug.LogError("Renderer not found on " + gameObject.name);
-        }
-        UpdateVisualState(health, health, true); // Apply the correct texture at the start
+        UpdateVisualState(health.Value, health.Value, true); // Apply the correct texture at the start
     }
 
-    private void OnCollisionEnter(Collision other) //need a rigibody on the TankShell and no trigger
-    {
-        // Check if the object was hit by a projectile
-        if (other.collider.CompareTag("TankShell"))
-        {
-            // à mettre quand ajout de FishNet/multi
-            // if (IsServer) // Only the server handles damage
-            // {
-            TakeDamage();
-            // }
-        }
+    public void TakeDamage() {
+        health.Value--;
     }
 
-    // à mettre quand ajout de FishNet/multi
-    // [Server] // Ensures only the server modifies health
-    void TakeDamage()
+    public void OnHealthChange(int previousHealth, int nextHealth, bool asServer)
     {
-        if (health > 0)
+        if (nextHealth == 0)
         {
-            var oldHealth = health;
-            health--;
-            UpdateVisualState(oldHealth, health, true);
-            // Debug.Log($"{gameObject.name} health: {health}"); //pour vérifier lors du multi
-            if (health == 0)
-            {
-                RpcBreak(); // Destroys the object on all clients
-            }
+            if (base.IsServerInitialized)
+                Despawn(gameObject);
         }
-    }
 
-    // à mettre quand ajout de FishNet/multi
-    // [ObserversRpc]
-    void RpcBreak()
-    {
-        // Debug.Log($"{gameObject.name} has been broken!"); //pour vérifier lors du multi
-        Destroy(gameObject);
+        UpdateVisualState(previousHealth, nextHealth, true);
     }
 
     void UpdateVisualState(int oldHealth, int newHealth, bool asServer)

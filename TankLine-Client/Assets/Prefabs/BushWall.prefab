@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1805496521371473903}
   - component: {fileID: 216296463254350863}
   - component: {fileID: 4236273183555251873}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: BushWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
