@@ -5,7 +5,7 @@ using System;
 using System.IO;
 
 
-public class ConnexionManager : MonoBehaviour
+public class ConnectionManager : MonoBehaviour
 {
     private NetworkManager networkManager;
     private Tugboat tugboat;
@@ -49,7 +49,7 @@ public class ConnexionManager : MonoBehaviour
             if (networkManager && tugboat) {
                 LoadServerConfig();
 
-                // set the server IP and PORT for client connexion
+                // set the server IP and PORT for client connection
                 tugboat.SetClientAddress(string.IsNullOrEmpty(serverConfig.GAME_SERVER_IP) ? "127.0.0.0" : serverConfig.GAME_SERVER_IP);
                 tugboat.SetPort((ushort)(int.TryParse(serverConfig.GAME_SERVER_PORT, out int result) ? result : 7770));
 
