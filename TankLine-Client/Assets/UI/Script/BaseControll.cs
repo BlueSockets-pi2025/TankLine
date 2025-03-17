@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -514,6 +515,13 @@ public class BaseControll : MonoBehaviour
             OpenErr("Date empty");
             return;
         }
+
+        if (!IsValidDate(Day.text, Month.text, Year.text))
+        {
+            OpenErr("Invalid date.");
+            return;
+        }
+        
         OpenPage_sign_up_et2();
     }
 
@@ -624,9 +632,28 @@ public class BaseControll : MonoBehaviour
         string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
         return Regex.IsMatch(email, emailPattern);
     }
+
     private bool IsValidPassword(string password)
     {
         string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         return Regex.IsMatch(password, pattern);
+    }
+
+    private bool IsValidDate(string day, string month, string year)
+    {
+        int dayInt, monthInt, yearInt;
+        if (int.TryParse(day, out dayInt) && int.TryParse(month, out monthInt) && int.TryParse(year, out yearInt))
+        {
+            try
+            {
+                DateTime date = new DateTime(yearInt, monthInt, dayInt);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        return false;
     }
 }
