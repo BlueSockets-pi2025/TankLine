@@ -458,6 +458,7 @@ public class BaseControll : MonoBehaviour
             Debug.LogError("AuthController is not initialized.");
             return;
         }
+
         StartCoroutine(ResetPasswordCoroutine());
     }
 
@@ -482,6 +483,13 @@ public class BaseControll : MonoBehaviour
             Debug.LogError("AuthController is not initialized.");
             return;
         }
+
+        if (!IsValidPassword(Re_Mdp.text))
+        {
+            OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+            return;
+        }
+
         StartCoroutine(ResetPassword2Coroutine());
     }
 
@@ -527,6 +535,12 @@ public class BaseControll : MonoBehaviour
         if (Mdp.text != Cmdp.text)
         {
             OpenErr("Passwords do not match.");
+            return;
+        }
+    
+        if (!IsValidPassword(Mdp.text))
+        {
+            OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
             return;
         }
 
@@ -609,5 +623,10 @@ public class BaseControll : MonoBehaviour
     {
         string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
         return Regex.IsMatch(email, emailPattern);
+    }
+    private bool IsValidPassword(string password)
+    {
+        string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+        return Regex.IsMatch(password, pattern);
     }
 }
