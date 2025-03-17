@@ -12,7 +12,8 @@ using System;
 using System.Net.Mail;
 using System.Net;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore; // Added for in-memory verification code management
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations; // Added for in-memory verification code management
 
 [ApiController]
 [Route("api/auth")]
@@ -154,6 +155,7 @@ public class ConnectionRegistrationController : Controller
             Console.WriteLine($"Error sending email: {ex.Message}");
         }
     }
+
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest loginRequest)
@@ -344,7 +346,7 @@ public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRe
         }
     }
 
-    [HttpPost("reset-password")]
+[HttpPost("reset-password")]
 public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 {
     Console.WriteLine($"In reset-password");
@@ -376,6 +378,19 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest r
         return BadRequest("Invalid reset code.");
     }
 
+    var passwordRegex = new System.Text.RegularExpressions.Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&]).{8,}$");
+    if (!passwordRegex.IsMatch(request.NewPassword))
+        {
+            return BadRequest(
+                "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
+            );
+        }
+    
+    if (request.NewPassword != request.ConfirmPassword)
+    {
+        return BadRequest(
+                "Passwords do not match");
+    }
     // Hash the new password and save it
     user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
     
@@ -401,6 +416,9 @@ public class ResetPasswordRequest
     public required string Email { get; set; }
     public required string Code { get; set; } 
     public required string NewPassword { get; set; }
+    public required string ConfirmPassword { get; set; }
+
+
 }
 
 
