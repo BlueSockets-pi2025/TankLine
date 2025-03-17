@@ -83,7 +83,7 @@ namespace GameApi.Controllers
 
             return Ok(user);
         }
-        
+
         [Authorize]
         [HttpGet("me/statistics")]
         public async Task<IActionResult> GetCurrentUserStatistics()
@@ -106,5 +106,43 @@ namespace GameApi.Controllers
 
             return Ok(statistics);
         }
+
+        [Authorize]
+        [HttpPut("me/statistics/update")]
+        public async Task<IActionResult> UpdateUserStatistics([FromBody] UpdateStatisticsRequest request)
+        {
+            Console.WriteLine("UPDATING USER STATISTICS..."); // Debug
+
+            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
+            {
+                return Unauthorized("Invalid token or missing user information.");
+            }
+
+            var username = subClaim.Value;
+            var statistics = await _context.UserStatistics.FirstOrDefaultAsync(s => s.Username == username);
+
+            if (statistics == null)
+            {
+                return NotFound("User statistics not found.");
+            }
+
+            // 
+            statistics.GamesPlayed += request.GamesPlayed; // Adds the number of games played
+            statistics.HighestScore = Math.Max(statistics.HighestScore, request.HighestScore); // Replace if higher
+            statistics.Ranking = request.Ranking; // Replaces ranking
+
+            await _context.SaveChangesAsync();
+            
+            return Ok(statistics);
+        }
+
     }
+}
+
+public class UpdateStatisticsRequest
+{
+    public int GamesPlayed { get; set; }
+    public int HighestScore { get; set; }
+    public int Ranking { get; set; }
 }

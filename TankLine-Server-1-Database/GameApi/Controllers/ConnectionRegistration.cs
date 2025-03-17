@@ -220,37 +220,37 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         return Ok("Logged out successfully.");
     }
 
-[HttpPost("resend-verification-code")]
-public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerificationRequest request)
-{
-    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-    if (user == null)
+    [HttpPost("resend-verification-code")]
+    public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerificationRequest request)
     {
-        return BadRequest("User not found.");
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        if (user.IsVerified)
+        {
+            return BadRequest("Account already verified.");
+        }
+
+        // Generate a new code
+        string newVerificationCode = new Random().Next(100000, 999999).ToString();
+
+        // Update the verification code and expiration directly in UserAccount
+        user.VerificationCode = newVerificationCode;
+        user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Valid for 5 minutes
+
+        // Save changes in the database
+        await _context.SaveChangesAsync();
+
+        Console.WriteLine($"New verification code for {user.Email}: {newVerificationCode}");
+
+        // Resend the verification email
+        SendVerificationEmail(user.Email, newVerificationCode);
+
+        return Ok("New verification code sent to your email.");
     }
-
-    if (user.IsVerified)
-    {
-        return BadRequest("Account already verified.");
-    }
-
-    // Generate a new code
-    string newVerificationCode = new Random().Next(100000, 999999).ToString();
-
-    // Update the verification code and expiration directly in UserAccount
-    user.VerificationCode = newVerificationCode;
-    user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Valid for 5 minutes
-
-    // Save changes in the database
-    await _context.SaveChangesAsync();
-
-    Console.WriteLine($"New verification code for {user.Email}: {newVerificationCode}");
-
-    // Resend the verification email
-    SendVerificationEmail(user.Email, newVerificationCode);
-
-    return Ok("New verification code sent to your email.");
-}
 
 
     private string GenerateJwtToken(UserAccount user)
@@ -279,40 +279,40 @@ public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerific
     }
 
 
-[HttpPost("request-password-reset")]
-public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
-{
-    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-    if (user == null)
+    [HttpPost("request-password-reset")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
     {
-        return BadRequest("User not found.");
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        
+        string resetCode = new Random().Next(100000, 999999).ToString();
+        var expirationTime = DateTime.UtcNow.AddMinutes(5); // Expiration in 5 minutes
+
+        // Update user account information with token and expiration date
+        user.PasswordResetToken = resetCode;
+        user.PasswordResetExpiration = expirationTime;
+
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.UtcNow.Date;
+
+
+        // Save changes to the database
+        _context.UserAccounts.Update(user);
+        await _context.SaveChangesAsync();
+
+        // Send email with code
+        SendPasswordResetEmail(user.Email, resetCode);
+
+        return Ok("Password reset code has been sent to your email.");
     }
-
-    
-    string resetCode = new Random().Next(100000, 999999).ToString();
-    var expirationTime = DateTime.UtcNow.AddMinutes(5); // Expiration in 5 minutes
-
-    // Update user account information with token and expiration date
-    user.PasswordResetToken = resetCode;
-    user.PasswordResetExpiration = expirationTime;
-
-    if (user.PasswordResetExpiration.HasValue)
-    {
-        user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
-    }
-    user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
-    user.BirthDate = DateTime.UtcNow.Date;
-
-
-    // Save changes to the database
-    _context.UserAccounts.Update(user);
-    await _context.SaveChangesAsync();
-
-    // Send email with code
-    SendPasswordResetEmail(user.Email, resetCode);
-
-    return Ok("Password reset code has been sent to your email.");
-}
 
 
 
@@ -364,62 +364,62 @@ public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRe
         }
     }
 
-[HttpPost("reset-password")]
-public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-{
-    Console.WriteLine($"In reset-password");
-
-    // Search user by email
-    var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.Email == request.Email);
-    if (user == null)
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        return BadRequest("User not found.");
-    }
+        Console.WriteLine($"In reset-password");
 
-    // Check that the reset code is correct
-    if (user.PasswordResetToken == null)
-    {
-        return BadRequest("No reset code found.");
-    }
+        // Search user by email
+        var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
 
-    if (DateTime.UtcNow > user.PasswordResetExpiration)
-    {
-        user.PasswordResetToken = null; // Delete expired code
-        user.PasswordResetExpiration = null; // Delete expiration
-        await _context.SaveChangesAsync();
-        return BadRequest("Reset code expired.");
-    }
+        // Check that the reset code is correct
+        if (user.PasswordResetToken == null)
+        {
+            return BadRequest("No reset code found.");
+        }
 
-    // Check that the code matches
-    if (user.PasswordResetToken != request.Code)
-    {
-        return BadRequest("Invalid reset code.");
-    }
+        if (DateTime.UtcNow > user.PasswordResetExpiration)
+        {
+            user.PasswordResetToken = null; // Delete expired code
+            user.PasswordResetExpiration = null; // Delete expiration
+            await _context.SaveChangesAsync();
+            return BadRequest("Reset code expired.");
+        }
 
-    var passwordRegex = new System.Text.RegularExpressions.Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&]).{8,}$");
-    if (!passwordRegex.IsMatch(request.NewPassword))
+        // Check that the code matches
+        if (user.PasswordResetToken != request.Code)
+        {
+            return BadRequest("Invalid reset code.");
+        }
+
+        var passwordRegex = new System.Text.RegularExpressions.Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&]).{8,}$");
+        if (!passwordRegex.IsMatch(request.NewPassword))
+            {
+                return BadRequest(
+                    "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
+                );
+            }
+        
+        if (request.NewPassword != request.ConfirmPassword)
         {
             return BadRequest(
-                "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
-            );
+                    "Passwords do not match");
         }
-    
-    if (request.NewPassword != request.ConfirmPassword)
-    {
-        return BadRequest(
-                "Passwords do not match");
+        // Hash the new password and save it
+        user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
+        
+        // Delete code after use
+        user.PasswordResetToken = null;
+        user.PasswordResetExpiration = null;
+
+        await _context.SaveChangesAsync();
+
+        return Ok("Password reset successfully.");
     }
-    // Hash the new password and save it
-    user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
-    
-    // Delete code after use
-    user.PasswordResetToken = null;
-    user.PasswordResetExpiration = null;
-
-    await _context.SaveChangesAsync();
-
-    return Ok("Password reset successfully.");
-}
 
 
 }
