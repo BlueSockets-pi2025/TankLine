@@ -522,6 +522,12 @@ public class BaseControll : MonoBehaviour
             OpenErr("Invalid date.");
             return;
         }
+
+        if (!IsValidAge(Day.text, Month.text, Year.text))
+        {
+            OpenErr("You must be at least 12 years old to register.");
+            return;
+        }
         
         OpenPage_sign_up_et2();
     }
@@ -649,6 +655,27 @@ public class BaseControll : MonoBehaviour
             {
                 DateTime date = new DateTime(yearInt, monthInt, dayInt);
                 return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private bool IsValidAge(string day, string month, string year)
+    {
+        int dayInt, monthInt, yearInt;
+        if (int.TryParse(day, out dayInt) && int.TryParse(month, out monthInt) && int.TryParse(year, out yearInt))
+        {
+            try
+            {
+                DateTime birthDate = new DateTime(yearInt, monthInt, dayInt);
+                DateTime today = DateTime.Today;
+                int age = today.Year - birthDate.Year;
+                if (birthDate > today.AddYears(-age)) age--;
+                return age >= 12;
             }
             catch
             {
