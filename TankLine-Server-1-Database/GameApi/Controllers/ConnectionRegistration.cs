@@ -28,7 +28,6 @@ public class ConnectionRegistrationController : Controller
         _configuration = configuration;
     }
 
-    // Register a new user
 [HttpPost("register")]
 public async Task<IActionResult> Register([FromBody] UserAccount user)
 {
@@ -37,9 +36,20 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         return BadRequest("Invalid data");
     }
 
-    if (_context.UserAccounts.Any(u => u.Username == user.Username || u.Email == user.Email))
+    var existingUser = _context.UserAccounts.FirstOrDefault(u => u.Username == user.Username || u.Email == user.Email);
+
+    if (existingUser != null)
     {
-        return BadRequest("Username or email already exists.");
+        if (existingUser.IsVerified)
+        {
+            return BadRequest("Username or email already exists.");
+        }
+        else
+        {
+            // Remove the unverified account
+            _context.UserAccounts.Remove(existingUser);
+            await _context.SaveChangesAsync();
+        }
     }
 
     try
@@ -54,7 +64,7 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         user.VerificationCode = verificationCode;
         user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Code valid for 5 minutes
 
-        // Add the user to the database
+        // Add the new user to the database
         _context.UserAccounts.Add(user);
         await _context.SaveChangesAsync();
 
