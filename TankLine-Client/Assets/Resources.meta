@@ -4,5 +4,6 @@ folderAsset: yes
 DefaultImporter:
   externalObjects: {}
   userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  assetBundleName: save&load
+  assetBundleVariant: test
+

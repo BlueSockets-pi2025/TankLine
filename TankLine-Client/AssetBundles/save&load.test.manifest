@@ -1,0 +1,53 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.36f1
+CRC: 3382890988
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 837336514e443b87dfe22c2adfb6b440
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 670a148434c7cf5e381f333265b0524a
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 0469b8a7e3502682e6ddaedd35aa7112
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 54
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3206ac5ff6acc444e8846460c000f202, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6c84b5448e076ed49a9f71e392e28d21, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Prefabs/StaticWall.prefab
+- Assets/Prefabs/tank.prefab
+- Assets/Resources/Materials/BushTest.mat
+- Assets/Resources/Materials/LowLifeWall.mat
+- Assets/Prefabs/BreakableWall.prefab
+- Assets/Resources/3D_Models/tankGun.fbx
+- Assets/Resources/Materials/MidLifeWall.mat
+- Assets/Resources/Materials/FullLifeWall.mat
+- Assets/Prefabs/BushWall.prefab
+- Assets/Resources/3D_Models/tank.fbx
+- Assets/Prefabs/WaterWall.prefab
+Dependencies: []
