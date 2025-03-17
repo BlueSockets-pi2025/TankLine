@@ -18,6 +18,7 @@ public class BaseControll : MonoBehaviour
 
     private void Start()
     {
+         OpenPagePrincipal();
         authController = GetComponent<AuthController>();
         if (authController == null)
         {
