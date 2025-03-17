@@ -186,8 +186,6 @@ public class Bullet : NetworkBehaviour {
         if (asServer) return;
 
         virtualServerPosition = newPos;
-        Debug.Log(Vector3.Distance(newPos, thisBullet.transform.position));
-        Debug.Log($"Position : {thisBullet.transform.position}, Received : {newPos}");
 
         // if distances is too high, teleport 
         if (Vector3.Distance(newPos, thisBullet.transform.position) > THRESHOLD_CORRECTION_DISTANCE) {
