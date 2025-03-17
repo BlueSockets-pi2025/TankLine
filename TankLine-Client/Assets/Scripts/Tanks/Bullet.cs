@@ -1,16 +1,28 @@
+using FishNet.Object;
 using Unity.Mathematics;
-using Unity.VisualScripting;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
+using Unity.VisualScripting;
 
-public class Bullet : MonoBehaviour {
+public class Bullet : NetworkBehaviour {
+
+    const string BREAKABLE_TAG = "BreakableWall";
+    const int WALL_LAYER = 3;
+    const int SHELL_LAYER = 9;
+    const int PLAYER_LAYER = 10;
+    const float THRESHOLD_CORRECTION_DISTANCE = 2;
+
+
+    /// <summary> Local variable to check if every client bullet position is correct with the server one </summary>
+    private readonly SyncVar<Vector3> serverPosition = new(new SyncTypeSettings(.1f));
+
+    /// <summary> This bullet direction </summary>
+    public readonly SyncVar<Vector3> direction = new(new SyncTypeSettings(.1f));
+
 
     /// <summary> Number of rebound left to make </summary>
     [Range(0,100)]
     public int nbRebounds = 1;
-
-    [HideInInspector]
-    /// <summary> This bullet direction </summary>
-    public Vector3 direction;
 
     /// <summary> This bullet speed movement (READONLY) </summary>
     [Range(1,10)]
@@ -20,31 +32,57 @@ public class Bullet : MonoBehaviour {
     [HideInInspector]
     public GameObject tankOwner = null;
 
-
-    const string BREAKABLE_TAG = "BreakableWall";
-
-    const int WALL_LAYER = 3;
-    const int SHELL_LAYER = 9;
-    const int PLAYER_LAYER = 10;
+    /// <summary> The smoothness of the correction applied to the bullet position to match with the server 
+    // (0 means no smoothness, almost teleport to right location, and 1 means high smoothness, almost no correction)</summary>
+    [Range(0f, 1f)]
+    public float correctionSmoothness = 0.8f;
 
 
     /// <summary> This bullet GameObject </summary>
     protected GameObject thisBullet;
     /// <summary> This bullet mesh renderer </summary>
     protected Transform meshTransform;
+    /// <summary> The correction vector between this client bullet position and the server position </summary>
+    protected Vector3 correctionWithServer;
+    /// <summary> The server bullet position simulated from the last informations received </summary>
+    protected Vector3 virtualServerPosition;
 
-    void Start() {
+    void Awake() {
+        // instanciate variables
+        direction.Value = new Vector3(0,0,0);
         thisBullet = gameObject;
         meshTransform = thisBullet.transform.Find("shell");
+
+        // functions called when the var is changed by another game instance
+        direction.OnChange += OnDirectionChange;
+        serverPosition.OnChange += OnServerPositionChange;
     }
 
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
     void FixedUpdate() {
-        direction.Normalize();
-        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
-        meshTransform.rotation = Quaternion.Euler(0,(math.atan2(-direction.z, direction.x) + math.PI/2) * Mathf.Rad2Deg, 9.648f);
+        // every 20 frames (1/3 seconds) send the server bullet position for correction
+        if (base.IsServerInitialized && Time.frameCount % 20 == 0) {
+            serverPosition.Value = thisBullet.transform.position;
+        } 
+        // else, correct this bullet instance position
+        else {
+            // if the difference is smaller than the correction, apply the difference
+            if ((thisBullet.transform.position - virtualServerPosition).magnitude <= correctionWithServer.magnitude) {
+                thisBullet.transform.position = virtualServerPosition;
+            } else {
+                thisBullet.transform.Translate(correctionWithServer);
+            }
+        }
+
+        // move the bullet
+        if (Input.GetKeyDown(KeyCode.E)) {
+            thisBullet.transform.position = new Vector3(0,0,0);
+        } else {
+            thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.Value);
+            virtualServerPosition += bulletSpeed * Time.deltaTime * direction.Value;
+        }
     }
 
     /// <summary>
@@ -63,7 +101,8 @@ public class Bullet : MonoBehaviour {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
                 wall.TakeDamage();
-                Destroy(gameObject);
+                if (base.IsServerInitialized)
+                    Despawn(thisBullet);
             } 
             
             // if static wall
@@ -71,7 +110,8 @@ public class Bullet : MonoBehaviour {
 
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0) {
-                    Destroy(thisBullet);
+                    if (base.IsServerInitialized)
+                        Despawn(thisBullet);
                     return;
                 }
 
@@ -83,12 +123,12 @@ public class Bullet : MonoBehaviour {
                 // get the contact point direction
                 // right-left direction
                 if (math.abs(relativeCollision.x) > 0.0001f) {
-                    direction.x = -direction.x;
+                    direction.Value = new Vector3(-direction.Value.x, 0, direction.Value.z);
                 }
 
                 // up-down direction
                 else if (math.abs(relativeCollision.z) > 0.0001f) {
-                    direction.z = -direction.z;
+                    direction.Value = new Vector3(direction.Value.x, 0, -direction.Value.z);
                 }
 
                 else {
@@ -107,7 +147,8 @@ public class Bullet : MonoBehaviour {
                 hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
             }
 
-            Destroy(thisBullet); // this bullet is destroy
+            if (base.IsServerInitialized)
+                Despawn(thisBullet);
 
             return;
         }
@@ -116,11 +157,12 @@ public class Bullet : MonoBehaviour {
             ############################## SHELL COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == SHELL_LAYER) {
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
+            if (base.IsServerInitialized) {
+                Despawn(collision.gameObject);
+                Despawn(thisBullet);
+            }
             return;
         }
-
     }
 
     /// <summary>
@@ -132,6 +174,28 @@ public class Bullet : MonoBehaviour {
         if (tankOwner != null) {
             Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
             playerOwner.DecreaseNbBulletShot();
+        }
+    }
+
+    public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer) {
+        // update the bullet rotation
+        meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.Value.z, direction.Value.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
+    }
+
+    public void OnServerPositionChange(Vector3 oldPos, Vector3 newPos, bool asServer) {
+        if (asServer) return;
+
+        virtualServerPosition = newPos;
+        Debug.Log(Vector3.Distance(newPos, thisBullet.transform.position));
+        Debug.Log($"Position : {thisBullet.transform.position}, Received : {newPos}");
+
+        // if distances is too high, teleport 
+        if (Vector3.Distance(newPos, thisBullet.transform.position) > THRESHOLD_CORRECTION_DISTANCE) {
+            thisBullet.transform.position = newPos;
+            correctionWithServer = new Vector3(0,0,0);
+        } else {
+            correctionWithServer = newPos - thisBullet.transform.position;
+            correctionWithServer *= 1f - correctionSmoothness;
         }
     }
 }
