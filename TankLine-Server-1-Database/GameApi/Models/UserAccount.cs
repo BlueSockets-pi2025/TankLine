@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 public class UserAccount
 {
     [Key]
@@ -16,7 +17,7 @@ public class UserAccount
     public required string Email { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 8)] // Password length 
+    [StringLength(100, MinimumLength = 8)]
     [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
     [Column("password_hash")]
     public required string PasswordHash { get; set; }
@@ -26,7 +27,7 @@ public class UserAccount
 
     [Required]
     [Column("is_verified")]
-    public bool IsVerified { get; set; } = false;  // Default value set to false
+    public bool IsVerified { get; set; } = false;
 
     [Required]
     [Column("first_name")]
@@ -41,6 +42,13 @@ public class UserAccount
     [Required]
     [Column("birth_date")]
     public DateTime BirthDate { get; set; } = DateTime.UtcNow.Date;
+
+    // New fields for verification code
+    [Column("verification_code")]
+    public string? VerificationCode { get; set; }
+
+    [Column("verification_expiration")]
+    public DateTime? VerificationExpiration { get; set; }
 
     // New fields for password reset
     [Column("password_reset_token")]

@@ -35,7 +35,7 @@ namespace GameApi.Controllers
         [Authorize]
         [HttpGet("{map_Id}")]
         public async Task<IActionResult> GetMap(string map_Id)
-        {
+        {   
             var map = await _context.GeneratedMaps.FindAsync(map_Id);
             if (map == null)
                 return NotFound();

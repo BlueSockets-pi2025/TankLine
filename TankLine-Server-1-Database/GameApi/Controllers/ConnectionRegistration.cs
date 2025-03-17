@@ -29,83 +29,82 @@ public class ConnectionRegistrationController : Controller
     }
 
     // Register a new user
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserAccount user)
+[HttpPost("register")]
+public async Task<IActionResult> Register([FromBody] UserAccount user)
+{
+    if (!ModelState.IsValid)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Invalid data");
-        }
-
-        if (_context.UserAccounts.Any(u => u.Username == user.Username || u.Email == user.Email))
-        {
-            return BadRequest("Username or email already exists.");
-        }
-
-        try
-        {
-            string verificationCode = new Random().Next(100000, 999999).ToString();
-
-            // Hash password before saving it
-            user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
-            user.BirthDate = user.BirthDate.ToUniversalTime();
-
-            // Add the user to the database
-            _context.UserAccounts.Add(user);
-            await _context.SaveChangesAsync();
-
-            // Create a VerificationCode object and add it to the database
-            var verificationCodeEntity = new VerificationCode
-            {
-                Email = user.Email,
-                Code = verificationCode,
-                Expiration = DateTime.UtcNow.AddMinutes(5) // Set expiration to 5 minutes from now
-            };
-
-            _context.VerificationCodes.Add(verificationCodeEntity);
-            await _context.SaveChangesAsync(); // Save the verification code to the database
-
-            Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
-
-            SendVerificationEmail(user.Email, verificationCode);
-
-            return Ok("Verification code sent to your email.");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
+        return BadRequest("Invalid data");
     }
 
-    [HttpPost("verify")]
-    public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
-    {   
-        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-        if (user == null)
-        {
-            return BadRequest("Invalid user.");
-        }
+    if (_context.UserAccounts.Any(u => u.Username == user.Username || u.Email == user.Email))
+    {
+        return BadRequest("Username or email already exists.");
+    }
 
-        var verificationEntry = await _context.VerificationCodes
-            .FirstOrDefaultAsync(v => v.Email == request.Email && v.Code == request.Code);
+    try
+    {
+        string verificationCode = new Random().Next(100000, 999999).ToString();
 
-        if (verificationEntry == null || verificationEntry.Expiration < DateTime.UtcNow)
-        {
-            return BadRequest("Invalid or expired verification code.");
-        }
+        // Hash password before saving it
+        user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
+        user.BirthDate = user.BirthDate.ToUniversalTime();
 
-        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
-        user.BirthDate = DateTime.UtcNow.Date;
+        // Add verification code directly to UserAccount
+        user.VerificationCode = verificationCode;
+        user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Code valid for 5 minutes
 
-        user.IsVerified = true;
-        _context.UserAccounts.Update(user);
-        _context.VerificationCodes.Remove(verificationEntry);
+        // Add the user to the database
+        _context.UserAccounts.Add(user);
         await _context.SaveChangesAsync();
 
-        Console.WriteLine($"Account verified successfully for {request.Email}");
+        Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
 
-        return Ok("Account verified successfully.");
+        SendVerificationEmail(user.Email, verificationCode);
+
+        return Ok("Verification code sent to your email.");
     }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
+
+[HttpPost("verify")]
+public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
+{   
+    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+    if (user == null)
+    {
+        return BadRequest("Invalid user.");
+    }
+
+    if (user.IsVerified)
+    {
+        return BadRequest("Account already verified.");
+    }
+
+    // Check if the verification code is correct and not expired
+    if (user.VerificationCode != request.Code || user.VerificationExpiration < DateTime.UtcNow)
+    {
+        return BadRequest("Invalid or expired verification code.");
+    }
+
+    // Mark the user as verified
+    user.IsVerified = true;
+    user.VerificationCode = null; // Remove the code after verification
+    user.VerificationExpiration = null;
+    user.BirthDate = user.BirthDate.ToUniversalTime();
+
+    user.CreatedAt = user.CreatedAt.ToUniversalTime();
+
+    _context.UserAccounts.Update(user);
+    await _context.SaveChangesAsync();
+
+    Console.WriteLine($"Account verified successfully for {request.Email}");
+
+    return Ok("Account verified successfully.");
+}
 
     private void SendVerificationEmail(string email, string code)
     {
@@ -198,41 +197,37 @@ public class ConnectionRegistrationController : Controller
         return Ok("Logged out successfully.");
     }
 
-    [HttpPost("resend-verification-code")]
-    public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerificationRequest request)
+[HttpPost("resend-verification-code")]
+public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerificationRequest request)
+{
+    var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
+    if (user == null)
     {
-        var user = _context.UserAccounts.FirstOrDefault(u => u.Email == request.Email);
-        if (user == null)
-        {
-            return BadRequest("User not found.");
-        }
-
-        if (user.IsVerified)
-        {
-            return BadRequest("Account already verified.");
-        }
-
-        // Generate a new code
-        string newVerificationCode = new Random().Next(100000, 999999).ToString();
-        
-        // Update code and expiration date
-        var verificationCodeEntity = new VerificationCode
-        {
-            Email = user.Email,
-            Code = newVerificationCode,
-            Expiration = DateTime.UtcNow.AddMinutes(5) // Set expiration to 5 minutes from now
-        };
-
-        _context.VerificationCodes.Add(verificationCodeEntity);
-        await _context.SaveChangesAsync(); // Save the verification code to the database
-
-        Console.WriteLine($"New verification code for {user.Email}: {newVerificationCode}");
-
-        // Resend email
-        SendVerificationEmail(user.Email, newVerificationCode);
-
-        return Ok("New verification code sent to your email.");
+        return BadRequest("User not found.");
     }
+
+    if (user.IsVerified)
+    {
+        return BadRequest("Account already verified.");
+    }
+
+    // Generate a new code
+    string newVerificationCode = new Random().Next(100000, 999999).ToString();
+
+    // Update the verification code and expiration directly in UserAccount
+    user.VerificationCode = newVerificationCode;
+    user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Valid for 5 minutes
+
+    // Save changes in the database
+    await _context.SaveChangesAsync();
+
+    Console.WriteLine($"New verification code for {user.Email}: {newVerificationCode}");
+
+    // Resend the verification email
+    SendVerificationEmail(user.Email, newVerificationCode);
+
+    return Ok("New verification code sent to your email.");
+}
 
 
     private string GenerateJwtToken(UserAccount user)
