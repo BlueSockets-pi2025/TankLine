@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 public class BaseControll : MonoBehaviour
 {
     public GameObject PagePrincipal, Reset_Your_Password, Reset_Your_Password2, Page_sign_up_et1, Page_sign_up_et2, Page_sign_up_et3, Menu, Play, CreateRoom, JoinRoom, RoomNum, Err, Msg, credits, option, score, InGame, WaintingRoom, ColorChangingPannel, lose, win;
-    public TMP_InputField LogUsername, LogEmail, LogPW, ForMail, Month, Year, Day, Fname, Lname, Nname, Email, Mdp, Cmdp, code;
+    public TMP_InputField LogUsername, LogPW, ForMail, Month, Year, Day, Fname, Lname, Nname, Email, Mdp, Cmdp, code;
     public TMP_InputField Re_Mdp, Re_Cmdp, Re_code;
     public TMP_Text ErrText;
     public TMP_Text MsgText;
@@ -30,21 +30,8 @@ public class BaseControll : MonoBehaviour
 
     private void AutoLogin()
     {
-        /*string savedEmail = PlayerPrefs.GetString("LoggedInEmail", "");
-        string savedPassword = PlayerPrefs.GetString("LoggedInPassword", "");
-
-        if (!string.IsNullOrEmpty(savedEmail) && !string.IsNullOrEmpty(savedPassword))
-        {
-            UserDatabase userDB = UserDatabase.LoadUsers();
-            if (userDB.ValidateUser(savedEmail, savedPassword))
-            {
-                nicknameText.text = userDB.GetNickname(savedEmail);
-                MenuBadge.text = nicknameText.text;
-                OpenMenu();
-                return;
-            }
-        }
-        LogEmail.text = savedEmail;
+        /*
+        TO DO 
         */
     }
 
