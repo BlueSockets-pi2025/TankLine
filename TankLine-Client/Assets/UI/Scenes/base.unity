@@ -2134,7 +2134,7 @@ GameObject:
   - component: {fileID: 143021613}
   - component: {fileID: 143021612}
   m_Layer: 5
-  m_Name: GP
+  m_Name: GPM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8406,7 +8406,7 @@ GameObject:
   - component: {fileID: 461707431}
   - component: {fileID: 461707430}
   m_Layer: 5
-  m_Name: HS
+  m_Name: HSM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9623,7 +9623,7 @@ GameObject:
   - component: {fileID: 582885514}
   - component: {fileID: 582885513}
   m_Layer: 5
-  m_Name: NiKname
+  m_Name: NiKnameM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11799,7 +11799,7 @@ GameObject:
   - component: {fileID: 717043998}
   - component: {fileID: 717043997}
   m_Layer: 5
-  m_Name: NiKname
+  m_Name: NiKnameP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21684,7 +21684,7 @@ GameObject:
   - component: {fileID: 1305002361}
   - component: {fileID: 1305002360}
   m_Layer: 5
-  m_Name: RK
+  m_Name: RKM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24200,8 +24200,14 @@ MonoBehaviour:
   Re_code: {fileID: 202880310}
   ErrText: {fileID: 1872987151}
   MsgText: {fileID: 350093224}
-  nicknameText: {fileID: 0}
+  nicknameText: {fileID: 717043997}
   MenuBadge: {fileID: 582885513}
+  GPMText: {fileID: 143021612}
+  HSMText: {fileID: 461707430}
+  RKMText: {fileID: 1305002360}
+  GPPText: {fileID: 1816802571}
+  HSPText: {fileID: 1614589857}
+  RKPText: {fileID: 2020327192}
 --- !u!4 &1464720208
 Transform:
   m_ObjectHideFlags: 0
@@ -26651,7 +26657,7 @@ GameObject:
   - component: {fileID: 1614589858}
   - component: {fileID: 1614589857}
   m_Layer: 5
-  m_Name: HS
+  m_Name: HSP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30217,7 +30223,7 @@ GameObject:
   - component: {fileID: 1816802572}
   - component: {fileID: 1816802571}
   m_Layer: 5
-  m_Name: GP
+  m_Name: GPP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34754,7 +34760,7 @@ GameObject:
   - component: {fileID: 2020327193}
   - component: {fileID: 2020327192}
   m_Layer: 5
-  m_Name: RK
+  m_Name: RKP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

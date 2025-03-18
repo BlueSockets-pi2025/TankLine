@@ -21,16 +21,17 @@ public class AuthController : MonoBehaviour
     private const string resetPasswordUrl = "https://185.155.93.105:17008/api/auth/reset-password";
 
     private const string userDataUrl = "https://185.155.93.105:17008/api/user/me";
+    private const string userStatisticsUrl = "https://185.155.93.105:17008/api/user/me/statistics";
 
     private static X509Certificate2 trustedCertificate;
 
     public bool IsRequestSuccessful { get; private set; }
     public UserData CurrentUser { get; private set; }
+    public UserStatistics CurrentUserStatistics { get; private set; }
 
     private void Awake()
     {
         LoadCertificate();
-
     }
 
     private void LoadCertificate()
@@ -76,6 +77,11 @@ public class AuthController : MonoBehaviour
     public IEnumerator User()
     {
         yield return StartCoroutine(GetCurrentUser());
+    }
+
+    public IEnumerator UserStatistics()
+    {
+        yield return StartCoroutine(GetUserStatistics());
     }
 
     public IEnumerator Logout()
@@ -395,6 +401,35 @@ public class AuthController : MonoBehaviour
             IsRequestSuccessful = false;
         }
     }
+
+    private IEnumerator GetUserStatistics()
+    {
+        UnityWebRequest request = new UnityWebRequest(userStatisticsUrl, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        request.certificateHandler = new CustomCertificateHandler();
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            responseText.text = "Statistics retrieved successfully!";
+            Debug.Log("User Statistics: " + request.downloadHandler.text);
+            // Parse statistics data
+            var userStatistics = JsonUtility.FromJson<UserStatistics>(request.downloadHandler.text);
+            CurrentUserStatistics = userStatistics; 
+
+            IsRequestSuccessful = true;
+        }
+        else
+        {
+            responseText.text = $"Error: {request.error}";
+            Debug.LogError("Failed to retrieve user statistics: " + request.error);
+            Debug.LogError("Details: " + request.downloadHandler.text);
+            IsRequestSuccessful = false;
+        }
+    }
 }
 
 public class CustomCertificateHandler : CertificateHandler
@@ -474,4 +509,12 @@ public class UserData
     public string birthDate;
     public string passwordResetToken;
     public string passwordResetExpiration;
+}
+
+[System.Serializable]
+public class UserStatistics
+{
+    public int gamesPlayed;
+    public int highestScore;
+    public int ranking;
 }

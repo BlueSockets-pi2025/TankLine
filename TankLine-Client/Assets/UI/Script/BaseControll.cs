@@ -12,7 +12,7 @@ public class BaseControll : MonoBehaviour
     public TMP_InputField Re_Mdp, Re_Cmdp, Re_code;
     public TMP_Text ErrText;
     public TMP_Text MsgText;
-    public TMP_Text nicknameText, MenuBadge;
+    public TMP_Text nicknameText, MenuBadge, GPMText, HSMText, RKMText, GPPText, HSPText, RKPText ;
 
     private AuthController authController;
 
@@ -194,10 +194,13 @@ public class BaseControll : MonoBehaviour
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
 
-        if (authController != null && authController.CurrentUser != null)
+        if (authController != null && authController.CurrentUser != null && authController.CurrentUserStatistics != null)
         {
-            nicknameText.text = authController.CurrentUser.username;
             MenuBadge.text = authController.CurrentUser.username;
+
+            GPMText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();  
+            HSMText.text = authController.CurrentUserStatistics.highestScore.ToString();    
+            RKMText.text = authController.CurrentUserStatistics.ranking.ToString();    
         }
     }
 
@@ -220,10 +223,19 @@ public class BaseControll : MonoBehaviour
         Page_sign_up_et1.SetActive(false);
         Page_sign_up_et2.SetActive(false);
         Page_sign_up_et3.SetActive(false);
+
+        if (authController != null && authController.CurrentUser != null && authController.CurrentUserStatistics != null)
+        {
+            nicknameText.text = authController.CurrentUser.username;
+
+            GPPText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();  
+            HSPText.text = authController.CurrentUserStatistics.highestScore.ToString();    
+            RKPText.text = authController.CurrentUserStatistics.ranking.ToString();    
+        }
     }
 
     public void OpenCreateRoom()
-    {
+    {   
         win.SetActive(false);
         lose.SetActive(false);
         WaintingRoom.SetActive(false);
@@ -430,7 +442,15 @@ public class BaseControll : MonoBehaviour
             yield return authController.User();
             if (authController.IsRequestSuccessful)
             {
-                OpenMenu();
+                yield return authController.UserStatistics(); 
+                if (authController.IsRequestSuccessful)
+                {
+                    OpenMenu();
+                }
+                else
+                {
+                    OpenErr("Failed to retrieve user statistics.");
+                }
             }
             else
             {
