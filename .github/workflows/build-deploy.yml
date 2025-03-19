@@ -1,0 +1,77 @@
+name: Unity Multiplayer Server CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - unity-server-tests-pipeline
+  pull_request:
+    branches:
+      - main
+
+env:
+  UNITY_VERSION: 6000.0.36f1
+  GAME_SERVER_IP: ${{ secrets.GAME_SERVER_IP }}
+  GAME_SERVER_PORT: ${{ secrets.GAME_SERVER_PORT }}
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Unity
+        uses: game-ci/unity-builder@v3
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+      
+      - name: Run Tests
+        uses: game-ci/unity-test-runner@v3
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+
+  build:
+    name: Build Headless Server
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Unity
+        uses: game-ci/unity-builder@v3
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          buildTarget: StandaloneLinux64
+          buildName: MultiplayerServer
+          outputPath: build
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: UnityServerBuild
+          path: build
+
+  deploy:
+    name: Deploy to Dedicated Server
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: UnityServerBuild
+          path: build
+
+      - name: Deploy to Server through Bastion
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          BASTION_IP: ${{ secrets.GAME_SERVER_IP }}
+          VM_NAME: ${{ secrets.VM_NAME }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
+          scp -o ProxyJump=$SERVER_USER@$BASTION_IP -i private_key -r build/ $SERVER_USER@$VM_NAME:/home/$SERVER_USER/server_build/
+          ssh -o ProxyJump=$SERVER_USER@$BASTION_IP -i private_key $SERVER_USER@$VM_NAME "cd /home/$SERVER_USER/server_build/ && ./MultiplayerServer.x86_64"

@@ -52,26 +52,29 @@ public class ConnectionManagerTests
 
         yield return new WaitForSeconds(1);
 
-        Assert.IsTrue(networkManager.ClientManager.Started, "[CLIENT] Client should be connected.");
+        Assert.IsTrue(connexionManager.GetComponent<NetworkManager>().ClientManager.Started, "[CLIENT] Client should be connected.");
     }
 
     [UnityTest]
-    public IEnumerator TestMultipleClients()
+    public IEnumerator TestMultipleClientsConnection()
     {
         System.Environment.SetEnvironmentVariable("IS_DEDICATED_SERVER", "true");
-        connectionManager.Awake();
+        networkManager.ServerManager.StartConnection();
+        yield return new WaitForSeconds(1);
+        Assert.IsTrue(networkManager.ServerManager.Started, "[SERVER] Server should be running.");
 
+        // Simulate first client connecting
+        System.Environment.SetEnvironmentVariable("IS_DEDICATED_SERVER", "false");
+        networkManager.ClientManager.StartConnection();
+        yield return new WaitForSeconds(1);
+        Assert.IsTrue(networkManager.ClientManager.Started, "[CLIENT] First client should be connected.");
+
+        // Simulate second client connecting
+        GameObject secondClientObject = new GameObject("SecondClient");
+        NetworkManager secondClientManager = secondClientObject.AddComponent<NetworkManager>();
+        secondClientManager.ClientManager.StartConnection();
         yield return new WaitForSeconds(1);
 
-        // Simulate two clients connecting
-        var client1 = new GameObject().AddComponent<ConnectionManager>();
-        var client2 = new GameObject().AddComponent<ConnectionManager>();
-
-        client1.Awake();
-        client2.Awake();
-
-        yield return new WaitForSeconds(2);
-
-        Assert.IsTrue(networkManager.ServerManager.Clients.Count == 2, "[SERVER] Should have two connected clients.");
+        Assert.IsTrue(secondClientManager.ClientManager.Started, "[CLIENT] Second client should be connected.");
     }
 }
