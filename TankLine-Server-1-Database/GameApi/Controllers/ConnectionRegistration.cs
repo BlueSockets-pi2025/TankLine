@@ -27,13 +27,18 @@ public class ConnectionRegistrationController : Controller
         _context = context;
         _configuration = configuration;
     }
-
 [HttpPost("register")]
 public async Task<IActionResult> Register([FromBody] UserAccount user)
 {
     if (!ModelState.IsValid)
     {
         return BadRequest("Invalid data");
+    }
+
+    // Vérification des champs vides ou composés uniquement de blancs
+    if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.PasswordHash))
+    {
+        return BadRequest("The values cannot be empty or contain only whitespace.");
     }
 
     var existingUser = _context.UserAccounts.FirstOrDefault(u => u.Username == user.Username || u.Email == user.Email);
@@ -79,7 +84,6 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         return StatusCode(500, $"Internal server error: {ex.Message}");
     }
 }
-
 
 
     [HttpPost("verify")]
@@ -316,7 +320,7 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
 
 
 
-    private void SendPasswordResetEmail(string email, string resetCode)
+    public void SendPasswordResetEmail(string email, string resetCode)
     {
         var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
         {
