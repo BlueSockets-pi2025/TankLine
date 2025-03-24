@@ -14,6 +14,7 @@ using System.Net;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations; // Added for in-memory verification code management
+using System.Security.Cryptography;
 
 [ApiController]
 [Route("api/auth")]
@@ -71,7 +72,7 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
 
     try
     {
-        string verificationCode = new Random().Next(100000, 999999).ToString();
+        string verificationCode = GenerateSecureVerificationCode();
 
         // Hash password before saving it
         user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
@@ -194,7 +195,6 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         }
     }
 
-
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest loginRequest)
     {
@@ -251,7 +251,7 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         }
 
         // Generate a new code
-        string newVerificationCode = new Random().Next(100000, 999999).ToString();
+        string newVerificationCode = GenerateSecureVerificationCode();
 
         // Update the verification code and expiration directly in UserAccount
         user.VerificationCode = newVerificationCode;
@@ -268,6 +268,20 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         return Ok("New verification code sent to your email.");
     }
 
+    private static string GenerateSecureVerificationCode()
+    {
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            byte[] randomBytes = new byte[4]; // 4 bytes are enough for an integer
+            rng.GetBytes(randomBytes);
+            uint randomValue = BitConverter.ToUInt32(randomBytes, 0);
+
+            // Convert to a 6-digit number (100000 - 999999)
+            int verificationCode = (int)(randomValue % 900000) + 100000;
+            
+            return verificationCode.ToString();
+        }
+    }
 
     private string GenerateJwtToken(UserAccount user)
     {
@@ -305,7 +319,7 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         }
 
         
-        string resetCode = new Random().Next(100000, 999999).ToString();
+        string resetCode = GenerateSecureVerificationCode();;
         var expirationTime = DateTime.UtcNow.AddMinutes(5); // Expiration in 5 minutes
 
         // Update user account information with token and expiration date
