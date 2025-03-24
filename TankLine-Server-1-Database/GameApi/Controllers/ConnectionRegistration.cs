@@ -35,11 +35,23 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         return BadRequest("Invalid data");
     }
 
-    // Vérification des champs vides ou composés uniquement de blancs
-    if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.PasswordHash))
+    // empty values or values only composed of whitespaces 
+    if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName)||
+        string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.PasswordHash))
     {
         return BadRequest("The values cannot be empty or contain only whitespace.");
     }
+
+    if (!user.PasswordHash.Any(char.IsDigit) || !user.PasswordHash.Any(char.IsPunctuation))
+    {
+        return BadRequest("Password must contain at least one numeric character and one special character.");
+    }
+
+    if (user.PasswordHash.Length < 8)
+    {
+        return BadRequest("Password must be at least 8 characters long.");
+    }
+
 
     var existingUser = _context.UserAccounts.FirstOrDefault(u => u.Username == user.Username || u.Email == user.Email);
 
