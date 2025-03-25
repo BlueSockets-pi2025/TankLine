@@ -26,4 +26,4 @@ jobs:
         uses: game-ci/unity-test-runner@v3
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
-          projectPath: /Tankline-Client
+          projectPath: Tankline-Client
