@@ -18,7 +18,7 @@ public class BaseControll : MonoBehaviour
 
     private void Start()
     {
-         OpenPagePrincipal();
+        OpenPagePrincipal();
         authController = GetComponent<AuthController>();
         if (authController == null)
         {
@@ -183,12 +183,10 @@ public class BaseControll : MonoBehaviour
 
         if (authController != null && authController.CurrentUser != null && authController.CurrentUserStatistics != null)
         {
-            MenuBadge.text = authController.CurrentUser.username;
-
-            GPMText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();  
-            HSMText.text = authController.CurrentUserStatistics.highestScore.ToString();    
-            RKMText.text = authController.CurrentUserStatistics.ranking.ToString();    
+            MenuBadge.text = authController.CurrentUser.username;   
         }
+
+        StartCoroutine(UpdateStatisticsCoroutine("Menu"));
     }
 
     public void OpenPlay()
@@ -214,11 +212,9 @@ public class BaseControll : MonoBehaviour
         if (authController != null && authController.CurrentUser != null && authController.CurrentUserStatistics != null)
         {
             nicknameText.text = authController.CurrentUser.username;
-
-            GPPText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();  
-            HSPText.text = authController.CurrentUserStatistics.highestScore.ToString();    
-            RKPText.text = authController.CurrentUserStatistics.ranking.ToString();    
         }
+        
+        StartCoroutine(UpdateStatisticsCoroutine("Play"));
     }
 
     public void OpenCreateRoom()
@@ -690,5 +686,41 @@ public class BaseControll : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private IEnumerator UpdateStatisticsCoroutine(string context)
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            yield break;
+        }
+
+        yield return authController.UserStatistics();
+
+        if (authController.IsRequestSuccessful && authController.CurrentUserStatistics != null)
+        {
+            // Met à jour les statistiques en fonction du contexte
+            if (context == "Play")
+            {
+                GPPText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();
+                HSPText.text = authController.CurrentUserStatistics.highestScore.ToString();
+                RKPText.text = authController.CurrentUserStatistics.ranking.ToString();
+            }
+            else if (context == "Menu")
+            {
+                GPMText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();
+                HSMText.text = authController.CurrentUserStatistics.highestScore.ToString();
+                RKMText.text = authController.CurrentUserStatistics.ranking.ToString();
+            }
+            else
+            {
+                Debug.LogWarning("Unknown context provided to UpdateStatisticsCoroutine.");
+            }
+        }
+        else
+        {
+            OpenErr("Failed to retrieve user statistics.");
+        }
     }
 }
