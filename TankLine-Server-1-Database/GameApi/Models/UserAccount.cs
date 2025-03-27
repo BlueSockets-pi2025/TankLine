@@ -56,4 +56,10 @@ public class UserAccount
 
     [Column("password_reset_expiration")]
     public DateTime? PasswordResetExpiration { get; set; }
+
+    [Column("refresh_token_hash")]
+    public string? RefreshTokenHash { get; set; }
+
+    [Column("refresh_token_expiration")]
+    public DateTime? RefreshTokenExpiration { get; set; }
 }

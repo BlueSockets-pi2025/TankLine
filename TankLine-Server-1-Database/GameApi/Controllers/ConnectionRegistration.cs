@@ -28,75 +28,77 @@ public class ConnectionRegistrationController : Controller
         _context = context;
         _configuration = configuration;
     }
-[HttpPost("register")]
-public async Task<IActionResult> Register([FromBody] UserAccount user)
-{
-    if (!ModelState.IsValid)
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] UserAccount user)
     {
-        return BadRequest("Invalid data");
-    }
-
-    // empty values or values only composed of whitespaces 
-    if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName)||
-        string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.PasswordHash))
-    {
-        return BadRequest("The values cannot be empty or contain only whitespace.");
-    }
-
-    if (!user.PasswordHash.Any(char.IsDigit) || !user.PasswordHash.Any(char.IsPunctuation))
-    {
-        return BadRequest("Password must contain at least one numeric character and one special character.");
-    }
-
-    if (user.PasswordHash.Length < 8)
-    {
-        return BadRequest("Password must be at least 8 characters long.");
-    }
-
-
-    var existingUser = _context.UserAccounts.FirstOrDefault(u => u.Username == user.Username || u.Email == user.Email);
-
-    if (existingUser != null)
-    {
-        if (existingUser.IsVerified)
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Username or email already exists.");
+            return BadRequest("Invalid data");
         }
-        else
+
+        // empty values or values only composed of whitespaces 
+        if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName)||
+            string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.PasswordHash))
         {
-            // Remove the unverified account
-            _context.UserAccounts.Remove(existingUser);
+            return BadRequest("The values cannot be empty or contain only whitespace.");
+        }
+
+        if (!user.PasswordHash.Any(char.IsDigit) || !user.PasswordHash.Any(char.IsPunctuation))
+        {
+            return BadRequest("Password must contain at least one numeric character and one special character.");
+        }
+
+        if (user.PasswordHash.Length < 8)
+        {
+            return BadRequest("Password must be at least 8 characters long.");
+        }
+
+        var existingUser = _context.UserAccounts.FirstOrDefault(u => u.Username == user.Username || u.Email == user.Email);
+
+        if (existingUser != null)
+        {
+            if (existingUser.IsVerified)
+            {
+                return BadRequest("Username or email already exists.");
+            }
+            else
+            {
+                // Remove the unverified account
+                _context.UserAccounts.Remove(existingUser);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        try
+        {
+            string verificationCode = GenerateSecureVerificationCode();
+
+            // Hash password before saving it
+            user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
+            user.BirthDate = user.BirthDate.ToUniversalTime();
+
+            user.CreatedAt = DateTime.UtcNow;
+
+            // Add verification code directly to UserAccount
+            user.VerificationCode = verificationCode;
+            user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Code valid for 5 minutes
+
+            // Add the new user to the database
+            _context.UserAccounts.Add(user);
             await _context.SaveChangesAsync();
+
+            Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
+
+            SendVerificationEmail(user.Email, verificationCode);
+
+            return Ok("Verification code sent to your email.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-
-    try
-    {
-        string verificationCode = GenerateSecureVerificationCode();
-
-        // Hash password before saving it
-        user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
-        user.BirthDate = user.BirthDate.ToUniversalTime();
-
-        // Add verification code directly to UserAccount
-        user.VerificationCode = verificationCode;
-        user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Code valid for 5 minutes
-
-        // Add the new user to the database
-        _context.UserAccounts.Add(user);
-        await _context.SaveChangesAsync();
-
-        Console.WriteLine($"Verification code for {user.Email}: {verificationCode}");
-
-        SendVerificationEmail(user.Email, verificationCode);
-
-        return Ok("Verification code sent to your email.");
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, $"Internal server error: {ex.Message}");
-    }
-}
 
 
     [HttpPost("verify")]
@@ -218,21 +220,126 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         }
 
         var token = GenerateJwtToken(user);
+
+        // Generate and hash refresh token
+        var refreshToken = GenerateRefreshToken(user.Username);
+        var hashedRefreshToken = TokenService.HashRefreshToken(refreshToken);
+        // Save the hashed refresh token in the user's record
+        user.RefreshTokenHash = hashedRefreshToken;
+
+        user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7);
+
+        user.BirthDate = user.BirthDate.ToUniversalTime();
+        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+
+        _context.UserAccounts.Update(user);
+        _context.SaveChanges();
+
         Response.Cookies.Append("AuthToken", token, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryHours"]))
+            Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
         });
 
-        return Ok(new { Token = token });
+        Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,  
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7) 
+        });
+
+        return Ok(new { Token = token, RefreshToken = refreshToken  });
+    }
+
+    [HttpPost("refresh-token")]
+    public IActionResult RefreshToken()
+    {
+        var refreshToken = Request.Cookies["RefreshToken"];
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return BadRequest("Refresh token is required.");
+        }
+
+        Console.WriteLine($"Received refresh token: {refreshToken}");
+        // Split the token to extract the username
+        var parts = refreshToken.Split(':');
+        if (parts.Length != 2)
+        {
+            return BadRequest("Invalid refresh token format.");
+        }
+
+        string username = parts[0];
+        Console.WriteLine($"Username: {username}");
+        string tokenPart = parts[1];
+        Console.WriteLine($"Token part: {tokenPart}");
+
+        // Find the user by username
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Username == username);
+        if (user == null || string.IsNullOrEmpty(user.RefreshTokenHash))
+        {
+            return BadRequest("Invalid or expired refresh token.");
+        }
+
+        // Verify the token
+        if (!TokenService.VerifyRefreshToken(refreshToken, user.RefreshTokenHash))
+        {
+            return BadRequest("Invalid or expired refresh token (not verify).");
+        }
+
+        // Check if the refresh token has expired
+        if (user.RefreshTokenExpiration < DateTime.UtcNow)
+        {
+            return BadRequest("Refresh token has expired.");
+        }
+
+        // Generate a new JWT token
+        var newJwtToken = GenerateJwtToken(user);
+
+        // Generate a new refresh token
+        var newRefreshToken = GenerateRefreshToken(user.Username);
+        var hashedNewRefreshToken = TokenService.HashRefreshToken(newRefreshToken);
+
+        // Replace the old refresh token with the new one
+        user.RefreshTokenHash = hashedNewRefreshToken;
+        user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7); // Reset expiration
+
+        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+        user.BirthDate = user.BirthDate.ToUniversalTime();
+
+        _context.UserAccounts.Update(user);
+        _context.SaveChanges();
+
+        // Send the new tokens to the client
+        Response.Cookies.Append("AuthToken", newJwtToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
+        });
+
+        Response.Cookies.Append("RefreshToken", newRefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+
+        return Ok(new { Token = newJwtToken });
     }
 
     [HttpPost("logout")]
     public IActionResult Logout()
     {
         Response.Cookies.Delete("AuthToken");
+        Response.Cookies.Delete("RefreshToken");
+
+        // Refresh token
         return Ok("Logged out successfully.");
     }
 
@@ -301,13 +408,25 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
             issuer: _configuration["JwtSettings:Issuer"] ?? string.Empty,
             audience: _configuration["JwtSettings:Audience"] ?? string.Empty,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryHours"])),
+            expires: DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"])),
             signingCredentials: creds
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+    private string GenerateRefreshToken(string username)
+    {
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            byte[] randomBytes = new byte[64]; // 64 bytes for better security
+            rng.GetBytes(randomBytes);
+            string randomToken = Convert.ToBase64String(randomBytes);
 
+            // Combine the username with the random token
+            string tokenWithUsername = $"{username}:{randomToken}";
+            return tokenWithUsername;
+        }
+    }
 
     [HttpPost("request-password-reset")]
     public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
@@ -330,8 +449,8 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         {
             user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
         }
-        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
-        user.BirthDate = DateTime.UtcNow.Date;
+        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+        user.BirthDate = user.BirthDate.ToUniversalTime();
 
 
         // Save changes to the database
@@ -343,8 +462,6 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
 
         return Ok("Password reset code has been sent to your email.");
     }
-
-
 
     public void SendPasswordResetEmail(string email, string resetCode)
     {
@@ -451,6 +568,26 @@ public async Task<IActionResult> Register([FromBody] UserAccount user)
         return Ok("Password reset successfully.");
     }
 
+    [HttpDelete("cleanup")]
+    public async Task<IActionResult> CleanupTestUsers()
+    {
+        try
+        {
+            // Suppression des utilisateurs créés pour les tests
+            var testUsers = _context.UserAccounts
+                .Where(u => u.Email.Contains("test.com"));  // Par exemple, on supprime les utilisateurs avec "test.com" dans l'email
+
+            _context.UserAccounts.RemoveRange(testUsers);
+            await _context.SaveChangesAsync();
+
+            return Ok("Test users cleaned up.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
 
 }
 
@@ -468,8 +605,6 @@ public class ResetPasswordRequest
 
 
 }
-
-
 
 public class VerificationRequest
 {
