@@ -5,6 +5,7 @@ using TMPro;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System;
+using System.Collections.Generic;
 
 public class AuthController : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class AuthController : MonoBehaviour
 
     private const string userDataUrl = "https://185.155.93.105:17008/api/user/me";
     private const string userStatisticsUrl = "https://185.155.93.105:17008/api/user/me/statistics";
+
+    private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
     private static X509Certificate2 trustedCertificate;
 
@@ -52,6 +55,96 @@ public class AuthController : MonoBehaviour
     public static X509Certificate2 GetTrustedCertificate()
     {
         return trustedCertificate;
+    }
+
+    private IEnumerator SendRequestWithAutoRefresh(string url, string method, Dictionary<string, string> headers, byte[] body, Action<UnityWebRequest> onSuccess, Action<UnityWebRequest> onError)
+    {
+        // Create the initial query
+        UnityWebRequest request = new UnityWebRequest(url, method);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        // Add query body if necessary
+        if (body != null && (method == "POST" || method == "PUT"))
+        {
+            request.uploadHandler = new UploadHandlerRaw(body);
+            request.uploadHandler.contentType = "application/json";
+        }
+
+        // Add headers
+        if (headers != null)
+        {
+            foreach (var header in headers)
+            {
+                request.SetRequestHeader(header.Key, header.Value);
+            }
+        }
+
+        request.certificateHandler = new CustomCertificateHandler();
+
+        yield return request.SendWebRequest();
+
+        if (request.responseCode == 401) // Unauthorized
+        {
+            Debug.Log("JWT expired. Attempting to refresh token...");
+
+            // Create a request to refresh the token
+            UnityWebRequest refreshRequest = new UnityWebRequest(refreshTokenUrl, "POST");
+            refreshRequest.downloadHandler = new DownloadHandlerBuffer();
+            refreshRequest.SetRequestHeader("Content-Type", "application/json");
+            refreshRequest.certificateHandler = new CustomCertificateHandler();
+
+            yield return refreshRequest.SendWebRequest();
+
+            if (refreshRequest.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Token refreshed successfully. Retrying original request...");
+
+                // Recreate the original request
+                UnityWebRequest retryRequest = new UnityWebRequest(url, method);
+                retryRequest.downloadHandler = new DownloadHandlerBuffer();
+
+                // Add query body if necessary
+                if (body != null && (method == "POST" || method == "PUT"))
+                {
+                    retryRequest.uploadHandler = new UploadHandlerRaw(body);
+                    retryRequest.uploadHandler.contentType = "application/json";
+                }
+
+                if (headers != null)
+                {
+                    foreach (var header in headers)
+                    {
+                        retryRequest.SetRequestHeader(header.Key, header.Value);
+                    }
+                }
+
+                retryRequest.certificateHandler = new CustomCertificateHandler();
+
+                yield return retryRequest.SendWebRequest();
+
+                if (retryRequest.result == UnityWebRequest.Result.Success)
+                {
+                    onSuccess?.Invoke(retryRequest);
+                }
+                else
+                {
+                    onError?.Invoke(retryRequest);
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to refresh token: " + refreshRequest.error);
+                onError?.Invoke(refreshRequest);
+            }
+        }
+        else if (request.result == UnityWebRequest.Result.Success)
+        {
+            onSuccess?.Invoke(request);
+        }
+        else
+        {
+            onError?.Invoke(request);
+        }
     }
 
     public IEnumerator Register(string username, string email, string password, string confirmPassword, string firstName, string lastName, string day, string month, string year)
@@ -373,33 +466,45 @@ public class AuthController : MonoBehaviour
         }
     }
 
-    private IEnumerator GetCurrentUser()
+    public IEnumerator GetCurrentUser()
     {
         UnityWebRequest request = new UnityWebRequest(userDataUrl, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-
         request.certificateHandler = new CustomCertificateHandler();
 
-        yield return request.SendWebRequest();
+        yield return SendRequestWithAutoRefresh(
+            userDataUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null,
+            onSuccess: (response) =>
+            {
+                responseText.text = "User data retrieved successfully!";
+                Debug.Log("User Data: " + response.downloadHandler.text);
 
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            responseText.text = "User data retrieved successfully!";
-            Debug.Log("User Data: " + request.downloadHandler.text);
-            // Parse user data
-            var userData = JsonUtility.FromJson<UserData>(request.downloadHandler.text);
-            CurrentUser = userData; 
-
-            IsRequestSuccessful = true;
-        }
-        else
-        {
-            responseText.text = $"Error: {request.error}";
-            Debug.LogError("Failed to retrieve user data: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
-            IsRequestSuccessful = false;
-        }
+                // Parse user data
+                try
+                {
+                    var userData = JsonUtility.FromJson<UserData>(response.downloadHandler.text);
+                    CurrentUser = userData;
+                    IsRequestSuccessful = true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error parsing user data: {ex.Message}");
+                    responseText.text = "Error parsing user data.";
+                    IsRequestSuccessful = false;
+                }
+            },
+            onError: (response) =>
+            {
+                responseText.text = $"Error: {response.error}";
+                Debug.LogError("Failed to retrieve user data: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                IsRequestSuccessful = false;
+            }
+        );
     }
 
     private IEnumerator GetUserStatistics()
@@ -407,28 +512,40 @@ public class AuthController : MonoBehaviour
         UnityWebRequest request = new UnityWebRequest(userStatisticsUrl, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-
         request.certificateHandler = new CustomCertificateHandler();
 
-        yield return request.SendWebRequest();
+        yield return SendRequestWithAutoRefresh(
+            userStatisticsUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // No body for a GET request
+            onSuccess: (response) =>
+            {
+                responseText.text = "Statistics retrieved successfully!";
+                Debug.Log("User Statistics: " + response.downloadHandler.text);
 
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            responseText.text = "Statistics retrieved successfully!";
-            Debug.Log("User Statistics: " + request.downloadHandler.text);
-            // Parse statistics data
-            var userStatistics = JsonUtility.FromJson<UserStatistics>(request.downloadHandler.text);
-            CurrentUserStatistics = userStatistics; 
-
-            IsRequestSuccessful = true;
-        }
-        else
-        {
-            responseText.text = $"Error: {request.error}";
-            Debug.LogError("Failed to retrieve user statistics: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
-            IsRequestSuccessful = false;
-        }
+                // Parse statistics data
+                try
+                {
+                    var userStatistics = JsonUtility.FromJson<UserStatistics>(response.downloadHandler.text);
+                    CurrentUserStatistics = userStatistics;
+                    IsRequestSuccessful = true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error parsing user statistics: {ex.Message}");
+                    responseText.text = "Error parsing user statistics.";
+                    IsRequestSuccessful = false;
+                }
+            },
+            onError: (response) =>
+            {
+                responseText.text = $"Error: {response.error}";
+                Debug.LogError("Failed to retrieve user statistics: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                IsRequestSuccessful = false;
+            }
+        );
     }
 }
 
@@ -480,7 +597,6 @@ public class ResetPasswordRequest
     public string Code;
     public string NewPassword;
     public string ConfirmPassword;
-
 }
 
 [System.Serializable]

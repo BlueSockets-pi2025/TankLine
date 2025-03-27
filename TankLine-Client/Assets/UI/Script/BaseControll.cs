@@ -446,16 +446,6 @@ public class BaseControll : MonoBehaviour
         }
     }
 
-    public void LogoutUser()
-    {
-        if (authController == null)
-        {
-            Debug.LogError("AuthController is not initialized.");
-            return;
-        }
-        authController.Logout();
-    }
-
     public void ResetPassword()
     {
         if (authController == null)
@@ -721,6 +711,30 @@ public class BaseControll : MonoBehaviour
         else
         {
             OpenErr("Failed to retrieve user statistics.");
+        }
+    }
+
+    public void LogoutUser()
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+        StartCoroutine(LogoutCoroutine());
+    }
+
+    private IEnumerator LogoutCoroutine()
+    {
+        yield return authController.Logout();
+
+        if (authController.IsRequestSuccessful)
+        {
+            OpenMessage("You have been logged out successfully.");
+        }
+        else
+        {
+            OpenErr("Logout failed. Please try again.");
         }
     }
 }
