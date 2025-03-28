@@ -57,20 +57,23 @@ public class AuthController : MonoBehaviour
         return trustedCertificate;
     }
 
-    private IEnumerator SendRequestWithAutoRefresh(string url, string method, Dictionary<string, string> headers, byte[] body, Action<UnityWebRequest> onSuccess, Action<UnityWebRequest> onError)
+    private IEnumerator SendRequestWithAutoRefresh(
+    string url,
+    string method,
+    Dictionary<string, string> headers,
+    byte[] body,
+    Action<UnityWebRequest> onSuccess,
+    Action<UnityWebRequest> onError)
     {
-        // Create the initial query
         UnityWebRequest request = new UnityWebRequest(url, method);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        // Add query body if necessary
         if (body != null && (method == "POST" || method == "PUT"))
         {
             request.uploadHandler = new UploadHandlerRaw(body);
             request.uploadHandler.contentType = "application/json";
         }
 
-        // Add headers
         if (headers != null)
         {
             foreach (var header in headers)
@@ -83,11 +86,10 @@ public class AuthController : MonoBehaviour
 
         yield return request.SendWebRequest();
 
-        if (request.responseCode == 401) // Unauthorized
+        if (request.responseCode == 401) // Unauthorized : when the access token is missing or expired 
         {
-            Debug.Log("JWT expired. Attempting to refresh token...");
+            Debug.Log("Access token expired or invalid. Attempting to refresh token...");
 
-            // Create a request to refresh the token
             UnityWebRequest refreshRequest = new UnityWebRequest(refreshTokenUrl, "POST");
             refreshRequest.downloadHandler = new DownloadHandlerBuffer();
             refreshRequest.SetRequestHeader("Content-Type", "application/json");
@@ -99,11 +101,9 @@ public class AuthController : MonoBehaviour
             {
                 Debug.Log("Token refreshed successfully. Retrying original request...");
 
-                // Recreate the original request
                 UnityWebRequest retryRequest = new UnityWebRequest(url, method);
                 retryRequest.downloadHandler = new DownloadHandlerBuffer();
 
-                // Add query body if necessary
                 if (body != null && (method == "POST" || method == "PUT"))
                 {
                     retryRequest.uploadHandler = new UploadHandlerRaw(body);
@@ -133,8 +133,16 @@ public class AuthController : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Failed to refresh token: " + refreshRequest.error);
-                onError?.Invoke(refreshRequest);
+                // If the refresh token is missing or invalid, redirect without displaying an error 
+                if (refreshRequest.responseCode == 400 || refreshRequest.responseCode == 401)
+                {
+                    Debug.Log("Refresh token is invalid or missing. Redirecting to login page...");
+                    BaseControll.Instance.HandleSessionExpired(); // Redirects to login page
+                }
+                else
+                {
+                    onError?.Invoke(refreshRequest);
+                }
             }
         }
         else if (request.result == UnityWebRequest.Result.Success)

@@ -14,25 +14,61 @@ public class BaseControll : MonoBehaviour
     public TMP_Text MsgText;
     public TMP_Text nicknameText, MenuBadge, GPMText, HSMText, RKMText, GPPText, HSPText, RKPText ;
 
+    public static BaseControll Instance { get; private set; }
+
     private AuthController authController;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this; // Assigns the current BaseControll instance to the Instance property
+        }
+        else
+        {
+            Destroy(gameObject); // Prevents multiple instances
+        }
+    }
 
     private void Start()
     {
-        OpenPagePrincipal();
         authController = GetComponent<AuthController>();
         if (authController == null)
         {
             Debug.LogError("AuthController is not attached to the same GameObject.");
             return;
         }
-        // AutoLogin();
+        AutoLogin();
+        //OpenPagePrincipal();
     }
 
     private void AutoLogin()
     {
-        /*
-        TO DO 
-        */
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(AutoLoginCoroutine());
+    }
+
+    private IEnumerator AutoLoginCoroutine()
+    {
+        Debug.Log("Attempting auto-login...");
+
+        // Request requiring an access token to check if the user is already logged in and set the current user 
+        yield return authController.User();
+        if (authController.IsRequestSuccessful)
+        {
+            Debug.Log("Auto-login successful. Skipping login page.");
+            OpenMenu(); // Go directly to the main page
+        }
+        else
+        {
+            Debug.Log("Auto-login failed. Redirecting to login page.");
+            OpenPagePrincipal(); // Connection page 
+        }
     }
 
     public void OpenPagePrincipal()
@@ -518,7 +554,7 @@ public class BaseControll : MonoBehaviour
 
         if (!IsValidAge(Day.text, Month.text, Year.text))
         {
-            OpenErr("You must be at least 12 years old to register.");
+            OpenErr("You must be at least 13 years old to register.");
             return;
         }
         
@@ -668,7 +704,7 @@ public class BaseControll : MonoBehaviour
                 DateTime today = DateTime.Today;
                 int age = today.Year - birthDate.Year;
                 if (birthDate > today.AddYears(-age)) age--;
-                return age >= 12;
+                return age >= 13;
             }
             catch
             {
@@ -690,7 +726,7 @@ public class BaseControll : MonoBehaviour
 
         if (authController.IsRequestSuccessful && authController.CurrentUserStatistics != null)
         {
-            // Met à jour les statistiques en fonction du contexte
+            // Update statistics according to context
             if (context == "Play")
             {
                 GPPText.text = authController.CurrentUserStatistics.gamesPlayed.ToString();
@@ -736,5 +772,11 @@ public class BaseControll : MonoBehaviour
         {
             OpenErr("Logout failed. Please try again.");
         }
+    }
+
+    public void HandleSessionExpired()
+    {
+        Debug.Log("Redirecting to login page...");
+        OpenPagePrincipal(); // Redirects to login page
     }
 }
