@@ -11,8 +11,6 @@ public class AuthController : MonoBehaviour
 {
     [Header("UI Elements")]
 
-    public TMP_Text responseText;
-
     private const string registerUrl = "https://185.155.93.105:17008/api/auth/register";
     private const string loginUrl = "https://185.155.93.105:17008/api/auth/login";
     private const string logoutUrl = "https://185.155.93.105:17008/api/auth/logout"; 
@@ -206,7 +204,6 @@ public class AuthController : MonoBehaviour
 
         if (password != confirmPassword)
         {
-            responseText.text = "Error: Passwords do not match.";
             Debug.LogError("Passwords do not match.");
             IsRequestSuccessful = false;
             yield break; 
@@ -239,13 +236,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Registration SUCCESSFUL!";
             Debug.Log("Registration successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"Error: {request.error}";
             Debug.LogError("Registration FAILED: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -288,13 +283,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Verification SUCCESSFUL!";
             Debug.Log("Account verified successfully: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"Error: {request.error}";
             Debug.LogError("Verification failed: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -322,13 +315,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Verification code resent!";
             Debug.Log("Verification code resent: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"Error: {request.error}";
             Debug.LogError("Error resending code: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -357,13 +348,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Login SUCCESSFUL!";
             Debug.Log("Login successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"ERROR: {request.error}";
             Debug.LogError("Login error: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -382,13 +371,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Logout SUCCESSFUL!";
             Debug.Log("Logout successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"ERROR: {request.error}";
             Debug.LogError("Logout error: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -416,13 +403,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Password reset code sent!";
             Debug.Log("Password reset code sent: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"Error: {request.error}";
             Debug.LogError("Password reset failed: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -433,7 +418,6 @@ public class AuthController : MonoBehaviour
     {
         if (newPassword != confirmNewPassword)
         {
-            responseText.text = "Error: New passwords do not match.";
             Debug.LogError("New passwords do not match.");
             IsRequestSuccessful = false;
             yield break;
@@ -461,13 +445,11 @@ public class AuthController : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            responseText.text = "Password reset successful!";
             Debug.Log("Password reset successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
         }
         else
         {
-            responseText.text = $"Error: {request.error}";
             Debug.LogError("Password reset error: " + request.error);
             Debug.LogError("Details: " + request.downloadHandler.text);
             IsRequestSuccessful = false;
@@ -488,7 +470,6 @@ public class AuthController : MonoBehaviour
             null,
             onSuccess: (response) =>
             {
-                responseText.text = "User data retrieved successfully!";
                 Debug.Log("User Data: " + response.downloadHandler.text);
 
                 // Parse user data
@@ -501,13 +482,11 @@ public class AuthController : MonoBehaviour
                 catch (Exception ex)
                 {
                     Debug.LogError($"Error parsing user data: {ex.Message}");
-                    responseText.text = "Error parsing user data.";
                     IsRequestSuccessful = false;
                 }
             },
             onError: (response) =>
             {
-                responseText.text = $"Error: {response.error}";
                 Debug.LogError("Failed to retrieve user data: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
                 IsRequestSuccessful = false;
@@ -529,7 +508,6 @@ public class AuthController : MonoBehaviour
             null, // No body for a GET request
             onSuccess: (response) =>
             {
-                responseText.text = "Statistics retrieved successfully!";
                 Debug.Log("User Statistics: " + response.downloadHandler.text);
 
                 // Parse statistics data
@@ -542,13 +520,11 @@ public class AuthController : MonoBehaviour
                 catch (Exception ex)
                 {
                     Debug.LogError($"Error parsing user statistics: {ex.Message}");
-                    responseText.text = "Error parsing user statistics.";
                     IsRequestSuccessful = false;
                 }
             },
             onError: (response) =>
             {
-                responseText.text = $"Error: {response.error}";
                 Debug.LogError("Failed to retrieve user statistics: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
                 IsRequestSuccessful = false;
