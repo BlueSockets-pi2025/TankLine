@@ -28,7 +28,8 @@ public class ConnectionRegistrationController : Controller
         _context = context;
         _configuration = configuration;
     }
-[HttpPost("register")]
+    
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserAccount user)
     {
         if (!ModelState.IsValid)
@@ -88,7 +89,7 @@ public class ConnectionRegistrationController : Controller
 
             // Hash the password before saving
             user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
-            user.BirthDate = user.BirthDate.ToUniversalTime();
+            user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
 
             user.CreatedAt = DateTime.UtcNow;
 
@@ -136,9 +137,19 @@ public class ConnectionRegistrationController : Controller
         user.IsVerified = true;
         user.VerificationCode = null; // Remove the code after verification
         user.VerificationExpiration = null;
-        user.BirthDate = user.BirthDate.ToUniversalTime();
 
-        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        if (user.RefreshTokenExpiration.HasValue)
+        {
+            user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
 
         _context.UserAccounts.Update(user);
         await _context.SaveChangesAsync();
@@ -208,71 +219,81 @@ public class ConnectionRegistrationController : Controller
         }
     }
 
-[HttpPost("login")]
-public IActionResult Login([FromBody] LoginRequest loginRequest)
-{
-    if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
+    [HttpPost("login")]
+    public IActionResult Login([FromBody] LoginRequest loginRequest)
     {
-        return BadRequest("Username, email, and password are required.");
-    }
-
-    // Validate for special characters in UsernameOrEmail and Password
-    string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
-    foreach (var field in fieldsToCheck)
-    {
-        if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
+        if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
         {
-            return BadRequest("Invalid characters detected in one or more fields.");
+            return BadRequest("Username, email, and password are required.");
         }
+
+        // Validate for special characters in UsernameOrEmail and Password
+        string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
+        foreach (var field in fieldsToCheck)
+        {
+            if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
+            {
+                return BadRequest("Invalid characters detected in one or more fields.");
+            }
+        }
+
+        var user = _context.UserAccounts
+            .FirstOrDefault(u => u.Username == loginRequest.UsernameOrEmail || u.Email == loginRequest.UsernameOrEmail);
+
+        if (user == null || !PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
+        {
+            return BadRequest("Incorrect username or password.");
+        }
+
+        if (!user.IsVerified)
+        {
+            return BadRequest("Account not verified. Please check your email.");
+        }
+
+        var token = GenerateJwtToken(user);
+
+        // Generate and hash refresh token
+        var refreshToken = GenerateRefreshToken(user.Username);
+        var hashedRefreshToken = TokenService.HashRefreshToken(refreshToken);
+
+        // Save the hashed refresh token in the user's record
+        user.RefreshTokenHash = hashedRefreshToken;
+        user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7);
+
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+        
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.VerificationExpiration.HasValue)
+        {
+            user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
+
+        _context.UserAccounts.Update(user);
+        _context.SaveChanges();
+
+        Response.Cookies.Append("AuthToken", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
+        });
+
+        Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+
+        return Ok(new { Token = token, RefreshToken = refreshToken });
     }
-
-    var user = _context.UserAccounts
-        .FirstOrDefault(u => u.Username == loginRequest.UsernameOrEmail || u.Email == loginRequest.UsernameOrEmail);
-
-    if (user == null || !PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
-    {
-        return BadRequest("Incorrect username or password.");
-    }
-
-    if (!user.IsVerified)
-    {
-        return BadRequest("Account not verified. Please check your email.");
-    }
-
-    var token = GenerateJwtToken(user);
-
-    // Generate and hash refresh token
-    var refreshToken = GenerateRefreshToken(user.Username);
-    var hashedRefreshToken = TokenService.HashRefreshToken(refreshToken);
-
-    // Save the hashed refresh token in the user's record
-    user.RefreshTokenHash = hashedRefreshToken;
-    user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7);
-
-    user.BirthDate = user.BirthDate.ToUniversalTime();
-    user.CreatedAt = user.CreatedAt.ToUniversalTime();
-
-    _context.UserAccounts.Update(user);
-    _context.SaveChanges();
-
-    Response.Cookies.Append("AuthToken", token, new CookieOptions
-    {
-        HttpOnly = true,
-        Secure = true,
-        SameSite = SameSiteMode.Strict,
-        Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
-    });
-
-    Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
-    {
-        HttpOnly = true,
-        Secure = true,
-        SameSite = SameSiteMode.Strict,
-        Expires = DateTime.UtcNow.AddDays(7)
-    });
-
-    return Ok(new { Token = token, RefreshToken = refreshToken });
-}
 
     [HttpPost("refresh-token")]
     public IActionResult RefreshToken()
@@ -327,8 +348,18 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
         user.RefreshTokenHash = hashedNewRefreshToken;
         user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7); // Reset expiration
 
-        user.CreatedAt = user.CreatedAt.ToUniversalTime();
-        user.BirthDate = user.BirthDate.ToUniversalTime();
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.VerificationExpiration.HasValue)
+        {
+            user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
 
         _context.UserAccounts.Update(user);
         _context.SaveChanges();
@@ -383,9 +414,21 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
         // Update the verification code and expiration directly in UserAccount
         user.VerificationCode = newVerificationCode;
         user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Valid for 5 minutes
+        
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
 
-        user.CreatedAt = user.CreatedAt.ToUniversalTime();
-        user.BirthDate = user.BirthDate.ToUniversalTime();
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.RefreshTokenExpiration.HasValue)
+        {
+            user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
+        }
+        
+        _context.UserAccounts.Update(user);
 
         // Save changes in the database
         await _context.SaveChangesAsync();
@@ -466,15 +509,21 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
 
         // Update user account information with token and expiration date
         user.PasswordResetToken = resetCode;
-        user.PasswordResetExpiration = expirationTime;
 
-        if (user.PasswordResetExpiration.HasValue)
+        user.PasswordResetExpiration = DateTime.SpecifyKind(expirationTime, DateTimeKind.Utc);
+
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        if (user.RefreshTokenExpiration.HasValue)
         {
-            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+            user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
         }
-        user.CreatedAt = user.CreatedAt.ToUniversalTime();
-        user.BirthDate = user.BirthDate.ToUniversalTime();
 
+        if (user.VerificationExpiration.HasValue)
+        {
+            user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
 
         // Save changes to the database
         _context.UserAccounts.Update(user);
@@ -552,9 +601,6 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
             return BadRequest("No reset code found.");
         }
 
-        user.CreatedAt = user.CreatedAt.ToUniversalTime();
-        user.BirthDate = user.BirthDate.ToUniversalTime();
-
         if (DateTime.UtcNow > user.PasswordResetExpiration)
         {
             user.PasswordResetToken = null; // Delete expired code
@@ -589,6 +635,18 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
         user.PasswordResetToken = null;
         user.PasswordResetExpiration = null;
 
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        if (user.RefreshTokenExpiration.HasValue)
+        {
+            user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
+        }
+        if (user.VerificationExpiration.HasValue)
+        {
+            user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
+
         await _context.SaveChangesAsync();
 
         return Ok("Password reset successfully.");
@@ -599,9 +657,9 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
     {
         try
         {
-            // Suppression des utilisateurs créés pour les tests
+            // Delete users created for tests
             var testUsers = _context.UserAccounts
-                .Where(u => u.Email.Contains("test.com"));  // Par exemple, on supprime les utilisateurs avec "test.com" dans l'email
+                .Where(u => u.Email.Contains("test.com"));  // For example, we delete users with “test.com” in the email
 
             _context.UserAccounts.RemoveRange(testUsers);
             await _context.SaveChangesAsync();
@@ -613,7 +671,6 @@ public IActionResult Login([FromBody] LoginRequest loginRequest)
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-
 
 }
 
@@ -628,8 +685,6 @@ public class ResetPasswordRequest
     public required string Code { get; set; } 
     public required string NewPassword { get; set; }
     public required string ConfirmPassword { get; set; }
-
-
 }
 
 public class VerificationRequest
