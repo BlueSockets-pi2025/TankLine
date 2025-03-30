@@ -28,8 +28,7 @@ public class ConnectionRegistrationController : Controller
         _context = context;
         _configuration = configuration;
     }
-
-    [HttpPost("register")]
+[HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserAccount user)
     {
         if (!ModelState.IsValid)
@@ -37,13 +36,24 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("Invalid data");
         }
 
-        // empty values or values only composed of whitespaces 
-        if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName)||
+        // Check for empty values or values only composed of whitespaces
+        if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName) ||
             string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.PasswordHash))
         {
             return BadRequest("The values cannot be empty or contain only whitespace.");
         }
 
+        // Validate for special characters in sensitive fields
+        string[] fieldsToCheck = { user.FirstName, user.LastName, user.Username, user.Email, user.PasswordHash };
+        foreach (var field in fieldsToCheck)
+        {
+            if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
+            {
+                return BadRequest("Invalid characters detected in one or more fields.");
+            }
+        }
+
+        // Password validation
         if (!user.PasswordHash.Any(char.IsDigit) || !user.PasswordHash.Any(char.IsPunctuation))
         {
             return BadRequest("Password must contain at least one numeric character and one special character.");
@@ -54,7 +64,9 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("Password must be at least 8 characters long.");
         }
 
-        var existingUser = _context.UserAccounts.FirstOrDefault(u => u.Username == user.Username || u.Email == user.Email);
+        var existingUser = await _context.UserAccounts
+            .Where(u => u.Username == user.Username || u.Email == user.Email)
+            .FirstOrDefaultAsync();
 
         if (existingUser != null)
         {
@@ -74,13 +86,13 @@ public class ConnectionRegistrationController : Controller
         {
             string verificationCode = GenerateSecureVerificationCode();
 
-            // Hash password before saving it
+            // Hash the password before saving
             user.PasswordHash = PasswordHelper.HashPassword(user.PasswordHash);
             user.BirthDate = user.BirthDate.ToUniversalTime();
 
             user.CreatedAt = DateTime.UtcNow;
 
-            // Add verification code directly to UserAccount
+            // Add the verification code directly to UserAccount
             user.VerificationCode = verificationCode;
             user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Code valid for 5 minutes
 
@@ -99,7 +111,6 @@ public class ConnectionRegistrationController : Controller
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-
 
     [HttpPost("verify")]
     public async Task<IActionResult> VerifyAccount([FromBody] VerificationRequest request)
@@ -197,62 +208,71 @@ public class ConnectionRegistrationController : Controller
         }
     }
 
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest loginRequest)
+[HttpPost("login")]
+public IActionResult Login([FromBody] LoginRequest loginRequest)
+{
+    if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
     {
-        if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
-        {
-            return BadRequest("Username, email, and password are required.");
-        }
-
-        var user = _context.UserAccounts.FirstOrDefault(u =>
-            u.Username == loginRequest.UsernameOrEmail ||
-            u.Email == loginRequest.UsernameOrEmail);
-
-        if (user == null || !PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
-        {
-            return BadRequest("Incorrect username or password.");
-        }
-
-        if (!user.IsVerified)
-        {
-            return BadRequest("Account not verified. Please check your email.");
-        }
-
-        var token = GenerateJwtToken(user);
-
-        // Generate and hash refresh token
-        var refreshToken = GenerateRefreshToken(user.Username);
-        var hashedRefreshToken = TokenService.HashRefreshToken(refreshToken);
-        // Save the hashed refresh token in the user's record
-        user.RefreshTokenHash = hashedRefreshToken;
-
-        user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7);
-
-        user.BirthDate = user.BirthDate.ToUniversalTime();
-        user.CreatedAt = user.CreatedAt.ToUniversalTime();
-
-        _context.UserAccounts.Update(user);
-        _context.SaveChanges();
-
-        Response.Cookies.Append("AuthToken", token, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
-        });
-
-        Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,  
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(7) 
-        });
-
-        return Ok(new { Token = token, RefreshToken = refreshToken  });
+        return BadRequest("Username, email, and password are required.");
     }
+
+    // Validate for special characters in UsernameOrEmail and Password
+    string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
+    foreach (var field in fieldsToCheck)
+    {
+        if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
+        {
+            return BadRequest("Invalid characters detected in one or more fields.");
+        }
+    }
+
+    var user = _context.UserAccounts
+        .FirstOrDefault(u => u.Username == loginRequest.UsernameOrEmail || u.Email == loginRequest.UsernameOrEmail);
+
+    if (user == null || !PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
+    {
+        return BadRequest("Incorrect username or password.");
+    }
+
+    if (!user.IsVerified)
+    {
+        return BadRequest("Account not verified. Please check your email.");
+    }
+
+    var token = GenerateJwtToken(user);
+
+    // Generate and hash refresh token
+    var refreshToken = GenerateRefreshToken(user.Username);
+    var hashedRefreshToken = TokenService.HashRefreshToken(refreshToken);
+
+    // Save the hashed refresh token in the user's record
+    user.RefreshTokenHash = hashedRefreshToken;
+    user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7);
+
+    user.BirthDate = user.BirthDate.ToUniversalTime();
+    user.CreatedAt = user.CreatedAt.ToUniversalTime();
+
+    _context.UserAccounts.Update(user);
+    _context.SaveChanges();
+
+    Response.Cookies.Append("AuthToken", token, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Strict,
+        Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
+    });
+
+    Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Strict,
+        Expires = DateTime.UtcNow.AddDays(7)
+    });
+
+    return Ok(new { Token = token, RefreshToken = refreshToken });
+}
 
     [HttpPost("refresh-token")]
     public IActionResult RefreshToken()
@@ -363,6 +383,9 @@ public class ConnectionRegistrationController : Controller
         // Update the verification code and expiration directly in UserAccount
         user.VerificationCode = newVerificationCode;
         user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Valid for 5 minutes
+
+        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+        user.BirthDate = user.BirthDate.ToUniversalTime();
 
         // Save changes in the database
         await _context.SaveChangesAsync();
@@ -528,6 +551,9 @@ public class ConnectionRegistrationController : Controller
         {
             return BadRequest("No reset code found.");
         }
+
+        user.CreatedAt = user.CreatedAt.ToUniversalTime();
+        user.BirthDate = user.BirthDate.ToUniversalTime();
 
         if (DateTime.UtcNow > user.PasswordResetExpiration)
         {
