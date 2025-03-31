@@ -818,10 +818,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-<<<<<<< HEAD
-=======
     Server: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
->>>>>>> waiting-room
     Standalone: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
   additionalCompilerArguments: {}
   platformArchitecture: {}
