@@ -1,6 +1,7 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Tank_Offline : MonoBehaviour
 {
@@ -46,6 +47,7 @@ public class Tank_Offline : MonoBehaviour
 
     //for mobile
     public VirtualJoystick joystick;
+    public Button shootButton;
 
 
     protected virtual void Start()
@@ -54,6 +56,18 @@ public class Tank_Offline : MonoBehaviour
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
+    }
+
+    public void OnShootButtonClick()
+    {
+        if (this.CanShoot())
+        {
+            this.Shoot();
+        }
+        else
+        {
+            // Debug.Log("Prevent self-shoot. TODO : animation");
+        }
     }
 
     /// <summary>
@@ -66,6 +80,7 @@ public class Tank_Offline : MonoBehaviour
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
+#if UNITY_STANDALONE
         // if left click recorded, try to shoot
         if (Input.GetMouseButtonDown(LEFT_CLICK))
         {
@@ -78,6 +93,10 @@ public class Tank_Offline : MonoBehaviour
                 // Debug.Log("Prevent self-shoot. TODO : animation");
             }
         }
+#endif
+#if UNITY_ANDROID
+        shootButton.onClick.AddListener(OnShootButtonClick);
+#endif
     }
 
     /// <summary>
