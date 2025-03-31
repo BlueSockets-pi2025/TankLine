@@ -15,7 +15,7 @@ public class Tank_Offline : MonoBehaviour
 
     /// <summary>The number of life left for this tank</summary>
     [Range(1, 10)]
-    public float nbLifeLeft = 3;
+    public int nbLifeLeft = 3;
 
     protected Transform thisTank;
     protected Transform thisGun;
@@ -44,6 +44,9 @@ public class Tank_Offline : MonoBehaviour
     /// <summary> The gun current angle in radians </summary>
     protected float gunRotation = 0;
 
+    //for mobile
+    public VirtualJoystick joystick;
+
 
     protected virtual void Start()
     {
@@ -56,18 +59,23 @@ public class Tank_Offline : MonoBehaviour
     /// <summary>
     /// Automatically called by unity every frame after the physic engine
     /// </summary>
-    protected void Update() {
+    protected void Update()
+    {
 
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
         // if left click recorded, try to shoot
-        if (Input.GetMouseButtonDown(LEFT_CLICK)) {
-            if (this.CanShoot()) {
+        if (Input.GetMouseButtonDown(LEFT_CLICK))
+        {
+            if (this.CanShoot())
+            {
                 this.Shoot();
-            } else {
-                Debug.Log("Prevent self-shoot. TODO : animation");
+            }
+            else
+            {
+                // Debug.Log("Prevent self-shoot. TODO : animation");
             }
         }
     }
@@ -75,12 +83,20 @@ public class Tank_Offline : MonoBehaviour
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
-    protected void FixedUpdate() {
-
+    protected void FixedUpdate()
+    {
+#if UNITY_STANDALONE
         // process rotation input
         float y = Input.GetAxis("Vertical");
         float x = Input.GetAxis("Horizontal");
         movementToMake = this.FaceDirection(x, y);
+        Debug.Log("UNITY_STANDALONE");
+#endif
+#if UNITY_ANDROID
+        float x = joystick.GetHorizontal();
+        float y = joystick.GetVertical();
+        movementToMake = this.FaceDirection(x, y);
+#endif
 
         // process movement input
         this.GoForward(movementToMake);

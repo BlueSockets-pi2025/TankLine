@@ -47,7 +47,8 @@ public class Bullet_Offline : MonoBehaviour
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
-    void FixedUpdate() {
+    void FixedUpdate()
+    {
         thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
         meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.z, direction.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
@@ -115,7 +116,7 @@ public class Bullet_Offline : MonoBehaviour
         */
         else if (collision.gameObject.layer == PLAYER_LAYER)
         {
-            Tank hitTank = collision.gameObject.GetComponent<Tank>();
+            Tank_Offline hitTank = collision.gameObject.GetComponent<Tank_Offline>();
 
             if (hitTank != null)
             {
