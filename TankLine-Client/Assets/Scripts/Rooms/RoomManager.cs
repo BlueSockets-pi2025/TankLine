@@ -25,7 +25,7 @@ public class RoomManager : NetworkBehaviour
     base.OnStartServer();
   }
 
-  puublic override void OnStopServer()
+  public override void OnStopServer()
   {
     base.OnStopServer();
     rooms.Clear();
@@ -85,7 +85,7 @@ public class RoomManager : NetworkBehaviour
       rooms[roomId].RemovePlayer(conn);
       playerRooms.Remove(conn);
 
-      if (rooms[roomId].PlayerCount == 0)
+      if (rooms[roomId].IsEmpty())
       {
         rooms.Remove(roomId);
       }

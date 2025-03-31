@@ -9,30 +9,55 @@ public class Room
 
   public int PlayerCount => players.Count;
 
+  // Event triggered when a player joins the room. Useful for UI messages or other notifications.
+  public event Action<NetworkConnection> OnPlayerJoined;
+  public event Action<NetworkConnection> OnPlayerLeft;
+
   public Room (int roomId)
   {
     RoomId = roomId;
   }
 
+  /// <summary>
+  /// Add a player to the room. 
+  /// </summary>
+  /// <param name="conn"></param>
   public void AddPlayer(NetworkConnection conn)
   {
     if (!players.Contains(conn))
     {
       players.Add(conn);
-      
+      OnPlajerJoined?.Invoke(conn);
     }
   }
 
+  /// <summary>
+  /// Remove a player from the room. 
+  /// </summary>
+  /// <param name="conn"></param>
   public void RemovePlayer(NetworkConnection conn)
   {
-    if (players.Contains(conn))
+    if (players.Remove(conn))
     {
-      players.Remove(conn);
+      OnPlayerLeft?.Invoke(conn);
     }
   }
 
-  public List<NetworkConnection> GetPlayers()
+  /// <summary>
+  /// Get the list of players in the room.
+  /// </summary>
+  /// <returns></returns>
+  public IReadOnlyList<NetworkConnection> GetPlayers()
   {
-    return players;
+    return players.AsReadOnly();
+  }
+
+  /// <summary>
+  /// Check if the room is empty.
+  /// </summary>
+  /// <returns></returns>
+  public bool IsEmpty()
+  {
+    return players.Count == 0;
   }
 }
