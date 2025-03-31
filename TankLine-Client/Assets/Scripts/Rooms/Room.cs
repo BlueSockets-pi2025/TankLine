@@ -6,8 +6,10 @@ public class Room
 {
   public int RoomId { get; private set; }
   private List<NetworkConnection> players = new List<NetworkConnection>();
+  public bool IsPublic { get; private set; }
 
   public int PlayerCount => players.Count;
+  public bool IsFull => PlayerCount >= maxPlayersPerRoom;
 
   // Event triggered when a player joins the room. Useful for UI messages or other notifications.
   public event Action<NetworkConnection> OnPlayerJoined;
