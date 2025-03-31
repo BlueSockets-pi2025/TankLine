@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 using FishNet.Connection;
+using System;
 
 public class Room
 {
   public int RoomId { get; private set; }
   private List<NetworkConnection> players = new List<NetworkConnection>();
+  private const int maxPlayersPerRoom = 6;
   public bool IsPublic { get; private set; }
 
   public int PlayerCount => players.Count;
@@ -29,7 +31,7 @@ public class Room
     if (!players.Contains(conn))
     {
       players.Add(conn);
-      OnPlajerJoined?.Invoke(conn);
+      OnPlayerJoined?.Invoke(conn);
     }
   }
 
