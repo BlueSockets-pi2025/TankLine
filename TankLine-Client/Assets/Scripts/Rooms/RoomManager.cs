@@ -10,7 +10,8 @@ public class RoomManager : NetworkBehaviour
   public static RoomManager Instance { get; private set; }
   private Dictionary<int, Room> rooms = new Dictionary<int, Room>();
   private Dictionary<NetworkConnection, int> playerRooms = new Dictionary<NetworkConnection, int>();
-
+  private const int maxPlayersPerRoom = 6;
+  private const int minPlayersPerRoom = 2; 
 
   private void Awake()
   {
@@ -103,5 +104,23 @@ public class RoomManager : NetworkBehaviour
   private void TargetConfirmRoomJoin(NetworkConnection conn, int roomId)
   {
     Debug.Log("You have joined room " + roomId);
+  }
+
+  public bool CanJoinRoom(int roomId)
+  {
+    return !rooms.ContainsKey(roomId) || rooms[roomId].PlayerCount < maxPlayersPerRoom;
+  }
+
+  public int? GetFirstAvaliablePublicRoom()
+  {
+    foreach (var kvp in rooms)
+    {
+      var room = kvp.Value;
+      if (room.IsPublic && room.PlayerCount < maxPlayersPerRoom)
+      {
+        return room.RoomId;
+      }
+    }
+    return null;  
   }
 }
