@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
+public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
 {
     private Vector2 inputVector;
     public RectTransform handle; // Drag and drop ton joystick handle ici
+    public Vector2 GetInput() => inputVector;
 
     public void OnDrag(PointerEventData eventData)
     {
@@ -16,9 +17,12 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
             out pos
         );
 
-        inputVector = (pos.magnitude > 50) ? pos.normalized : pos / 50;
-        handle.anchoredPosition = inputVector * 50;
+        float radius = GetComponent<RectTransform>().sizeDelta.x / 2; // Rayon du joystick
+
+        inputVector = pos.magnitude > radius ? pos.normalized : pos / radius;
+        handle.anchoredPosition = inputVector * radius;
     }
+
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -29,15 +33,5 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     {
         inputVector = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
-    }
-
-    public float GetHorizontal()
-    {
-        return inputVector.x;
-    }
-
-    public float GetVertical()
-    {
-        return inputVector.y;
     }
 }

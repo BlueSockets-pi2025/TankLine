@@ -46,7 +46,8 @@ public class Tank_Offline : MonoBehaviour
     protected float gunRotation = 0;
 
     //for mobile
-    public VirtualJoystick joystick;
+    public MoveJoystick joystick;
+    public ShootJoystick shootJoystick;
     public Button shootButton;
 
 
@@ -75,12 +76,11 @@ public class Tank_Offline : MonoBehaviour
     /// </summary>
     protected void Update()
     {
-
+#if UNITY_STANDALONE
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
-#if UNITY_STANDALONE
         // if left click recorded, try to shoot
         if (Input.GetMouseButtonDown(LEFT_CLICK))
         {
@@ -95,6 +95,9 @@ public class Tank_Offline : MonoBehaviour
         }
 #endif
 #if UNITY_ANDROID
+        this.GunTrackJoystick(shootJoystick.GetInput()); 
+        this.ApplyRotation();
+
         shootButton.onClick.AddListener(OnShootButtonClick);
 #endif
     }
@@ -128,7 +131,7 @@ public class Tank_Offline : MonoBehaviour
     {
         // Tank rotation
         float degreeRotation = tankRotation * Mathf.Rad2Deg; // transform radians to degrees
-        thisTank.transform.rotation = Quaternion.Euler(0, degreeRotation, 0); // aply rotation
+        thisTank.transform.rotation = Quaternion.Euler(0, degreeRotation, 0); // apply rotation
 
         // Tank gun rotation
         degreeRotation = gunRotation * Mathf.Rad2Deg; // transform radians to degrees
@@ -361,6 +364,20 @@ public class Tank_Offline : MonoBehaviour
         // rotate this tank gun to face the mouse
         this.SetRotationGun(gunRotation + math.PI / 2);
     }
+
+    //for android Joystick
+    protected void GunTrackJoystick(Vector2 joystickInput)
+    {
+        if (joystickInput.magnitude < 0.1f)
+            return; // Ignore les petits mouvements
+
+        // Convertit l’entrée joystick en angle
+        float gunRotation = Mathf.Atan2(-joystickInput.y, joystickInput.x);
+
+        // Applique la rotation au canon
+        this.SetRotationGun(gunRotation + Mathf.PI / 2);
+    }
+
 
     /// <summary>
     /// Make the player face the direction (x,y)
