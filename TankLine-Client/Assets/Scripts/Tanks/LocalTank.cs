@@ -98,7 +98,7 @@ public class Tank_Offline : MonoBehaviour
         this.GunTrackJoystick(shootJoystick.GetInput()); 
         this.ApplyRotation();
 
-        shootButton.onClick.AddListener(OnShootButtonClick);
+        // shootButton.onClick.AddListener(OnShootButtonClick);
 #endif
     }
 
