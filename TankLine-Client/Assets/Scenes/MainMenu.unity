@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 6244959}
   - component: {fileID: 6244958}
   m_Layer: 5
-  m_Name: Page_sign_up_et3
+  m_Name: SignUpStep3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -258,16 +258,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenWaitingRoom
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: WaitingRoom
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &10519294
@@ -974,16 +974,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenWaitingRoom
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: WaitingRoom
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &65108793
@@ -1212,16 +1212,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenMenu
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: MainMenu
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &73619440
@@ -1344,7 +1344,7 @@ GameObject:
   - component: {fileID: 96093098}
   - component: {fileID: 96093097}
   m_Layer: 5
-  m_Name: Sign in
+  m_Name: SignInBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1414,8 +1414,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
         m_MethodName: LoginUser
         m_Mode: 1
         m_Arguments:
@@ -1612,7 +1612,7 @@ GameObject:
   - component: {fileID: 122084926}
   - component: {fileID: 122084925}
   m_Layer: 5
-  m_Name: ms
+  m_Name: DateOfBirthTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1956,7 +1956,7 @@ GameObject:
   - component: {fileID: 143021613}
   - component: {fileID: 143021612}
   m_Layer: 5
-  m_Name: GPM
+  m_Name: GamePlayed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2978,7 +2978,7 @@ GameObject:
   - component: {fileID: 202880312}
   - component: {fileID: 202880310}
   m_Layer: 5
-  m_Name: Code
+  m_Name: CodeInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3155,7 +3155,7 @@ GameObject:
   - component: {fileID: 203784322}
   - component: {fileID: 203784321}
   m_Layer: 5
-  m_Name: PS
+  m_Name: PasswordTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3334,8 +3334,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
           m_MethodName: LogoutUser
           m_Mode: 1
           m_Arguments:
@@ -3982,7 +3982,7 @@ GameObject:
   - component: {fileID: 235532702}
   - component: {fileID: 235532701}
   m_Layer: 5
-  m_Name: Out
+  m_Name: ExitBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4024,16 +4024,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &235532702
@@ -4430,7 +4430,7 @@ GameObject:
   - component: {fileID: 253891143}
   - component: {fileID: 253891142}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4702,7 +4702,7 @@ GameObject:
   - component: {fileID: 267811975}
   - component: {fileID: 267811974}
   m_Layer: 5
-  m_Name: RYP
+  m_Name: ResetPasswordTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4839,7 +4839,7 @@ GameObject:
   - component: {fileID: 271890013}
   - component: {fileID: 271890012}
   m_Layer: 5
-  m_Name: Continue
+  m_Name: ContinueBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4909,8 +4909,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
         m_MethodName: ResetPassword2
         m_Mode: 1
         m_Arguments:
@@ -4972,7 +4972,7 @@ GameObject:
   - component: {fileID: 280986091}
   - component: {fileID: 280986090}
   m_Layer: 5
-  m_Name: Lname
+  m_Name: LastNameInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5500,16 +5500,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenRoomNumber
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: RoomNum
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &329129857
@@ -5585,7 +5585,6 @@ RectTransform:
   - {fileID: 419200586}
   - {fileID: 1024822053}
   - {fileID: 1459314864}
-  - {fileID: 2063731581}
   - {fileID: 196561208}
   - {fileID: 1267506003}
   - {fileID: 1357518742}
@@ -5593,6 +5592,7 @@ RectTransform:
   - {fileID: 997889047}
   - {fileID: 778466155}
   - {fileID: 1702124012}
+  - {fileID: 2063731581}
   - {fileID: 896943385}
   - {fileID: 147611919}
   - {fileID: 1725909285}
@@ -5812,7 +5812,7 @@ GameObject:
   - component: {fileID: 350093225}
   - component: {fileID: 350093224}
   m_Layer: 5
-  m_Name: Message Info
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6000,7 +6000,7 @@ GameObject:
   - component: {fileID: 357570909}
   - component: {fileID: 357570908}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6411,16 +6411,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenMenu
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: MainMenu
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &368935911
@@ -6764,7 +6764,7 @@ GameObject:
   - component: {fileID: 396143894}
   - component: {fileID: 396143893}
   m_Layer: 5
-  m_Name: Email
+  m_Name: EmailInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7518,7 +7518,7 @@ GameObject:
   - component: {fileID: 437479329}
   - component: {fileID: 437479328}
   m_Layer: 5
-  m_Name: Nick Name
+  m_Name: UserNameTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7842,7 +7842,7 @@ GameObject:
   - component: {fileID: 446641992}
   - component: {fileID: 446641991}
   m_Layer: 5
-  m_Name: ms
+  m_Name: EnterYourEmailTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8330,7 +8330,7 @@ GameObject:
   - component: {fileID: 461707431}
   - component: {fileID: 461707430}
   m_Layer: 5
-  m_Name: HSM
+  m_Name: HighScore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8467,7 +8467,7 @@ GameObject:
   - component: {fileID: 469986815}
   - component: {fileID: 469986814}
   m_Layer: 5
-  m_Name: Forget MDP
+  m_Name: ForgetPassword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8537,16 +8537,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenReset_Your_Password
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: ResetPasswordStep1
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &469986815
@@ -8834,7 +8834,7 @@ GameObject:
   - component: {fileID: 522306042}
   - component: {fileID: 522306041}
   m_Layer: 5
-  m_Name: ForMail
+  m_Name: MailInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9031,8 +9031,8 @@ RectTransform:
   m_Children:
   - {fileID: 582885512}
   - {fileID: 143021611}
-  - {fileID: 1305002359}
   - {fileID: 461707429}
+  - {fileID: 1305002359}
   m_Father: {fileID: 560234027}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -9087,12 +9087,12 @@ GameObject:
   - component: {fileID: 560234029}
   - component: {fileID: 560234028}
   m_Layer: 5
-  m_Name: Menu
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &560234027
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9215,16 +9215,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &579201762
@@ -9412,7 +9412,7 @@ GameObject:
   - component: {fileID: 581300439}
   - component: {fileID: 581300438}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9548,7 +9548,7 @@ GameObject:
   - component: {fileID: 582885514}
   - component: {fileID: 582885513}
   m_Layer: 5
-  m_Name: NiKnameM
+  m_Name: UserName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10099,16 +10099,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenMenu
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &643815767
@@ -10162,7 +10162,7 @@ GameObject:
   - component: {fileID: 648226528}
   - component: {fileID: 648226527}
   m_Layer: 5
-  m_Name: Resend
+  m_Name: ResendBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10232,8 +10232,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
         m_MethodName: ResendVerificationCode
         m_Mode: 1
         m_Arguments:
@@ -10347,7 +10347,7 @@ GameObject:
   - component: {fileID: 666418232}
   - component: {fileID: 666418231}
   m_Layer: 5
-  m_Name: Out
+  m_Name: ExitBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10389,16 +10389,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenReset_Your_Password
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: ResetPasswordStep1
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &666418232
@@ -10584,7 +10584,7 @@ GameObject:
   - component: {fileID: 682552298}
   - component: {fileID: 682552297}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10883,7 +10883,7 @@ GameObject:
   - component: {fileID: 698065076}
   - component: {fileID: 698065075}
   m_Layer: 5
-  m_Name: Cmdp
+  m_Name: ConfirmPasswordInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11524,16 +11524,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenPlay
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Play
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &706059470
@@ -11724,7 +11724,7 @@ GameObject:
   - component: {fileID: 717043998}
   - component: {fileID: 717043997}
   m_Layer: 5
-  m_Name: NiKnameP
+  m_Name: UserName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13067,8 +13067,8 @@ RectTransform:
   m_Children:
   - {fileID: 717043996}
   - {fileID: 1816802570}
-  - {fileID: 2020327191}
   - {fileID: 1614589856}
+  - {fileID: 2020327191}
   m_Father: {fileID: 795220800}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -13274,7 +13274,7 @@ GameObject:
   - component: {fileID: 808643166}
   - component: {fileID: 808643165}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13349,7 +13349,7 @@ GameObject:
   - component: {fileID: 819747393}
   - component: {fileID: 819747392}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13561,7 +13561,7 @@ GameObject:
   - component: {fileID: 834201065}
   - component: {fileID: 834201064}
   m_Layer: 5
-  m_Name: Mdp
+  m_Name: PasswordInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13916,7 +13916,7 @@ GameObject:
   - component: {fileID: 852685172}
   - component: {fileID: 852685171}
   m_Layer: 5
-  m_Name: SI
+  m_Name: ResetPasswordTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14445,6 +14445,8 @@ GameObject:
   - component: {fileID: 897803371}
   - component: {fileID: 897803370}
   - component: {fileID: 897803369}
+  - component: {fileID: 897803373}
+  - component: {fileID: 897803374}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -14481,10 +14483,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -14541,13 +14543,13 @@ RectTransform:
   - {fileID: 345369285}
   - {fileID: 1854823519}
   - {fileID: 1365689439}
-  - {fileID: 2102403009}
-  - {fileID: 1976018104}
   - {fileID: 1828692500}
   - {fileID: 693591556}
   - {fileID: 230713844}
   - {fileID: 1901238576}
   - {fileID: 436897684}
+  - {fileID: 2102403009}
+  - {fileID: 1976018104}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -14555,6 +14557,34 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &897803373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897803368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbf5f0c84fca17ff8c7ec4d8c25c329, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvas: {fileID: 897803368}
+  ErrorPopup: {fileID: 2102403008}
+  MessagePopup: {fileID: 1976018103}
+  CurrentPage: {fileID: 2020324182}
+--- !u!114 &897803374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897803368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &908462845
 GameObject:
   m_ObjectHideFlags: 0
@@ -15012,7 +15042,7 @@ GameObject:
   - component: {fileID: 930934664}
   - component: {fileID: 930934663}
   m_Layer: 5
-  m_Name: Create Account
+  m_Name: CreateAccountTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15263,16 +15293,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &951226535
@@ -15598,7 +15628,7 @@ GameObject:
   - component: {fileID: 976697167}
   - component: {fileID: 976697166}
   m_Layer: 5
-  m_Name: Fname
+  m_Name: FirstNameInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16419,16 +16449,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1024822055
@@ -16751,7 +16781,7 @@ GameObject:
   - component: {fileID: 1041125629}
   - component: {fileID: 1041125628}
   m_Layer: 5
-  m_Name: code
+  m_Name: CheckCodeInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16929,7 +16959,7 @@ GameObject:
   - component: {fileID: 1041200586}
   - component: {fileID: 1041200585}
   m_Layer: 5
-  m_Name: Join_Room
+  m_Name: JoinRoomBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16999,16 +17029,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenJoinRoom
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: JoinRoom
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1041200586
@@ -17198,7 +17228,7 @@ GameObject:
   - component: {fileID: 1048933354}
   - component: {fileID: 1048933353}
   m_Layer: 5
-  m_Name: Sign up
+  m_Name: ContinueBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17268,9 +17298,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: SigninUser3
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: SignUpUser3
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17539,7 +17569,7 @@ GameObject:
   - component: {fileID: 1076437333}
   - component: {fileID: 1076437332}
   m_Layer: 5
-  m_Name: Back_To_Menu
+  m_Name: BackBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17609,16 +17639,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenMenu
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1076437333
@@ -17672,7 +17702,7 @@ GameObject:
   - component: {fileID: 1098991883}
   - component: {fileID: 1098991882}
   m_Layer: 5
-  m_Name: Sign up
+  m_Name: SignUpBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17742,16 +17772,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenPage_sign_up_et1
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: SignUpStep1
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1098991883
@@ -17938,7 +17968,7 @@ GameObject:
   - component: {fileID: 1103930535}
   - component: {fileID: 1103930534}
   m_Layer: 5
-  m_Name: Resend
+  m_Name: ResendBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18008,8 +18038,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
         m_MethodName: ResetPassword
         m_Mode: 1
         m_Arguments:
@@ -18070,7 +18100,7 @@ GameObject:
   - component: {fileID: 1118533338}
   - component: {fileID: 1118533337}
   m_Layer: 5
-  m_Name: First Name
+  m_Name: FirstNameTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18510,16 +18540,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1144794779
@@ -18570,7 +18600,7 @@ GameObject:
   - component: {fileID: 1149450722}
   - component: {fileID: 1149450721}
   m_Layer: 5
-  m_Name: Year
+  m_Name: YearInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19334,7 +19364,7 @@ GameObject:
   - component: {fileID: 1199013194}
   - component: {fileID: 1199013193}
   m_Layer: 5
-  m_Name: Out
+  m_Name: ExitBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19376,16 +19406,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPage_sign_up_et1
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: SignUpStep1
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1199013194
@@ -19478,16 +19508,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenMenu
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: MainMenu
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1199798215
@@ -19955,16 +19985,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenOption
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Option
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1222732084
@@ -20153,7 +20183,7 @@ GameObject:
   - component: {fileID: 1230012448}
   - component: {fileID: 1230012447}
   m_Layer: 5
-  m_Name: Reset_Your_Password_et1
+  m_Name: ResetPasswordStep1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20671,16 +20701,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1268371074
@@ -21316,7 +21346,7 @@ GameObject:
   - component: {fileID: 1305002361}
   - component: {fileID: 1305002360}
   m_Layer: 5
-  m_Name: RKM
+  m_Name: Rank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21453,7 +21483,7 @@ GameObject:
   - component: {fileID: 1311217869}
   - component: {fileID: 1311217868}
   m_Layer: 5
-  m_Name: Create_Room
+  m_Name: CreateRoomBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21523,16 +21553,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenCreateRoom
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: CreateRoom
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1311217869
@@ -21721,7 +21751,7 @@ GameObject:
   - component: {fileID: 1342907324}
   - component: {fileID: 1342907323}
   m_Layer: 5
-  m_Name: Reset_Your_Password_et2
+  m_Name: ResetPasswordStep2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21808,7 +21838,7 @@ GameObject:
   - component: {fileID: 1347227807}
   - component: {fileID: 1347227806}
   m_Layer: 5
-  m_Name: Page_sign_up_et2
+  m_Name: SignUpStep2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22058,7 +22088,7 @@ GameObject:
   - component: {fileID: 1354303901}
   - component: {fileID: 1354303900}
   m_Layer: 5
-  m_Name: Email
+  m_Name: EmailTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22677,7 +22707,7 @@ GameObject:
   - component: {fileID: 1416806466}
   - component: {fileID: 1416806465}
   m_Layer: 5
-  m_Name: Create Account
+  m_Name: CreateAccountTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23002,7 +23032,7 @@ GameObject:
   - component: {fileID: 1444233816}
   - component: {fileID: 1444233814}
   m_Layer: 5
-  m_Name: Mdp
+  m_Name: PasswordInputField1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23302,16 +23332,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenMenu
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1453596071
@@ -23502,7 +23532,7 @@ GameObject:
   - component: {fileID: 1459314866}
   - component: {fileID: 1459314865}
   m_Layer: 5
-  m_Name: Num_Play
+  m_Name: NumerOfPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23779,7 +23809,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1464720207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24014,7 +24044,7 @@ GameObject:
   - component: {fileID: 1471110194}
   - component: {fileID: 1471110193}
   m_Layer: 5
-  m_Name: PS
+  m_Name: PasswordTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24203,7 +24233,7 @@ GameObject:
   - component: {fileID: 1476133086}
   - component: {fileID: 1476133085}
   m_Layer: 5
-  m_Name: Sign up
+  m_Name: ContinueBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24273,9 +24303,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: SigninUser2
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: SignUpUser2
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24392,7 +24422,7 @@ GameObject:
   - component: {fileID: 1492114577}
   - component: {fileID: 1492114576}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24852,16 +24882,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenPlay
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Play
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1534329889
@@ -24985,16 +25015,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenWaitingRoom
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: WaitingRoom
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1535588424
@@ -25226,16 +25256,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1541564470
@@ -25492,16 +25522,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenMenu
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1545735228
@@ -25688,7 +25718,7 @@ GameObject:
   - component: {fileID: 1570096083}
   - component: {fileID: 1570096082}
   m_Layer: 5
-  m_Name: Out
+  m_Name: ExitBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25730,16 +25760,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPage_sign_up_et2
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: SignUpStep2
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1570096083
@@ -25789,7 +25819,7 @@ GameObject:
   - component: {fileID: 1570291172}
   - component: {fileID: 1570291171}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: NbStepImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26068,16 +26098,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenScore
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Score
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1603289384
@@ -26287,7 +26317,7 @@ GameObject:
   - component: {fileID: 1614589858}
   - component: {fileID: 1614589857}
   m_Layer: 5
-  m_Name: HSP
+  m_Name: HighScore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26888,7 +26918,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.4124146, y: 0}
+  m_AnchoredPosition: {x: -1.4125977, y: 0}
   m_SizeDelta: {x: -649.0154, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1652523515
@@ -26942,7 +26972,7 @@ GameObject:
   - component: {fileID: 1658912591}
   - component: {fileID: 1658912590}
   m_Layer: 5
-  m_Name: Nname
+  m_Name: UserNameInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27120,7 +27150,7 @@ GameObject:
   - component: {fileID: 1660223713}
   - component: {fileID: 1660223712}
   m_Layer: 5
-  m_Name: Sign up
+  m_Name: ContinueBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27190,8 +27220,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
         m_MethodName: ResetPassword
         m_Mode: 1
         m_Arguments:
@@ -27295,16 +27325,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1663493942
@@ -27354,7 +27384,7 @@ GameObject:
   - component: {fileID: 1670585249}
   - component: {fileID: 1670585248}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28066,7 +28096,7 @@ GameObject:
   - component: {fileID: 1724430569}
   - component: {fileID: 1724430567}
   m_Layer: 5
-  m_Name: Cmdp
+  m_Name: PasswordInputField2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28326,16 +28356,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenWaitingRoom
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: WaitingRoom
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1725909287
@@ -28461,7 +28491,7 @@ GameObject:
   - component: {fileID: 1735321261}
   - component: {fileID: 1735321260}
   m_Layer: 5
-  m_Name: Month
+  m_Name: MonthInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28638,7 +28668,7 @@ GameObject:
   - component: {fileID: 1736457842}
   - component: {fileID: 1736457841}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28860,7 +28890,7 @@ GameObject:
   - component: {fileID: 1747623326}
   - component: {fileID: 1747623325}
   m_Layer: 5
-  m_Name: First Name
+  m_Name: ConfirmationCodeTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29376,7 +29406,7 @@ GameObject:
   - component: {fileID: 1793910507}
   - component: {fileID: 1793910506}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: NbStepImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29449,7 +29479,7 @@ GameObject:
   - component: {fileID: 1803583728}
   - component: {fileID: 1803583727}
   m_Layer: 5
-  m_Name: Sign up
+  m_Name: ContinueBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29519,9 +29549,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: SigninUser1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: SignUpUser1
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -29717,7 +29747,7 @@ GameObject:
   - component: {fileID: 1811143605}
   - component: {fileID: 1811143604}
   m_Layer: 5
-  m_Name: CPS
+  m_Name: ConfirmPasswordTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29853,7 +29883,7 @@ GameObject:
   - component: {fileID: 1816802572}
   - component: {fileID: 1816802571}
   m_Layer: 5
-  m_Name: GPP
+  m_Name: GamePlayed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30062,7 +30092,7 @@ GameObject:
   - component: {fileID: 1826656143}
   - component: {fileID: 1826656142}
   m_Layer: 5
-  m_Name: Day
+  m_Name: DayInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30596,7 +30626,7 @@ GameObject:
   - component: {fileID: 1842367839}
   - component: {fileID: 1842367838}
   m_Layer: 5
-  m_Name: LogPW
+  m_Name: LogPassword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31071,7 +31101,7 @@ GameObject:
   - component: {fileID: 1868619610}
   - component: {fileID: 1868619609}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31362,7 +31392,7 @@ GameObject:
   - component: {fileID: 1872987152}
   - component: {fileID: 1872987151}
   m_Layer: 5
-  m_Name: Message Err
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31498,7 +31528,7 @@ GameObject:
   - component: {fileID: 1875378472}
   - component: {fileID: 1875378471}
   m_Layer: 5
-  m_Name: Last Name
+  m_Name: LastNameTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32323,12 +32353,12 @@ GameObject:
   - component: {fileID: 1901238578}
   - component: {fileID: 1901238577}
   m_Layer: 5
-  m_Name: Waiting Room
+  m_Name: WaitingRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1901238576
 RectTransform:
   m_ObjectHideFlags: 0
@@ -32477,16 +32507,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenCredits
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Credits
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1901337928
@@ -32747,7 +32777,7 @@ GameObject:
   - component: {fileID: 1925217616}
   - component: {fileID: 1925217615}
   m_Layer: 5
-  m_Name: Check your mail
+  m_Name: CheckMailTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33019,7 +33049,7 @@ GameObject:
   - component: {fileID: 1943595763}
   - component: {fileID: 1943595762}
   m_Layer: 5
-  m_Name: Page_sign_up_et1
+  m_Name: SignUpStep1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33106,7 +33136,7 @@ GameObject:
   - component: {fileID: 1960597277}
   - component: {fileID: 1960597276}
   m_Layer: 5
-  m_Name: Out
+  m_Name: ExitBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33148,16 +33178,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenPagePrincipal
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: PagePrincipale
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &1960597277
@@ -33806,7 +33836,7 @@ GameObject:
   - component: {fileID: 1976018106}
   - component: {fileID: 1976018105}
   m_Layer: 5
-  m_Name: Msg
+  m_Name: InfoPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33884,7 +33914,7 @@ GameObject:
   - component: {fileID: 1984338047}
   - component: {fileID: 1984338046}
   m_Layer: 5
-  m_Name: SI
+  m_Name: SignInTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34201,7 +34231,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.4124146, y: 0}
+  m_AnchoredPosition: {x: -1.4125977, y: 0}
   m_SizeDelta: {x: -649.0154, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2020202560
@@ -34254,12 +34284,12 @@ GameObject:
   - component: {fileID: 2020324185}
   - component: {fileID: 2020324184}
   m_Layer: 5
-  m_Name: PagePrincipal
+  m_Name: PagePrincipale
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2020324183
 RectTransform:
   m_ObjectHideFlags: 0
@@ -34337,7 +34367,7 @@ GameObject:
   - component: {fileID: 2020327193}
   - component: {fileID: 2020327192}
   m_Layer: 5
-  m_Name: RKP
+  m_Name: Rank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34661,7 +34691,7 @@ GameObject:
   - component: {fileID: 2052245855}
   - component: {fileID: 2052245854}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: NbStepImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35005,7 +35035,7 @@ GameObject:
   - component: {fileID: 2063731583}
   - component: {fileID: 2063731582}
   m_Layer: 5
-  m_Name: PrivOrPub
+  m_Name: PrivatePublic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35481,7 +35511,7 @@ GameObject:
   - component: {fileID: 2102403011}
   - component: {fileID: 2102403010}
   m_Layer: 5
-  m_Name: Err
+  m_Name: ErrorPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35559,7 +35589,7 @@ GameObject:
   - component: {fileID: 2103636552}
   - component: {fileID: 2103636551}
   m_Layer: 5
-  m_Name: CPS
+  m_Name: PasswordConfirmTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35902,16 +35932,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1464720207}
-        m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-        m_MethodName: OpenPlay
-        m_Mode: 1
+      - m_Target: {fileID: 897803373}
+        m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+        m_MethodName: OpenPage
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Play
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2126325522
