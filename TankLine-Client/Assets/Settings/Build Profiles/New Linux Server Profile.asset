@@ -21,8 +21,6 @@ MonoBehaviour:
   m_OverrideGlobalSceneList: 1
   m_Scenes:
   - m_enabled: 0
-    m_path: Assets/Scenes/HeadlessServer.unity
-  - m_enabled: 0
     m_path: Assets/Scenes/InGameScene.unity
   - m_enabled: 1
     m_path: Assets/Scenes/WaitingRoom.unity

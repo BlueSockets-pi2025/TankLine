@@ -37,7 +37,7 @@ public class AuthController : MonoBehaviour
 
     private void LoadCertificate()
     {
-        string certificatePath = "Assets/UI/certificat.pem";  
+        string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
         if (File.Exists(certificatePath))
         {
             byte[] certificateBytes = File.ReadAllBytes(certificatePath);

@@ -872,8 +872,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
           m_MethodName: CloseMessage
           m_Mode: 1
           m_Arguments:
@@ -13166,16 +13166,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenMenu
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: MainMenu
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &803458202
@@ -16381,19 +16381,7 @@ MonoBehaviour:
   - eventID: 4
     callback:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: OpenColorChanger
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
 --- !u!1 &1024822052
 GameObject:
   m_ObjectHideFlags: 0
@@ -18438,8 +18426,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
           m_MethodName: CloseErr
           m_Mode: 1
           m_Arguments:
@@ -19994,7 +19982,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Option
+          m_StringArgument: Options
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1222732084
@@ -23792,110 +23780,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1461122872}
   m_CullTransparentMesh: 1
---- !u!1 &1464720206
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1464720208}
-  - component: {fileID: 1464720207}
-  - component: {fileID: 1464720209}
-  m_Layer: 0
-  m_Name: Base
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1464720207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1464720206}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f693f08c20f739d428ed319e14a7de85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PagePrincipal: {fileID: 2020324182}
-  Reset_Your_Password: {fileID: 1230012445}
-  Reset_Your_Password2: {fileID: 1342907322}
-  Page_sign_up_et1: {fileID: 1943595760}
-  Page_sign_up_et2: {fileID: 1347227804}
-  Page_sign_up_et3: {fileID: 6244956}
-  Menu: {fileID: 560234026}
-  Play: {fileID: 795220799}
-  CreateRoom: {fileID: 345369284}
-  JoinRoom: {fileID: 1854823516}
-  RoomNum: {fileID: 1365689438}
-  Err: {fileID: 2102403008}
-  Msg: {fileID: 1976018103}
-  credits: {fileID: 1765434137}
-  option: {fileID: 1843882803}
-  score: {fileID: 192434538}
-  InGame: {fileID: 1828692499}
-  WaintingRoom: {fileID: 1901238575}
-  ColorChangingPannel: {fileID: 436897683}
-  lose: {fileID: 230713843}
-  win: {fileID: 693591555}
-  LogUsername: {fileID: 979700262}
-  LogPW: {fileID: 1842367838}
-  ForMail: {fileID: 522306041}
-  Month: {fileID: 1735321260}
-  Year: {fileID: 1149450721}
-  Day: {fileID: 1826656142}
-  Fname: {fileID: 976697166}
-  Lname: {fileID: 280986090}
-  Nname: {fileID: 1658912590}
-  Email: {fileID: 396143893}
-  Mdp: {fileID: 834201064}
-  Cmdp: {fileID: 698065075}
-  code: {fileID: 1041125628}
-  Re_Mdp: {fileID: 1444233814}
-  Re_Cmdp: {fileID: 1724430567}
-  Re_code: {fileID: 202880310}
-  ErrText: {fileID: 1872987151}
-  MsgText: {fileID: 350093224}
-  nicknameText: {fileID: 717043997}
-  MenuBadge: {fileID: 582885513}
-  GPMText: {fileID: 143021612}
-  HSMText: {fileID: 461707430}
-  RKMText: {fileID: 1305002360}
-  GPPText: {fileID: 1816802571}
-  HSPText: {fileID: 1614589857}
-  RKPText: {fileID: 2020327192}
---- !u!4 &1464720208
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1464720206}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 953.1876, y: 565.50867, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1464720209
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1464720206}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1466168952
 GameObject:
   m_ObjectHideFlags: 0
@@ -30803,7 +30687,7 @@ GameObject:
   - component: {fileID: 1843882806}
   - component: {fileID: 1843882805}
   m_Layer: 5
-  m_Name: 'Option '
+  m_Name: Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32358,7 +32242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1901238576
 RectTransform:
   m_ObjectHideFlags: 0
@@ -35249,16 +35133,16 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: CloseRoomNumber
-          m_Mode: 1
+        - m_Target: {fileID: 897803373}
+          m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
+          m_MethodName: OpenPage
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument: JoinRoom
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!1 &2080780668
@@ -35451,19 +35335,7 @@ MonoBehaviour:
   - eventID: 4
     callback:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1464720207}
-          m_TargetAssemblyTypeName: BaseControll, Assembly-CSharp
-          m_MethodName: CloseColorChanger
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
 --- !u!114 &2083605794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36064,6 +35936,5 @@ SceneRoots:
   - {fileID: 1766897983}
   - {fileID: 1885914501}
   - {fileID: 158569964}
-  - {fileID: 1464720208}
   - {fileID: 1491361360}
   - {fileID: 806702984}
