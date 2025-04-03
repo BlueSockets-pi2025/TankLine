@@ -24,7 +24,8 @@ public class AuthController : MonoBehaviour
 
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
-    private static X509Certificate2 trustedCertificate;
+    private static X509Certificate2 trustedCertificate;  
+
 
     public bool IsRequestSuccessful { get; private set; }
     public UserData CurrentUser { get; private set; }
@@ -135,7 +136,7 @@ public class AuthController : MonoBehaviour
                 if (refreshRequest.responseCode == 400 || refreshRequest.responseCode == 401)
                 {
                     Debug.Log("Refresh token is invalid or missing. Redirecting to login page...");
-                    BaseControll.Instance.HandleSessionExpired(); // Redirects to login page
+                    MenuSwapper.Instance.HandleSessionExpired(); // Redirects to login page
                 }
                 else
                 {
@@ -200,8 +201,6 @@ public class AuthController : MonoBehaviour
 
     private IEnumerator RegisterUser(string username, string email, string password, string confirmPassword, string firstName, string lastName, string day, string month, string year)
     {
-        Debug.Log(" REGISTERRRR");
-
         if (password != confirmPassword)
         {
             Debug.LogError("Passwords do not match.");
