@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
 {
     private Vector2 inputVector;
-    public RectTransform handle; // Drag and drop ton joystick handle ici
+    public RectTransform handle;
     public Vector2 GetInput() => inputVector;
     private Vector2 startTouchPosition;
     private bool isDragging = false;
@@ -25,11 +25,11 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
             out pos
         );
 
-        float radius = GetComponent<RectTransform>().sizeDelta.x / 2; // Rayon du joystick
+        float radius = GetComponent<RectTransform>().sizeDelta.x / 2;
 
-        if (Vector2.Distance(startTouchPosition, eventData.position) > 10f) // Seuil pour considérer un drag
+        if (Vector2.Distance(startTouchPosition, eventData.position) > 10f)
         {
-            isDragging = true; // L'utilisateur bouge, ce n'est pas un simple clic
+            isDragging = true;
         }
 
         inputVector = pos.magnitude > radius ? pos.normalized : pos / radius;
@@ -41,7 +41,7 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
     {
         if (tank == null) return;
         startTouchPosition = eventData.position;
-        isDragging = false; // Reset l'état
+        isDragging = false;
         OnDrag(eventData);
     }
 
@@ -51,7 +51,7 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
         inputVector = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
 
-        if (!isDragging) // Si ce n'était pas un drag, alors c'est un tir
+        if (!isDragging)
         {
             FindObjectOfType<Tank_Offline>().OnShootButtonClick();
         }

@@ -45,7 +45,7 @@ public class Tank_Offline : MonoBehaviour
     /// <summary> The gun current angle in radians </summary>
     protected float gunRotation = 0;
 
-    //for mobile
+    //for mobile controls
     public MoveJoystick joystick;
     public ShootJoystick shootJoystick;
     public Button shootButton;
@@ -368,7 +368,7 @@ public class Tank_Offline : MonoBehaviour
     //for android Joystick
     protected void GunTrackJoystick(Vector2 joystickInput)
     {
-        if (joystickInput.magnitude < 0.1f)
+        if (joystickInput.magnitude < 0.2f)
             return; // Ignore les petits mouvements
 
         // Convertit l’entrée joystick en angle
