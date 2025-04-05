@@ -128,11 +128,16 @@ public class ConnectionRegistrationController : Controller
         }
 
         // Check if the verification code is correct and not expired
-        if (user.VerificationCode != request.Code || user.VerificationExpiration < DateTime.UtcNow)
+        if (user.VerificationCode != request.Code)
         {
-            return BadRequest("Invalid or expired verification code.");
+            return BadRequest("Invalid verification code.");
         }
 
+        if (user.VerificationExpiration < DateTime.UtcNow)
+        {
+            return BadRequest("Expired verification code.");
+        }
+    
         // Mark the user as verified
         user.IsVerified = true;
         user.VerificationCode = null; // Remove the code after verification
@@ -333,7 +338,7 @@ public class ConnectionRegistrationController : Controller
         // Verify the token
         if (!TokenService.VerifyRefreshToken(refreshToken, user.RefreshTokenHash))
         {
-            return BadRequest("Invalid or expired refresh token (not verify).");
+            return BadRequest("Invalid or expired refresh token (not verified).");
         }
 
         // Check if the refresh token has expired
@@ -606,18 +611,18 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("No reset code found.");
         }
 
+        // Check that the code matches
+        if (user.PasswordResetToken != request.Code)
+        {
+            return BadRequest("Invalid reset code.");
+        }
+
         if (DateTime.UtcNow > user.PasswordResetExpiration)
         {
             user.PasswordResetToken = null; // Delete expired code
             user.PasswordResetExpiration = null; // Delete expiration
             await _context.SaveChangesAsync();
             return BadRequest("Reset code expired.");
-        }
-
-        // Check that the code matches
-        if (user.PasswordResetToken != request.Code)
-        {
-            return BadRequest("Invalid reset code.");
         }
 
         var passwordRegex = new System.Text.RegularExpressions.Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&]).{8,}$");
@@ -630,7 +635,7 @@ public class ConnectionRegistrationController : Controller
         
         if (request.NewPassword != request.ConfirmPassword)
         {
-            return BadRequest("Passwords do not match");
+            return BadRequest("Passwords do not match.");
         }
         // Hash the new password and save it
         user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);

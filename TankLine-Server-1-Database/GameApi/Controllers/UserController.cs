@@ -85,7 +85,7 @@ namespace GameApi.Controllers
 
             // Create a DTO (Data Transfer Object) with the necessary data (without sensitive data)
             var userDto = new UserDto
-            {
+            {   
                 Username = user.Username,
                 Email = user.Email,
                 FirstName = user.FirstName,
