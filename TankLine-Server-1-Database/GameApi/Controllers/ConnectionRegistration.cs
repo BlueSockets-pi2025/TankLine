@@ -224,7 +224,7 @@ public class ConnectionRegistrationController : Controller
     {
         if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
         {
-            return BadRequest("Username, email, and password are required.");
+            return BadRequest("Username (or email) and password are required."); 
         }
 
         // Validate for special characters in UsernameOrEmail and Password
@@ -240,9 +240,14 @@ public class ConnectionRegistrationController : Controller
         var user = _context.UserAccounts
             .FirstOrDefault(u => u.Username == loginRequest.UsernameOrEmail || u.Email == loginRequest.UsernameOrEmail);
 
-        if (user == null || !PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
+        if (user == null)
         {
-            return BadRequest("Incorrect username or password.");
+            return BadRequest("User not found.");
+        }
+
+        if (!PasswordHelper.VerifyPassword(loginRequest.Password, user.PasswordHash))
+        {
+            return BadRequest("Incorrect password.");
         }
 
         if (!user.IsVerified)
@@ -625,8 +630,7 @@ public class ConnectionRegistrationController : Controller
         
         if (request.NewPassword != request.ConfirmPassword)
         {
-            return BadRequest(
-                    "Passwords do not match");
+            return BadRequest("Passwords do not match");
         }
         // Hash the new password and save it
         user.PasswordHash = PasswordHelper.HashPassword(request.NewPassword);
