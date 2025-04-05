@@ -49,39 +49,53 @@ namespace GameApi.Controllers
         {
             Console.WriteLine("GET CURRENT USER..."); // Debug
 
-            var token = Request.Cookies["AuthToken"]; // Debug 
+            var token = Request.Cookies["AuthToken"];
             if (string.IsNullOrEmpty(token))
             {
                 return Unauthorized("Token is missing in the cookies.");
             }
-            Console.WriteLine(token);
-            
+            Console.WriteLine($"AuthToken: {token}");
+
+            // Display claims for debugging
             var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
             foreach (var claim in allClaims)
             {
                 Console.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
             }
 
+            // NameIdentifier claim verification
             var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-
-            if (subClaim == null)
+            if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
             {
-                return Unauthorized($"Invalid token or missing user information. Claim '{JwtRegisteredClaimNames.Sub}' is missing.");
+                return Unauthorized("Invalid token or missing user information.");
             }
 
             var username = subClaim.Value;
             if (string.IsNullOrEmpty(username))
             {
-                return Unauthorized($"Invalid token or missing user information. Claim '{JwtRegisteredClaimNames.Sub}' is empty.");
+                return Unauthorized("Invalid token or missing user information. Username is empty.");
             }
 
+            // Retrieve user from DB 
             var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.Username == username);
             if (user == null)
             {
                 return NotFound("User not found.");
             }
 
-            return Ok(user);
+            // Create a DTO (Data Transfer Object) with the necessary data (without sensitive data)
+            var userDto = new UserDto
+            {
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                CreatedAt = user.CreatedAt,
+                BirthDate = user.BirthDate
+            };
+
+            // Returns DTO data only
+            return Ok(userDto);
         }
 
         [Authorize]
@@ -127,7 +141,6 @@ namespace GameApi.Controllers
                 return NotFound("User statistics not found.");
             }
 
-            // 
             statistics.GamesPlayed += request.GamesPlayed; // Adds the number of games played
             statistics.HighestScore = Math.Max(statistics.HighestScore, request.HighestScore); // Replace if higher
             statistics.Ranking = request.Ranking; // Replaces ranking
@@ -145,4 +158,14 @@ public class UpdateStatisticsRequest
     public int GamesPlayed { get; set; }
     public int HighestScore { get; set; }
     public int Ranking { get; set; }
+}
+
+public class UserDto
+{
+    public required string Username { get; set; }
+    public required string Email { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime BirthDate { get; set; }
 }
