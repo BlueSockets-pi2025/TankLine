@@ -3,7 +3,7 @@ using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using System;
 using System.IO;
-
+using System.Collections.Generic;
 
 public class ConnexionManager : MonoBehaviour
 {
