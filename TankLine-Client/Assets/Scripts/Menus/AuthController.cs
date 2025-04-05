@@ -600,14 +600,10 @@ public class UserData
 {
     public string username;
     public string email;
-    public string passwordHash;
-    public string createdAt;
-    public string isVerified;
     public string firstName;
     public string lastName;
+    public string createdAt;
     public string birthDate;
-    public string passwordResetToken;
-    public string passwordResetExpiration;
 }
 
 [System.Serializable]
