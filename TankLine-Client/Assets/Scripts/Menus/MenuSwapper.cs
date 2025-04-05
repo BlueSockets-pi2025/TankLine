@@ -109,15 +109,26 @@ public class MenuSwapper : MonoBehaviour {
             Debug.LogError("AuthController is not initialized.");
             return;
         }
+
+        Transform page = CurrentPage.name == "PagePrincipale" ? CurrentPage.transform : Canvas.Find("PagePrincipale").transform;
+        string username = page.Find("LogUsername").GetComponent<TMP_InputField>().text;
+        string password = page.Find("LogPassword").GetComponent<TMP_InputField>().text;
+
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) {
+            OpenErr("Both username and password fields must be filled.");
+            return;
+        }
+
         if (CurrentPage.name == "PagePrincipale")
             StartCoroutine(LoginUserCoroutine(CurrentPage.transform));
         else 
             StartCoroutine(LoginUserCoroutine(Canvas.Find("PagePrincipale").transform));
+
     }
 
     private IEnumerator LoginUserCoroutine(Transform PagePrincipale) {
 
-        // find username and password input field
+        // Find username and password input field
         yield return authController.Login(PagePrincipale.Find("LogUsername").GetComponent<TMP_InputField>().text, 
                                         PagePrincipale.Find("LogPassword").GetComponent<TMP_InputField>().text);
 
