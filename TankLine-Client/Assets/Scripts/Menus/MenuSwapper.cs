@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuSwapper : MonoBehaviour {
     public static MenuSwapper Instance { get; private set; }
@@ -373,5 +374,13 @@ public class MenuSwapper : MonoBehaviour {
         } else {
             OpenErr("Failed to retrieve user statistics.");
         }
+    }
+
+    public void ConnectToRandomWaitingRoom() {
+        ConnectToWaitingRoom();
+    }
+
+    public void ConnectToWaitingRoom() {
+        SceneManager.LoadScene("WaitingRoom");
     }
 }
