@@ -110,15 +110,26 @@ public class MenuSwapper : MonoBehaviour {
             Debug.LogError("AuthController is not initialized.");
             return;
         }
+
+        Transform page = CurrentPage.name == "PagePrincipale" ? CurrentPage.transform : Canvas.Find("PagePrincipale").transform;
+        string username = page.Find("LogUsername").GetComponent<TMP_InputField>().text;
+        string password = page.Find("LogPassword").GetComponent<TMP_InputField>().text;
+
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) {
+            OpenErr("Both username and password fields must be filled.");
+            return;
+        }
+
         if (CurrentPage.name == "PagePrincipale")
             StartCoroutine(LoginUserCoroutine(CurrentPage.transform));
         else 
             StartCoroutine(LoginUserCoroutine(Canvas.Find("PagePrincipale").transform));
+
     }
 
     private IEnumerator LoginUserCoroutine(Transform PagePrincipale) {
 
-        // find username and password input field
+        // Find username and password input field
         yield return authController.Login(PagePrincipale.Find("LogUsername").GetComponent<TMP_InputField>().text, 
                                         PagePrincipale.Find("LogPassword").GetComponent<TMP_InputField>().text);
 
@@ -131,19 +142,27 @@ public class MenuSwapper : MonoBehaviour {
                 if (authController.IsRequestSuccessful) {
                     OpenPage("MainMenu");
                 } else {
-                    OpenErr("Failed to retrieve user statistics.");
+                    OpenErr($"Failed to retrieve user statistics:\n {authController.ErrorResponse}");
                 }
             } else {
-                OpenErr("Failed to retrieve user data.");
+                OpenErr($"Failed to retrieve user data: \n {authController.ErrorResponse}");
             }
         } else {
-            OpenErr("Login failed.");
+            OpenErr($"Login failed: \n {authController.ErrorResponse}");
         }
     }
 
     public void ResetPassword() {
         if (authController == null) {
             Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        Transform resetPasswordPage = CurrentPage.name == "ResetPasswordStep1" ? CurrentPage.transform : Canvas.Find("ResetPasswordStep1").transform;
+        string email =  resetPasswordPage.Find("MailInputField").GetComponent<TMP_InputField>().text;
+
+        if (!InputCheckers.IsValidEmail(email)) {
+            OpenErr("Invalid email format.");
             return;
         }
 
@@ -160,7 +179,7 @@ public class MenuSwapper : MonoBehaviour {
             OpenPage("ResetPasswordStep2");
             OpenMessage("Password reset code sent to your email.");
         } else {
-            OpenErr("Password reset request failed.");
+            OpenErr($"Password reset request failed: \n {authController.ErrorResponse}");
         }
     }
 
@@ -193,7 +212,7 @@ public class MenuSwapper : MonoBehaviour {
         }
         else
         {
-            OpenErr("Password reset failed.");
+            OpenErr($"Password reset failed: \n {authController.ErrorResponse}");
         }
     }
 
@@ -280,7 +299,7 @@ public class MenuSwapper : MonoBehaviour {
             OpenPage("SignUpStep3");
             OpenMessage("Account created successfully. Please check your email for verification code.");
         } else {
-            OpenErr("Registration failed.");
+            OpenErr($"Registration failed: \n {authController.ErrorResponse}");
         }
     }
 
@@ -309,7 +328,7 @@ public class MenuSwapper : MonoBehaviour {
             OpenPage("PagePrincipale");
             OpenMessage("Account verified successfully.");
         } else {
-            OpenErr("Account verification failed.");
+            OpenErr($"Account verification failed: \n {authController.ErrorResponse}");
         }
     }
 
@@ -344,7 +363,7 @@ public class MenuSwapper : MonoBehaviour {
         if (authController.IsRequestSuccessful) {
             OpenMessage("You have been logged out successfully.");
         } else {
-            OpenErr("Logout failed. Please try again.");
+            OpenErr($"Logout failed. Please try again: \n {authController.ErrorResponse}");
         }
     }
 
@@ -372,7 +391,7 @@ public class MenuSwapper : MonoBehaviour {
                 Debug.LogWarning("Badge undefined");
             }
         } else {
-            OpenErr("Failed to retrieve user statistics.");
+            OpenErr($"Failed to retrieve user statistics: \n {authController.ErrorResponse}");
         }
     }
 

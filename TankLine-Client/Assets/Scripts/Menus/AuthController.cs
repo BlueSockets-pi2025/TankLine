@@ -24,9 +24,10 @@ public class AuthController : MonoBehaviour
 
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
-    private static X509Certificate2 trustedCertificate;
+    private static X509Certificate2 trustedCertificate;  
 
     public bool IsRequestSuccessful { get; private set; }
+    public string ErrorResponse { get; private set; }
     public UserData CurrentUser { get; private set; }
     public UserStatistics CurrentUserStatistics { get; private set; }
 
@@ -135,7 +136,7 @@ public class AuthController : MonoBehaviour
                 if (refreshRequest.responseCode == 400 || refreshRequest.responseCode == 401)
                 {
                     Debug.Log("Refresh token is invalid or missing. Redirecting to login page...");
-                    BaseControll.Instance.HandleSessionExpired(); // Redirects to login page
+                    MenuSwapper.Instance.HandleSessionExpired(); // Redirects to login page
                 }
                 else
                 {
@@ -200,8 +201,6 @@ public class AuthController : MonoBehaviour
 
     private IEnumerator RegisterUser(string username, string email, string password, string confirmPassword, string firstName, string lastName, string day, string month, string year)
     {
-        Debug.Log(" REGISTERRRR");
-
         if (password != confirmPassword)
         {
             Debug.LogError("Passwords do not match.");
@@ -241,8 +240,9 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Registration FAILED: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Registration failed: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text);
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -288,8 +288,9 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Verification failed: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Verification failed: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text);
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -320,8 +321,9 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Error resending code: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Error resending code: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text);
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -353,8 +355,9 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Login error: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Login error: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text);
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -376,8 +379,9 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Logout error: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Logout error: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text);
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -408,8 +412,10 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Password reset failed: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Password reset failed: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text); 
+            // Updates ErrorResponse with the error message:
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -450,8 +456,9 @@ public class AuthController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Password reset error: " + request.error);
-            Debug.LogError("Details: " + request.downloadHandler.text);
+            Debug.Log("Password reset error: " + request.error);
+            Debug.Log("Details: " + request.downloadHandler.text);
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
         }
     }
@@ -489,6 +496,7 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Failed to retrieve user data: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
                 IsRequestSuccessful = false;
             }
         );
@@ -527,6 +535,7 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Failed to retrieve user statistics: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
                 IsRequestSuccessful = false;
             }
         );
@@ -601,14 +610,10 @@ public class UserData
 {
     public string username;
     public string email;
-    public string passwordHash;
-    public string createdAt;
-    public string isVerified;
     public string firstName;
     public string lastName;
+    public string createdAt;
     public string birthDate;
-    public string passwordResetToken;
-    public string passwordResetExpiration;
 }
 
 [System.Serializable]
