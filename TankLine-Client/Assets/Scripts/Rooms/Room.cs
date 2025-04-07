@@ -17,9 +17,10 @@ public class Room
   public event Action<NetworkConnection> OnPlayerJoined;
   public event Action<NetworkConnection> OnPlayerLeft;
 
-  public Room (int roomId)
+  public Room (int roomId, bool isPublic = true)
   {
     RoomId = roomId;
+    IsPublic = isPublic;
   }
 
   /// <summary>

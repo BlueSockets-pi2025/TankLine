@@ -37,7 +37,7 @@ public class RoomManager : NetworkBehaviour
   /// <param name="roomId"></param>
   /// <param name="conn"></param>
   [ServerRpc(RequireOwnership = false)]
-  private void RequestJoinRoom (int roomId, NetworkConnection conn = null)
+  public void RequestJoinRoom (int roomId, NetworkConnection conn = null)
   {
     JoinRoom(conn, roomId);
   }
@@ -51,7 +51,7 @@ public class RoomManager : NetworkBehaviour
   {
     if (!rooms.ContainsKey(roomId))
     {
-      rooms[roomId] = new Room(roomId);
+      rooms[roomId] = new Room(roomId, true);
     }
 
     Room room = rooms[roomId];
@@ -68,7 +68,7 @@ public class RoomManager : NetworkBehaviour
   /// </summary>
   /// <param name="conn"></param>
   [ServerRpc(RequireOwnership = false)]
-  private void RequestLeaveRoom (NetworkConnection conn = null)
+  public void RequestLeaveRoom (NetworkConnection conn = null)
   {
     LeaveRoom(conn);
   }
