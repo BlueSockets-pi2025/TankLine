@@ -1,7 +1,6 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MenuSwapper : MonoBehaviour {
     public static MenuSwapper Instance { get; private set; }
@@ -400,6 +399,6 @@ public class MenuSwapper : MonoBehaviour {
     }
 
     public void ConnectToWaitingRoom() {
-        SceneManager.LoadScene("WaitingRoom");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 }
