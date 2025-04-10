@@ -28800,7 +28800,7 @@ GameObject:
   - component: {fileID: 861920929}
   - component: {fileID: 861920926}
   m_Layer: 5
-  m_Name: InputField
+  m_Name: DateInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
