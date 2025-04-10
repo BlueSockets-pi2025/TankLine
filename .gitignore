@@ -51,3 +51,7 @@ sysinfo.txt
 # VERIFY THESE LINES BEFORE PUSHING WITH THE `.env` FILE
 .env
 *.env
+<<<<<<< HEAD
+
+=======
+>>>>>>> waiting-room

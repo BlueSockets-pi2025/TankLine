@@ -3,7 +3,7 @@ using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using System;
 using System.IO;
-
+using System.Collections.Generic;
 
 public class ConnexionManager : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class ConnexionManager : MonoBehaviour
     public EnvVariables serverConfig;
 
 
-    private void Awake() {
+    private void Start() {
         // initialize variables
         networkManager = FindFirstObjectByType<NetworkManager>();
         tugboat = networkManager.GetComponent<Tugboat>();

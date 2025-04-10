@@ -42,8 +42,8 @@ PlayerSettings:
   m_SplashScreenLogos: []
   m_VirtualRealitySplashScreen: {fileID: 0}
   m_HolographicTrackingLossScreen: {fileID: 0}
-  defaultScreenWidth: 720
-  defaultScreenHeight: 480
+  defaultScreenWidth: 1280
+  defaultScreenHeight: 720
   defaultScreenWidthWeb: 960
   defaultScreenHeightWeb: 600
   m_StereoRenderingPath: 0
@@ -919,11 +919,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: dfc32cba-0a05-4851-ac75-0fee86130862
+  cloudProjectId: 3caddfee-230c-4f57-b8e6-8ef1be30c194
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: TankLine-Client 2025-03-14_10-16-02
-  organizationId: jeer0
+  projectName: TankLine-Client
+  organizationId: ruon44
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
