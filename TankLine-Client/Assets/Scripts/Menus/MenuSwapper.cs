@@ -191,8 +191,21 @@ public class MenuSwapper : MonoBehaviour {
         if (CurrentPage.name != "ResetPasswordStep2")
             OpenPage("ResetPasswordStep2");
 
-        if (!InputCheckers.IsValidPassword(CurrentPage.transform.Find("PasswordInputField1").GetComponent<TMP_InputField>().text)) {
+        TMP_InputField Password = CurrentPage.transform.Find("PasswordInputField1").GetComponent<TMP_InputField>();
+        TMP_InputField ConfirmPassword = CurrentPage.transform.Find("PasswordInputField2").GetComponent<TMP_InputField>();
+
+        ValidatePasswordField(Password);
+        ValidatePasswordField(ConfirmPassword);
+        ValidateConfirmPasswordField(Password, ConfirmPassword);
+
+        if (!InputCheckers.IsValidPassword(Password.text)) {
             OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+            return;
+        }
+
+        if (Password.text != ConfirmPassword.text)
+        {
+            OpenErr("Passwords do not match.");
             return;
         }
 
@@ -326,15 +339,13 @@ public class MenuSwapper : MonoBehaviour {
     }
 
       public void ValidateEmailField(TMP_InputField emailField) {
-        // Récupère le composant Outline attaché au champ d'entrée
         var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
 
         if (outline != null) {
-            // Vérifie si le champ est vide ou si l'email est invalide
             if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text)) {
-                outline.enabled = true; // Active l'outline
+                outline.enabled = true; 
             } else {
-                outline.enabled = false; // Désactive l'outline
+                outline.enabled = false;
             }
         } else {
             Debug.LogWarning("Outline component not found on the input field.");
@@ -342,15 +353,13 @@ public class MenuSwapper : MonoBehaviour {
     }
         
     public void ValidatePasswordField(TMP_InputField passwordField) {
-        // Récupère le composant Outline attaché au champ d'entrée
         var outline = passwordField.GetComponent<UnityEngine.UI.Outline>();
 
         if (outline != null) {
-            // Vérifie si le champ est vide ou si le mot de passe est invalide
             if (string.IsNullOrEmpty(passwordField.text) || !InputCheckers.IsValidPassword(passwordField.text)) {
-                outline.enabled = true; // Active l'outline
+                outline.enabled = true; 
             } else {
-                outline.enabled = false; // Désactive l'outline
+                outline.enabled = false; 
             }
         } else {
             Debug.LogWarning("Outline component not found on the input field.");
@@ -358,23 +367,20 @@ public class MenuSwapper : MonoBehaviour {
     }
 
     public void ValidateConfirmPasswordField(TMP_InputField passwordField, TMP_InputField confirmPasswordField) {
-        // Récupère le composant Outline attaché au champ "Confirm Password"
         var outline = confirmPasswordField.GetComponent<UnityEngine.UI.Outline>();
 
         if (outline != null) {
-            // Vérifie si les deux champs correspondent
             if (passwordField.text != confirmPasswordField.text) {
-                outline.enabled = true; // Active l'outline pour indiquer une erreur
+                outline.enabled = true;
             } else {
-                outline.enabled = false; // Désactive l'outline si les champs correspondent
+                outline.enabled = false; 
             }
         } else {
             Debug.LogWarning("Outline component not found on the confirm password field.");
         }
     }
 
-    public void ValidateConfirmPassword() {
-        // Rechercher la page "SignUpStep2" directement
+    public void ValidateConfirmPasswordRegistration() {
         Transform signUpStep2Page = Canvas.Find("SignUpStep2");
 
         if (signUpStep2Page == null) {
@@ -393,40 +399,24 @@ public class MenuSwapper : MonoBehaviour {
         ValidateConfirmPasswordField(passwordField, confirmPasswordField);
     }
 
-    public void TogglePasswordVisibility(TMP_InputField passwordField) {
-        if (passwordField == null) {
-            Debug.LogError("PasswordInputField is null.");
+    public void ValidateConfirmPasswordReset() {
+        Transform signUpStep2Page = Canvas.Find("ResetPasswordStep2");
+
+        if (signUpStep2Page == null) {
+            Debug.LogError("Page 'ResetPasswordStep2' not found.");
             return;
         }
 
-        // Rechercher le bouton "TogglePasswordButton" sous le champ de mot de passe
-        Transform togglePasswordButton = passwordField.transform.Find("TogglePasswordButton");
-        if (togglePasswordButton == null) {
-            Debug.LogError("TogglePasswordButton not found under the PasswordInputField.");
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = signUpStep2Page.Find("PasswordInputField2")?.GetComponent<TMP_InputField>();
+
+        if (passwordField == null || confirmPasswordField == null) {
+            Debug.LogError("PasswordInputField1 or PasswordInputField1 not found in 'ResetPasswordStep2'.");
             return;
         }
 
-        // Rechercher la RawImage attachée au bouton
-        UnityEngine.UI.RawImage eyeIcon = togglePasswordButton.GetComponent<UnityEngine.UI.RawImage>();
-        if (eyeIcon == null) {
-            Debug.LogError("RawImage component not found on 'TogglePasswordButton'.");
-            return;
-        }
-
-        // Vérifie si le champ est actuellement en mode mot de passe
-        if (passwordField.contentType == TMP_InputField.ContentType.Password) {
-            // Passe en mode texte visible
-            passwordField.contentType = TMP_InputField.ContentType.Standard;
-            passwordField.ForceLabelUpdate(); // Met à jour l'affichage
-            eyeIcon.texture = Resources.Load<Texture>("Images/visibility_OFF");
-        } else {
-            // Passe en mode mot de passe
-            passwordField.contentType = TMP_InputField.ContentType.Password;
-            passwordField.ForceLabelUpdate(); // Met à jour l'affichage
-            eyeIcon.texture = Resources.Load<Texture>("Images/visibility_ON");
-        }
+        ValidateConfirmPasswordField(passwordField, confirmPasswordField);
     }
-
 
     private IEnumerator SignUpUser2Coroutine(TMP_InputField FirstName, TMP_InputField LastName, TMP_InputField UserName,
                                             TMP_InputField Email, TMP_InputField Password, TMP_InputField ConfirmPassword,
