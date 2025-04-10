@@ -24,7 +24,7 @@ public class MoveJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPoi
         );
 
         inputVector = (pos.magnitude > 50) ? pos.normalized : pos / 50;
-        handle.anchoredPosition = inputVector * 25;
+        handle.anchoredPosition = inputVector * 27;
     }
 
     public void OnPointerDown(PointerEventData eventData)
