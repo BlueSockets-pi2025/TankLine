@@ -25,7 +25,7 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
             out pos
         );
 
-        float radius = GetComponent<RectTransform>().sizeDelta.x / 2;
+        float radius = GetComponent<RectTransform>().sizeDelta.x / 4;
 
         if (Vector2.Distance(startTouchPosition, eventData.position) > 10f)
         {
