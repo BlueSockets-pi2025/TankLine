@@ -13,7 +13,7 @@ public class ConnexionManager : MonoBehaviour
     public EnvVariables serverConfig;
 
 
-    private void Start() {
+    private void Awake() {
         // initialize variables
         networkManager = FindFirstObjectByType<NetworkManager>();
         tugboat = networkManager.GetComponent<Tugboat>();
