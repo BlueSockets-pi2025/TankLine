@@ -32,10 +32,10 @@ public class PlayerSpawner : NetworkBehaviour
         // instantiate the new player at the current spawnpoint position
         GameObject newPlayer = Instantiate(playerObjectPrefab.gameObject);
         newPlayer.transform.position = spawnPoints[currentSpawnIndex].transform.position;
-        newPlayer.name = "Player:" + ownerName;
 
         // spawn the player
         Spawn(newPlayer, ownerConnection);
+        newPlayer.name = "Player:" + ownerName;
 
         // increment current spawn point
         currentSpawnIndex++;

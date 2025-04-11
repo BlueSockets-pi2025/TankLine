@@ -34,7 +34,7 @@ public class ConnexionManager : MonoBehaviour
 
                 // add a log for when client connects
                 networkManager.ServerManager.OnRemoteConnectionState += (conn, state) => {
-                    Debug.Log($"[SERVER] Client {conn.ClientId} State: {state}");
+                    //Debug.Log($"[SERVER] Client {conn.ClientId} State: {state}");
                 };
 
                 Debug.Log("[SERVER] Server initialized");

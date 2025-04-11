@@ -54,7 +54,6 @@ public class WaitingRoomManager : NetworkBehaviour
     /// <param name="name">The username to add</param>
     [ServerRpc(RequireOwnership = false)]
     public void AddPlayerToList(NetworkConnection connection, string name) {
-        
         Debug.Log($"[Waiting-Room] New player connected : {name}");
 
         // add player to list
@@ -66,11 +65,32 @@ public class WaitingRoomManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Remove a player to the server-side playerList
+    /// Add a player to the server-side playerList (call only from client-side)
     /// </summary>
-    /// <param name="name">The username to remove</param>
-    private void RemovePlayerFromList_ServerSide(NetworkConnection connection) {
+    /// <param name="connection">Auto-fill by fishnet, the connection of the client who calls this procedure</param>
+    [ServerRpc(RequireOwnership = false)]
+    public void DisconnectClient(NetworkConnection connection = null) {
+        if (connection == null) return;
 
+        Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connection]}");
+
+        // despawn player
+        string playerName = serverPlayerList[connection];
+        playerSpawner.DespawnPlayer(playerName);
+
+        // remove player from list
+        serverPlayerList.Remove(connection);
+        OnPlayerListChange(serverPlayerList.Values.ToList());
+
+        // Break client connection
+        connection.Disconnect(false);
+    }
+
+    /// <summary>
+    /// Remove a player to the server-side playerList (call only from server-side)
+    /// </summary>
+    /// <param name="connection">The connection to remove</param>
+    private void RemovePlayerFromList_ServerSide(NetworkConnection connection) {
         Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connection]}");
 
         // despawn player
@@ -134,6 +154,7 @@ public class WaitingRoomManager : NetworkBehaviour
     }
 
     public void ExitToMenu() {
+        DisconnectClient();
         UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 

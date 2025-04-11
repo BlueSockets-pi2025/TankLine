@@ -1504,8 +1504,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WaitingRoomMenu, Assembly-CSharp
+      - m_Target: {fileID: 1905176438}
+        m_TargetAssemblyTypeName: WaitingRoomManager, Assembly-CSharp
         m_MethodName: ClickPanel
         m_Mode: 1
         m_Arguments:
@@ -2284,8 +2284,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WaitingRoomMenu, Assembly-CSharp
+      - m_Target: {fileID: 1905176438}
+        m_TargetAssemblyTypeName: WaitingRoomManager, Assembly-CSharp
         m_MethodName: ExitToMenu
         m_Mode: 1
         m_Arguments:
@@ -4104,7 +4104,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7080833071844431531, guid: d80325bf1aae29f4488361726e61dcc5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
