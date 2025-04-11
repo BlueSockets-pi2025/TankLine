@@ -31,7 +31,7 @@ public class RoomUIManager : MonoBehaviour
   void OnCreateRoomClicked()
   {
     int newRoomId = Random.Range(1000, 9999);
-    RoomManager.Instance.RequestJoinRoom(InstanceFinder.ClientManager.Connection, newRoomId);
+    RoomManager.Instance.RequestJoinRoom(newRoomId, InstanceFinder.ClientManager.Connection);
     Debug.Log("Room created with ID: " + newRoomId);
   }
 
@@ -47,13 +47,13 @@ public class RoomUIManager : MonoBehaviour
 
     if (availableRoom.HasValue)
     {
-      RoomManager.Instance.RequestJoinRoom(conn, availableRoom.Value);  
+      RoomManager.Instance.RequestJoinRoom(availableRoom.Value, conn);  
     }
     else
     {
       Debug.Log("No available public rooms, Creating one...");
       int newRoomId = Random.Range(1000, 9999);
-      RoomManager.Instance.RequestJoinRoom(conn, newRoomId);
+      RoomManager.Instance.RequestJoinRoom(newRoomId, conn);
     }
   }
 
@@ -67,7 +67,7 @@ public class RoomUIManager : MonoBehaviour
   {
     if (joiningPrivate && int.TryParse(codeInput.text, out int roomId))
     {
-      RoomManager.Instance.RequestJoinRoom(InstanceFinder.ClientManager.Connection, roomId);
+      RoomManager.Instance.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
       joiningPrivate = false;
     }
     else
