@@ -20,8 +20,14 @@ MonoBehaviour:
     rid: 7525589823855263805
   m_OverrideGlobalSceneList: 1
   m_Scenes:
+<<<<<<< HEAD
   - m_enabled: 1
+=======
+  - m_enabled: 0
+>>>>>>> e1ba131c07476ddca90ee8a80b340901b2eb291c
     m_path: Assets/Scenes/InGameScene.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/WaitingRoom.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
     m_Settings:
@@ -37,7 +43,7 @@ MonoBehaviour:
     - line: '|   useOnDemandResources: 0'
     - line: '|   accelerometerFrequency: 60'
     - line: '|   companyName: BlueSocket'
-    - line: '|   productName: Tanks - pi2025'
+    - line: '|   productName: TanksLine-server'
     - line: '|   defaultCursor: {instanceID: 0}'
     - line: '|   cursorHotspot: {x: 0, y: 0}'
     - line: '|   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b:
@@ -166,7 +172,9 @@ MonoBehaviour:
     - line: '|   visionOSBundleVersion: 1.0'
     - line: '|   tvOSBundleVersion: 1.0'
     - line: '|   bundleVersion: 0.1.0'
-    - line: '|   preloadedAssets: []'
+    - line: '|   preloadedAssets:'
+    - line: '|   - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b,
+        type: 3}'
     - line: '|   metroInputSource: 0'
     - line: '|   wsaTransparentSwapchain: 0'
     - line: '|   m_HolographicPauseOnTrackingLoss: 1'
