@@ -6,21 +6,24 @@ using System;
 public class Room
 {
   public int RoomId { get; private set; }
-  private List<NetworkConnection> players = new List<NetworkConnection>();
-  private const int maxPlayersPerRoom = 6;
   public bool IsPublic { get; private set; }
-
   public int PlayerCount => players.Count;
   public bool IsFull => PlayerCount >= maxPlayersPerRoom;
+  public NetworkConnection Host { get; private set; }
+
+
+  private List<NetworkConnection> players = new List<NetworkConnection>();
+  private int maxPlayersPerRoom;
 
   // Event triggered when a player joins the room. Useful for UI messages or other notifications.
   public event Action<NetworkConnection> OnPlayerJoined;
   public event Action<NetworkConnection> OnPlayerLeft;
 
-  public Room (int roomId, bool isPublic = true)
+  public Room(int roomId, bool isPublic = true, int maxPlayersPerRoom = 6)
   {
     RoomId = roomId;
     IsPublic = isPublic;
+    this.maxPlayersPerRoom = maxPlayersPerRoom;
   }
 
   /// <summary>
@@ -32,6 +35,9 @@ public class Room
     if (!players.Contains(conn))
     {
       players.Add(conn);
+      if (players.Count == 1)
+        Host = conn; // The first player to join becomes the host.
+
       OnPlayerJoined?.Invoke(conn);
     }
   }
@@ -48,21 +54,11 @@ public class Room
     }
   }
 
-  /// <summary>
-  /// Get the list of players in the room.
-  /// </summary>
-  /// <returns></returns>
-  public IReadOnlyList<NetworkConnection> GetPlayers()
-  {
-    return players.AsReadOnly();
-  }
+  public IReadOnlyList<NetworkConnection> GetPlayers() => players.AsReadOnly();
 
-  /// <summary>
-  /// Check if the room is empty.
-  /// </summary>
-  /// <returns></returns>
-  public bool IsEmpty()
-  {
-    return players.Count == 0;
-  }
+  public bool IsEmpty() => players.Count == 0;
+
+  public bool HasPlayer(NetworkConnection conn) => players.Contains(conn);
+  
+  public bool IsHost(NetworkConnection conn) => Host == conn;
 }

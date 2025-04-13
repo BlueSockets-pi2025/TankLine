@@ -8,9 +8,12 @@ using FishNet.Object;
 public class RoomManager : NetworkBehaviour
 {
   public static RoomManager Instance { get; private set; }
+
   private Dictionary<int, Room> rooms = new Dictionary<int, Room>();
   private Dictionary<NetworkConnection, int> playerRooms = new Dictionary<NetworkConnection, int>();
 
+  public event Action<NetworkConnection, int> OnRoomCreated;
+  
   private void Awake()
   {
     if (Instance == null)
@@ -19,16 +22,34 @@ public class RoomManager : NetworkBehaviour
       Destroy(gameObject);
   }
 
-  public override void OnStartServer()
-  {
-    base.OnStartServer();
-  }
-
   public override void OnStopServer()
   {
     base.OnStopServer();
     rooms.Clear();
     playerRooms.Clear();
+  }
+
+  [ServerRpc(RequireOwnership = false)]
+  public void RequestCreateRoom (int maxPlayers, bool isPublic, NetworkConnection conn = null)
+  {
+    int roomId = GenerateUniqueRoomId();
+    CreateRoom(conn, roomId, maxPlayers, isPublic);
+  }
+
+  private void CreateRoom(NetworkConnection conn, int roomId, int maxPlayers, bool isPublic)
+  {
+    if (rooms.ContainsKey(roomId))
+    {
+      TargetJoinFailed(conn, "Room already exists.");
+      return;
+    }
+
+    Room room = new Room(roomId, isPublic, maxPlayers);
+    rooms[roomId] = room;
+    Debug.Log($"[RoomManager] Created room {roomId} | Public: {isPublic} | Max Players: {maxPlayers}");
+
+    OnRoomCreated?.Invoke(conn, roomId);
+    JoinRoom(conn, roomId);
   }
 
   /// <summary>
@@ -47,14 +68,28 @@ public class RoomManager : NetworkBehaviour
   /// </summary>
   /// <param name="conn"></param>
   /// <param name="roomId"></param>
-  public void JoinRoom(NetworkConnection conn, int roomId)
+  private void JoinRoom(NetworkConnection conn, int roomId)
   {
     if (!rooms.ContainsKey(roomId))
     {
-      rooms[roomId] = new Room(roomId, true);
+      TargetJoinFailed(conn, "Room does not exist.");
+      return;
+    }
+
+    if (playerRooms.ContainsKey(conn))
+    {
+      TargetJoinFailed(conn, "You are already in a room.");
+      return;
     }
 
     Room room = rooms[roomId];
+
+    if (room.IsFull)
+    {
+      TargetJoinFailed(conn, "Room is full.");
+      return;
+    }
+
     room.AddPlayer(conn);
     playerRooms[conn] = roomId;
 
@@ -87,6 +122,7 @@ public class RoomManager : NetworkBehaviour
       if (rooms[roomId].IsEmpty())
       {
         rooms.Remove(roomId);
+        Debug.Log($"[RoomManager] Room {roomId} is empty and has been removed.");
       }
 
       Debug.Log($"[RoomManager] {conn.ClientId} left room {roomId}");
@@ -102,6 +138,12 @@ public class RoomManager : NetworkBehaviour
   private void TargetConfirmRoomJoin(NetworkConnection conn, int roomId)
   {
     Debug.Log("You have joined room " + roomId);
+  }
+
+  [TargetRpc]
+  private void TargetJoinFailed(NetworkConnection conn, string message)
+  {
+    Debug.LogWarning($"[RoomManager] Join failed: {message}");
   }
 
   public bool CanJoinRoom(int roomId)
@@ -120,5 +162,15 @@ public class RoomManager : NetworkBehaviour
       }
     }
     return null;  
+  }
+
+  private int GenerateUniqueRoomId()
+  {
+    int roomId;
+    do
+    {
+      roomId = UnityEngine.Random.Range(100000, 999999);
+    } while (rooms.ContainsKey(roomId));
+    return roomId;
   }
 }
