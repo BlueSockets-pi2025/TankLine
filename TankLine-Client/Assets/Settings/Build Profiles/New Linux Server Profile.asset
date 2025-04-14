@@ -20,9 +20,9 @@ MonoBehaviour:
     rid: 7525589823855263805
   m_OverrideGlobalSceneList: 1
   m_Scenes:
-  - m_enabled: 0
-    m_path: Assets/Scenes/InGameScene.unity
   - m_enabled: 1
+    m_path: Assets/Scenes/InGameScene.unity
+  - m_enabled: 0
     m_path: Assets/Scenes/WaitingRoom.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
@@ -961,11 +961,11 @@ MonoBehaviour:
     - line: '|   captureStartupLogs: {}'
     - line: '|   activeInputHandler: 2'
     - line: '|   windowsGamepadBackendHint: 0'
-    - line: '|   cloudProjectId: dfc32cba-0a05-4851-ac75-0fee86130862'
+    - line: '|   cloudProjectId: 3caddfee-230c-4f57-b8e6-8ef1be30c194'
     - line: '|   framebufferDepthMemorylessMode: 0'
     - line: '|   qualitySettingsNames: []'
-    - line: '|   projectName: TankLine-Client 2025-03-14_10-16-02'
-    - line: '|   organizationId: jeer0'
+    - line: '|   projectName: TankLine-Client'
+    - line: '|   organizationId: ruon44'
     - line: '|   cloudEnabled: 0'
     - line: '|   legacyClampBlendShapeWeights: 0'
     - line: '|   hmiLoadingImage: {instanceID: 0}'
