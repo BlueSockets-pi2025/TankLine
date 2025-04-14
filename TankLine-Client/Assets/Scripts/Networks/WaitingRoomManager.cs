@@ -40,7 +40,7 @@ public class WaitingRoomManager : NetworkBehaviour
 
         // on client connexion change
         networkManager.ServerManager.OnRemoteConnectionState += (connexion, state) => {
-            // if client is disconnectingPlayerSpconnection
+            // if client is disconnecting
             if (state.ConnectionState == FishNet.Transporting.RemoteConnectionState.Stopped) {
                 // remove from list
                 RemovePlayerFromList_ServerSide(connexion);
