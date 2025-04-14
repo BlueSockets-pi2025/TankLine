@@ -13,7 +13,7 @@ public class RoomManager : NetworkBehaviour
   private Dictionary<NetworkConnection, int> playerRooms = new Dictionary<NetworkConnection, int>();
 
   public event Action<NetworkConnection, int> OnRoomCreated;
-  
+
   private void Awake()
   {
     if (Instance == null)
@@ -30,7 +30,7 @@ public class RoomManager : NetworkBehaviour
   }
 
   [ServerRpc(RequireOwnership = false)]
-  public void RequestCreateRoom (int maxPlayers, bool isPublic, NetworkConnection conn = null)
+  public void RequestCreateRoom(int maxPlayers, bool isPublic, NetworkConnection conn = null)
   {
     int roomId = GenerateUniqueRoomId();
     CreateRoom(conn, roomId, maxPlayers, isPublic);
@@ -58,7 +58,7 @@ public class RoomManager : NetworkBehaviour
   /// <param name="roomId"></param>
   /// <param name="conn"></param>
   [ServerRpc(RequireOwnership = false)]
-  public void RequestJoinRoom (int roomId, NetworkConnection conn = null)
+  public void RequestJoinRoom(int roomId, NetworkConnection conn = null)
   {
     JoinRoom(conn, roomId);
   }
@@ -103,7 +103,7 @@ public class RoomManager : NetworkBehaviour
   /// </summary>
   /// <param name="conn"></param>
   [ServerRpc(RequireOwnership = false)]
-  public void RequestLeaveRoom (NetworkConnection conn = null)
+  public void RequestLeaveRoom(NetworkConnection conn = null)
   {
     LeaveRoom(conn);
   }
@@ -138,6 +138,10 @@ public class RoomManager : NetworkBehaviour
   private void TargetConfirmRoomJoin(NetworkConnection conn, int roomId)
   {
     Debug.Log("You have joined room " + roomId);
+
+    RoomClientData.CurrentRoomId = roomId;
+
+    UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
   }
 
   [TargetRpc]
@@ -161,7 +165,7 @@ public class RoomManager : NetworkBehaviour
         return room.RoomId;
       }
     }
-    return null;  
+    return null;
   }
 
   private int GenerateUniqueRoomId()
@@ -172,5 +176,11 @@ public class RoomManager : NetworkBehaviour
       roomId = UnityEngine.Random.Range(100000, 999999);
     } while (rooms.ContainsKey(roomId));
     return roomId;
+  }
+
+  public Room GetRoom(int roomId)
+  {
+    rooms.TryGetValue(roomId, out Room room);
+    return room;
   }
 }

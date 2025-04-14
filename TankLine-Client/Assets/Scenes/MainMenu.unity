@@ -4116,7 +4116,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectNumber
         m_Mode: 3
@@ -5219,7 +5219,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectMode
         m_Mode: 5
@@ -6185,7 +6185,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -9}
+  m_AnchoredPosition: {x: 0, y: -8.9999695}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192434540
@@ -6309,7 +6309,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectNumber
         m_Mode: 3
@@ -10812,7 +10812,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &345369285
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11535,7 +11535,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: ValidateSelection
         m_Mode: 1
@@ -11561,7 +11561,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 897803373}
         m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
-        m_MethodName: ConnectToWaitingRoom
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15849,7 +15849,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 11, y: -13}
+  m_AnchoredPosition: {x: 11, y: -12.9999695}
   m_SizeDelta: {x: -946.9207, y: -105.9757}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &451879747
@@ -16254,7 +16254,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectNumber
         m_Mode: 3
@@ -20293,6 +20293,104 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 600537339}
   m_CullTransparentMesh: 1
+--- !u!1 &610386774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 610386777}
+  - component: {fileID: 610386776}
+  - component: {fileID: 610386775}
+  m_Layer: 0
+  m_Name: RoomManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &610386775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 610386774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 0
+  <SceneId>k__BackingField: 2512256218
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
+--- !u!114 &610386776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 610386774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0122e260b42f74f4ca0740f4aed0d997, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 610386775}
+  _networkObjectCache: {fileID: 0}
+--- !u!4 &610386777
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 610386774}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 992.17065, y: 549.6779, z: -45.349297}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &616577145
 GameObject:
   m_ObjectHideFlags: 0
@@ -32158,7 +32256,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectMode
         m_Mode: 5
@@ -35803,6 +35901,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976697164}
   m_CullTransparentMesh: 1
+--- !u!1 &978902865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 978902867}
+  - component: {fileID: 978902866}
+  m_Layer: 0
+  m_Name: RoomUIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &978902866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978902865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba79ef045e820184fa5f28e4d73d1bbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CreateRoomBtn: {fileID: 352712798}
+  JoinRoomBtn: {fileID: 1521003941}
+  returnBtn: {fileID: 1140371313}
+  codeInput: {fileID: 850711434}
+  selectedNumberText: {fileID: 0}
+  selectedModeText: {fileID: 0}
+  numberButtons:
+  - {fileID: 196561209}
+  - {fileID: 1240976595}
+  - {fileID: 115041505}
+  - {fileID: 1164070680}
+  - {fileID: 458806155}
+  modeButtons:
+  - {fileID: 147611920}
+  - {fileID: 896943386}
+--- !u!4 &978902867
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978902865}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 992.17065, y: 549.6779, z: -45.349297}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &979620650
 GameObject:
   m_ObjectHideFlags: 0
@@ -43355,7 +43512,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectNumber
         m_Mode: 3
@@ -45388,7 +45545,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1491361359}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CreateRoom, Assembly-CSharp
         m_MethodName: SelectNumber
         m_Mode: 3
@@ -54941,63 +55098,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1489844164}
   m_CullTransparentMesh: 0
---- !u!1 &1491361358
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1491361360}
-  - component: {fileID: 1491361359}
-  m_Layer: 0
-  m_Name: CreateRoom
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1491361359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1491361358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9d23afc08e07b4ab289f73c3b43a96, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectedNumberText: {fileID: 0}
-  selectedModeText: {fileID: 0}
-  numberButtons:
-  - {fileID: 196561209}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  modeButtons:
-  - {fileID: 147611920}
-  - {fileID: 896943386}
---- !u!4 &1491361360
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1491361358}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 992.17065, y: 549.6779, z: -45.349297}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1492114574
 GameObject:
   m_ObjectHideFlags: 0
@@ -55849,7 +55949,7 @@ GameObject:
   - component: {fileID: 1521003942}
   - component: {fileID: 1521003941}
   m_Layer: 5
-  m_Name: SignUpBtn (1)
+  m_Name: JoinRoomBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59798,7 +59898,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 11, y: -13}
+  m_AnchoredPosition: {x: 11, y: -12.9999695}
   m_SizeDelta: {x: -946.9207, y: -105.9757}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1628417657
@@ -80692,7 +80792,8 @@ SceneRoots:
   - {fileID: 1766897983}
   - {fileID: 1885914501}
   - {fileID: 158569964}
-  - {fileID: 1491361360}
+  - {fileID: 610386777}
+  - {fileID: 978902867}
   - {fileID: 788156275}
   - {fileID: 806702984}
   - {fileID: 242109071}

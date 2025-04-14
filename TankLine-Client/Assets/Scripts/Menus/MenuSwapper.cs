@@ -30,7 +30,7 @@ public class MenuSwapper : MonoBehaviour {
             Debug.LogError("AuthController not found.");
             return;
         }
-        AutoLogin();
+        //AutoLogin();
 
         // load first page
         OpenPage(CurrentPage.name);

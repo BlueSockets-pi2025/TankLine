@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using FishNet;
 using FishNet.Connection;
 using System.Collections.Generic;
+using TMPro;
 
 public class RoomUIManager : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class RoomUIManager : MonoBehaviour
   public Button returnBtn;
 
   [Header("Input Fields")]
-  public InputField codeInput;
+  public TMP_InputField codeInput;
 
   [Header("Create Room Selection")]
   public Text selectedNumberText;
@@ -28,13 +29,13 @@ public class RoomUIManager : MonoBehaviour
   private Color normalColor = Color.white;
   private Color selectedColor = Color.red;
 
-void Awake()
-{
+  void Awake()
+  {
     if (Instance == null)
-        Instance = this;
+      Instance = this;
     else
-        Destroy(gameObject);
-}
+      Destroy(gameObject);
+  }
 
   void Start()
   {
@@ -144,7 +145,11 @@ void Awake()
   {
     input = input.Trim();
 
-    return input.Length == 6 && int.TryParse(input, out roomId);
+    if (input.Length == 6 && int.TryParse(input, out roomId))
+      return true;
+    
+    roomId = -1;
+    return false;
   }
 
   private void HandleReturn()
