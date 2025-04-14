@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-public class ConnexionManager : MonoBehaviour
+public class ConnectionManager : MonoBehaviour
 {
     private NetworkManager networkManager;
     private Tugboat tugboat;
@@ -34,7 +34,7 @@ public class ConnexionManager : MonoBehaviour
 
                 // add a log for when client connects
                 networkManager.ServerManager.OnRemoteConnectionState += (conn, state) => {
-                    Debug.Log($"[SERVER] Client {conn.ClientId} State: {state}");
+                    //Debug.Log($"[SERVER] Client {conn.ClientId} State: {state}");
                 };
 
                 Debug.Log("[SERVER] Server initialized");
