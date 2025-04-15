@@ -71,7 +71,8 @@ namespace UI.Dates
                     }
                     else
                     {
-                        m_VisibleDate = new SerializableDate(DateTime.Today);
+                        // Change from DateTime.Today to new DateTime(2000, 1, 1)
+                        m_VisibleDate = new SerializableDate(new DateTime(2000, 1, 1));
                     }
                 }
 
@@ -175,12 +176,12 @@ namespace UI.Dates
 
         void Awake()
         {
-#if UNITY_EDITOR && UNITY_2019_2_OR_NEWER
+        #if UNITY_EDITOR && UNITY_2019_2_OR_NEWER
             if (UnityEditor.PrefabUtility.IsOutermostPrefabInstanceRoot(this.gameObject))
             {
                 UnityEditor.PrefabUtility.UnpackPrefabInstance(this.gameObject, UnityEditor.PrefabUnpackMode.Completely, UnityEditor.InteractionMode.AutomatedAction);
             }
-#endif
+        #endif
 
             ClearWeekDayHeaders();
             buttonPool.InvalidateAll();
@@ -190,8 +191,6 @@ namespace UI.Dates
                 DestroyImmediate(row.gameObject);
             }
 
-            // If any buttons already exist (most likely created in edit mode)
-            // Then add them to our pool rather than creating new ones unnecessarily
             var existingDayButtons = Ref_DatePickerTransform.GetComponentsInChildren<DatePicker_DayButton>();
             foreach (var button in existingDayButtons)
             {
@@ -202,7 +201,8 @@ namespace UI.Dates
             {
                 if (VisibleDateDefaultBehaviour == Dates.VisibleDateDefaultBehaviour.UseTodaysDate)
                 {
-                    VisibleDate = DateTime.Today;
+                    // Change from DateTime.Today to new DateTime(2000, 1, 1)
+                    VisibleDate = new DateTime(2000, 1, 1);
                 }
             }
         }
