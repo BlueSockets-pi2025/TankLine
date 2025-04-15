@@ -5,21 +5,28 @@ using System.Linq;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Object;
+using FishNet.Observing;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class WaitingRoomMenu : NetworkBehaviour 
+[RequireComponent(typeof(AuthController))]
+[RequireComponent(typeof(NetworkObserver))]
+[RequireComponent(typeof(PlayerSpawner))]
+public class WaitingRoomManager : NetworkBehaviour 
 {
     private readonly Dictionary<NetworkConnection, string> serverPlayerList = new();
 
     private List<string> clientPlayerList = new();
-    public GameObject canvas;
     private GameObject playerListDiv;
     private GameObject playerCount;
-    public GameObject playerEntryPrefab;
-    private AuthController authController;
     private bool isSettingsPanelOpen = false;
+    private AuthController authController;
+    private PlayerSpawner playerSpawner;
+
+    [Header("UI References")]
+    [Space(5)]
+    public GameObject canvas;
+    public GameObject playerEntryPrefab;
 
     void Awake() {
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
@@ -48,17 +55,50 @@ public class WaitingRoomMenu : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void AddPlayerToList(NetworkConnection connection, string name) {
         Debug.Log($"[Waiting-Room] New player connected : {name}");
+
+        // add player to list
         serverPlayerList.Add(connection, name);
         OnPlayerListChange(serverPlayerList.Values.ToList());
+
+        // spawn player object
+        playerSpawner.SpawnPlayer(connection, name);
     }
 
     /// <summary>
-    /// Remove a player to the server-side playerList
+    /// Add a player to the server-side playerList (call only from client-side)
     /// </summary>
-    /// <param name="name">The username to remove</param>
-    private void RemovePlayerFromList_ServerSide(NetworkConnection connexion) {
-        Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connexion]}");
-        serverPlayerList.Remove(connexion);
+    /// <param name="connection">Auto-fill by fishnet, the connection of the client who calls this procedure</param>
+    [ServerRpc(RequireOwnership = false)]
+    public void DisconnectClient(NetworkConnection connection = null) {
+        if (connection == null) return;
+
+        Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connection]}");
+
+        // despawn player
+        string playerName = serverPlayerList[connection];
+        playerSpawner.DespawnPlayer(playerName);
+
+        // remove player from list
+        serverPlayerList.Remove(connection);
+        OnPlayerListChange(serverPlayerList.Values.ToList());
+
+        // Break client connection
+        connection.Disconnect(false);
+    }
+
+    /// <summary>
+    /// Remove a player to the server-side playerList (call only from server-side)
+    /// </summary>
+    /// <param name="connection">The connection to remove</param>
+    private void RemovePlayerFromList_ServerSide(NetworkConnection connection) {
+        Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connection]}");
+
+        // despawn player
+        string playerName = serverPlayerList[connection];
+        playerSpawner.DespawnPlayer(playerName);
+
+        // remove player from list
+        serverPlayerList.Remove(connection);
         OnPlayerListChange(serverPlayerList.Values.ToList());
     }
 
@@ -89,9 +129,8 @@ public class WaitingRoomMenu : NetworkBehaviour
     void Start() {
         playerListDiv = canvas.transform.Find("PlayersCanvas").gameObject;
         playerCount = canvas.transform.Find("PlayerCount").gameObject;
-        if (canvas == null) {
-            canvas = gameObject;
-        }
+        playerSpawner = gameObject.GetComponent<PlayerSpawner>();
+
 
         // send username to DB
         if (base.IsClientInitialized) {
@@ -109,11 +148,13 @@ public class WaitingRoomMenu : NetworkBehaviour
         } else {
             // send username to server
             string userName = authController.CurrentUser.username.ToString();
+            Debug.Log("connecting...");
             AddPlayerToList(base.ClientManager.Connection, userName);
         }
     }
 
     public void ExitToMenu() {
+        DisconnectClient();
         UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 

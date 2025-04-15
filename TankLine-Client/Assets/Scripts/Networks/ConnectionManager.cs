@@ -3,7 +3,7 @@ using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using System;
 using System.IO;
-
+using System.Collections.Generic;
 
 public class ConnectionManager : MonoBehaviour
 {
@@ -34,7 +34,7 @@ public class ConnectionManager : MonoBehaviour
 
                 // add a log for when client connects
                 networkManager.ServerManager.OnRemoteConnectionState += (conn, state) => {
-                    Debug.Log($"[SERVER] Client {conn.ClientId} State: {state}");
+                    //Debug.Log($"[SERVER] Client {conn.ClientId} State: {state}");
                 };
 
                 Debug.Log("[SERVER] Server initialized");
@@ -49,7 +49,7 @@ public class ConnectionManager : MonoBehaviour
             if (networkManager && tugboat) {
                 LoadServerConfig();
 
-                // set the server IP and PORT for client connection
+                // set the server IP and PORT for client connexion
                 tugboat.SetClientAddress(string.IsNullOrEmpty(serverConfig.GAME_SERVER_IP) ? "127.0.0.0" : serverConfig.GAME_SERVER_IP);
                 tugboat.SetPort((ushort)(int.TryParse(serverConfig.GAME_SERVER_PORT, out int result) ? result : 7770));
 
