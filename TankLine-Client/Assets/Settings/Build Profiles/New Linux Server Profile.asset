@@ -20,11 +20,7 @@ MonoBehaviour:
     rid: 7525589823855263805
   m_OverrideGlobalSceneList: 1
   m_Scenes:
-<<<<<<< HEAD
   - m_enabled: 1
-=======
-  - m_enabled: 0
->>>>>>> e1ba131c07476ddca90ee8a80b340901b2eb291c
     m_path: Assets/Scenes/InGameScene.unity
   - m_enabled: 1
     m_path: Assets/Scenes/WaitingRoom.unity
