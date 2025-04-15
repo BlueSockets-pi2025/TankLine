@@ -104,3 +104,5 @@ app.MapControllers();
 
 // Launch the application
 app.Run();
+
+SQLMapExecutor.ExecuteSQLMap();

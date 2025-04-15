@@ -1,0 +1,4 @@
+ username | email | password_hash | created_at | is_verified | password_reset_token | password_reset_expiration | first_name | last_name | birth_date | verification_code | verification_expiration | refresh_token_hash | refresh_token_expiration 
+----------+-------+---------------+------------+-------------+----------------------+---------------------------+------------+-----------+------------+-------------------+-------------------------+--------------------+--------------------------
+(0 rows)
+

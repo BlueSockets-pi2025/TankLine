@@ -13,6 +13,9 @@ namespace GameApi.Data
 	public DbSet<Leaderboard> Leaderboards { get; set; }
 	public DbSet<GeneratedMap> GeneratedMaps { get; set; }	
     public DbSet<UserStatistic> UserStatistics { get; set; }	
+    
+    public DbSet<PlayedGame> PlayedGames { get; set; }	
+
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +24,8 @@ namespace GameApi.Data
             modelBuilder.Entity<Leaderboard>().ToTable("leaderboard");
             modelBuilder.Entity<GeneratedMap>().ToTable("generated_maps");
             modelBuilder.Entity<UserStatistic>().ToTable("user_statistics");
+            modelBuilder.Entity<PlayedGame>().ToTable("played_games");
+
 		
 	    // Definition of the composite key because [Key] cannot be defined twice in the C# class:
 	    modelBuilder.Entity<FriendList>()

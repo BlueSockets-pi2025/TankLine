@@ -15,11 +15,13 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations; // Added for in-memory verification code management
 using System.Security.Cryptography;
+using Castle.Core.Logging;
 
 [ApiController]
 [Route("api/auth")]
 public class ConnectionRegistrationController : Controller
 {
+
     private readonly GameDbContext _context;
     private readonly IConfiguration _configuration;
 
@@ -226,21 +228,21 @@ public class ConnectionRegistrationController : Controller
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest loginRequest)
-    {
-        if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
-        {
-            return BadRequest("Username (or email) and password are required."); 
-        }
+     {
+        // if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
+        // {
+        //     return BadRequest("Username (or email) and password are required."); 
+        // }
 
-        // Validate for special characters in UsernameOrEmail and Password
-        string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
-        foreach (var field in fieldsToCheck)
-        {
-            if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
-            {
-                return BadRequest("Invalid characters detected in one or more fields.");
-            }
-        }
+        // // Validate for special characters in UsernameOrEmail and Password
+        // string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
+        // foreach (var field in fieldsToCheck)
+        // {
+        //     if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
+        //     {
+        //         return BadRequest("Invalid characters detected in one or more fields.");
+        //     }
+        // }
 
         var user = _context.UserAccounts
             .FirstOrDefault(u => u.Username == loginRequest.UsernameOrEmail || u.Email == loginRequest.UsernameOrEmail);
@@ -265,6 +267,7 @@ public class ConnectionRegistrationController : Controller
         // Generate and hash refresh token
         var refreshToken = GenerateRefreshToken(user.Username);
         var hashedRefreshToken = TokenService.HashRefreshToken(refreshToken);
+
 
         // Save the hashed refresh token in the user's record
         user.RefreshTokenHash = hashedRefreshToken;

@@ -41,7 +41,7 @@ public class UserAccount
 
     [Required]
     [Column("birth_date")]
-    public DateTime BirthDate { get; set; } = DateTime.UtcNow.Date;
+    public DateTime BirthDate { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
     // New fields for verification code
     [Column("verification_code")]
