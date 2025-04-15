@@ -191,8 +191,21 @@ public class MenuSwapper : MonoBehaviour {
         if (CurrentPage.name != "ResetPasswordStep2")
             OpenPage("ResetPasswordStep2");
 
-        if (!InputCheckers.IsValidPassword(CurrentPage.transform.Find("PasswordInputField1").GetComponent<TMP_InputField>().text)) {
+        TMP_InputField Password = CurrentPage.transform.Find("PasswordInputField1").GetComponent<TMP_InputField>();
+        TMP_InputField ConfirmPassword = CurrentPage.transform.Find("PasswordInputField2").GetComponent<TMP_InputField>();
+
+        ValidatePasswordField(Password);
+        ValidatePasswordField(ConfirmPassword);
+        ValidateConfirmPasswordField(Password, ConfirmPassword);
+
+        if (!InputCheckers.IsValidPassword(Password.text)) {
             OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+            return;
+        }
+
+        if (Password.text != ConfirmPassword.text)
+        {
+            OpenErr("Passwords do not match.");
             return;
         }
 
@@ -215,27 +228,43 @@ public class MenuSwapper : MonoBehaviour {
         }
     }
 
-    public void SignUpUser1() {
-        // Check if on correct page
+    public void SignUpUser1()
+    {
         if (CurrentPage.name != "SignUpStep1")
             OpenPage("SignUpStep1");
 
-        // get "year", "month" and "day" input field
-        TMP_InputField Day = CurrentPage.transform.Find("DayInputField").GetComponent<TMP_InputField>();
-        TMP_InputField Month = CurrentPage.transform.Find("MonthInputField").GetComponent<TMP_InputField>();
-        TMP_InputField Year = CurrentPage.transform.Find("YearInputField").GetComponent<TMP_InputField>();
-
-        if (string.IsNullOrEmpty(Month.text) || string.IsNullOrEmpty(Year.text) || string.IsNullOrEmpty(Day.text)) {
-            OpenErr("Date empty");
+        TMP_InputField DateInputField = FindDeepChild(CurrentPage.transform, "DateInputField")?.GetComponent<TMP_InputField>();
+        if (DateInputField == null)
+        {
+            Debug.LogError("DateInputField not found in the hierarchy of SignUpStep1.");
             return;
         }
 
-        if (!InputCheckers.IsValidDate(Day.text, Month.text, Year.text)) {
+        if (string.IsNullOrEmpty(DateInputField.text))
+        {
+            OpenErr("Date is empty.");
+            return;
+        }
+
+        string[] dateParts = DateInputField.text.Split('-');
+        if (dateParts.Length != 3)
+        {
+            OpenErr("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+        }
+
+        string year = dateParts[0];
+        string month = dateParts[1];
+        string day = dateParts[2];
+
+        if (!InputCheckers.IsValidDate(day, month, year))
+        {
             OpenErr("Invalid date.");
             return;
         }
 
-        if (!InputCheckers.IsValidAge(Day.text, Month.text, Year.text)) {
+        if (!InputCheckers.IsValidAge(day, month, year))
+        {
             OpenErr("You must be at least 13 years old to register.");
             return;
         }
@@ -243,8 +272,8 @@ public class MenuSwapper : MonoBehaviour {
         OpenPage("SignUpStep2");
     }
 
-    public void SignUpUser2() {
-        // Check if on correct page
+    public void SignUpUser2()
+    {
         if (CurrentPage.name != "SignUpStep2")
             OpenPage("SignUpStep2");
 
@@ -255,49 +284,153 @@ public class MenuSwapper : MonoBehaviour {
         TMP_InputField Password = CurrentPage.transform.Find("PasswordInputField").GetComponent<TMP_InputField>();
         TMP_InputField ConfirmPassword = CurrentPage.transform.Find("ConfirmPasswordInputField").GetComponent<TMP_InputField>();
 
-        if (string.IsNullOrEmpty(FirstName.text) || string.IsNullOrEmpty(LastName.text) || string.IsNullOrEmpty(UserName.text) ||
-            string.IsNullOrEmpty(Email.text) || string.IsNullOrEmpty(Password.text) || string.IsNullOrEmpty(ConfirmPassword.text)) {
-        OpenErr("All fields are required.");
+        ValidateEmailField(Email);
+        ValidatePasswordField(Password);
+        ValidatePasswordField(ConfirmPassword);
+        ValidateConfirmPasswordField(Password, ConfirmPassword);
+
+        TMP_InputField DateInputField = FindDeepChild(Canvas.Find("SignUpStep1"), "DateInputField")?.GetComponent<TMP_InputField>();
+        if (DateInputField == null)
+        {
+            Debug.LogError("DateInputField not found in the hierarchy of SignUpStep1.");
             return;
         }
 
-        if (!InputCheckers.IsValidEmail(Email.text)) {
+        if (string.IsNullOrEmpty(FirstName.text) || string.IsNullOrEmpty(LastName.text) || string.IsNullOrEmpty(UserName.text) ||
+            string.IsNullOrEmpty(Email.text) || string.IsNullOrEmpty(Password.text) || string.IsNullOrEmpty(ConfirmPassword.text) ||
+            string.IsNullOrEmpty(DateInputField.text))
+        {
+            OpenErr("All fields are required.");
+            return;
+        }
+
+        if (!InputCheckers.IsValidEmail(Email.text))
+        {
             OpenErr("Invalid email format.");
             return;
         }
 
-        if (Password.text != ConfirmPassword.text) {
-            OpenErr("Passwords does not match.");
+        if (Password.text != ConfirmPassword.text)
+        {
+            OpenErr("Passwords do not match.");
             return;
         }
 
-        if (!InputCheckers.IsValidPassword(Password.text)) {
+        if (!InputCheckers.IsValidPassword(Password.text))
+        {
             OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
             return;
         }
 
-        if (authController == null) {
-            Debug.LogError("AuthController is not initialized.");
+        string[] dateParts = DateInputField.text.Split('-');
+        if (dateParts.Length != 3)
+        {
+            OpenErr("Invalid date format. Please use YYYY-MM-DD.");
             return;
         }
 
-        Transform SignUpStep1Page = Canvas.Find("SignUpStep1");
-        StartCoroutine(SignUpUser2Coroutine(FirstName, LastName, UserName, Email, Password, ConfirmPassword,
-                                            SignUpStep1Page.Find("DayInputField").GetComponent<TMP_InputField>(),
-                                            SignUpStep1Page.Find("MonthInputField").GetComponent<TMP_InputField>(),
-                                            SignUpStep1Page.Find("YearInputField").GetComponent<TMP_InputField>()));
+        string year = dateParts[0];
+        string month = dateParts[1];
+        string day = dateParts[2];
+
+        Debug.Log($"Parsed Date - Year: {year}, Month: {month}, Day: {day}");
+
+        StartCoroutine(SignUpUser2Coroutine(FirstName, LastName, UserName, Email, Password, ConfirmPassword, day, month, year));
     }
 
-    private IEnumerator SignUpUser2Coroutine(TMP_InputField FirstName, TMP_InputField LastName, TMP_InputField UserName, 
-                                            TMP_InputField Email, TMP_InputField Password, TMP_InputField ConfirmPassword,
-                                            TMP_InputField Day, TMP_InputField Month, TMP_InputField Year) {
+      public void ValidateEmailField(TMP_InputField emailField) {
+        var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
 
-        yield return authController.Register(UserName.text, Email.text, Password.text, ConfirmPassword.text, 
-                                            FirstName.text, LastName.text, Day.text, Month.text, Year.text);
-        if (authController.IsRequestSuccessful) {
+        if (outline != null) {
+            if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text)) {
+                outline.enabled = true; 
+            } else {
+                outline.enabled = false;
+            }
+        } else {
+            Debug.LogWarning("Outline component not found on the input field.");
+        }
+    }
+        
+    public void ValidatePasswordField(TMP_InputField passwordField) {
+        var outline = passwordField.GetComponent<UnityEngine.UI.Outline>();
+
+        if (outline != null) {
+            if (string.IsNullOrEmpty(passwordField.text) || !InputCheckers.IsValidPassword(passwordField.text)) {
+                outline.enabled = true; 
+            } else {
+                outline.enabled = false; 
+            }
+        } else {
+            Debug.LogWarning("Outline component not found on the input field.");
+        }
+    }
+
+    public void ValidateConfirmPasswordField(TMP_InputField passwordField, TMP_InputField confirmPasswordField) {
+        var outline = confirmPasswordField.GetComponent<UnityEngine.UI.Outline>();
+
+        if (outline != null) {
+            if (passwordField.text != confirmPasswordField.text) {
+                outline.enabled = true;
+            } else {
+                outline.enabled = false; 
+            }
+        } else {
+            Debug.LogWarning("Outline component not found on the confirm password field.");
+        }
+    }
+
+    public void ValidateConfirmPasswordRegistration() {
+        Transform signUpStep2Page = Canvas.Find("SignUpStep2");
+
+        if (signUpStep2Page == null) {
+            Debug.LogError("Page 'SignUpStep2' not found.");
+            return;
+        }
+
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = signUpStep2Page.Find("ConfirmPasswordInputField")?.GetComponent<TMP_InputField>();
+
+        if (passwordField == null || confirmPasswordField == null) {
+            Debug.LogError("PasswordInputField or ConfirmPasswordInputField not found in 'SignUpStep2'.");
+            return;
+        }
+
+        ValidateConfirmPasswordField(passwordField, confirmPasswordField);
+    }
+
+    public void ValidateConfirmPasswordReset() {
+        Transform signUpStep2Page = Canvas.Find("ResetPasswordStep2");
+
+        if (signUpStep2Page == null) {
+            Debug.LogError("Page 'ResetPasswordStep2' not found.");
+            return;
+        }
+
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = signUpStep2Page.Find("PasswordInputField2")?.GetComponent<TMP_InputField>();
+
+        if (passwordField == null || confirmPasswordField == null) {
+            Debug.LogError("PasswordInputField1 or PasswordInputField1 not found in 'ResetPasswordStep2'.");
+            return;
+        }
+
+        ValidateConfirmPasswordField(passwordField, confirmPasswordField);
+    }
+
+    private IEnumerator SignUpUser2Coroutine(TMP_InputField FirstName, TMP_InputField LastName, TMP_InputField UserName,
+                                            TMP_InputField Email, TMP_InputField Password, TMP_InputField ConfirmPassword,
+                                            string day, string month, string year)
+    {
+        yield return authController.Register(UserName.text, Email.text, Password.text, ConfirmPassword.text,
+                                            FirstName.text, LastName.text, day, month, year);
+        if (authController.IsRequestSuccessful)
+        {
             OpenPage("SignUpStep3");
             OpenMessage("Account created successfully. Please check your email for verification code.");
-        } else {
+        }
+        else
+        {
             OpenErr($"Registration failed: \n {authController.ErrorResponse}");
         }
     }
@@ -400,5 +533,20 @@ public class MenuSwapper : MonoBehaviour {
 
     public void ConnectToWaitingRoom() {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
+    }
+
+    // Recursive search for a GameObject by name
+    private Transform FindDeepChild(Transform parent, string childName)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == childName)
+                return child;
+
+            Transform result = FindDeepChild(child, childName);
+            if (result != null)
+                return result;
+        }
+        return null;
     }
 }

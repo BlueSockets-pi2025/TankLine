@@ -818,6 +818,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
+    Android: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
     Server: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
     Standalone: FISHNET;FISHNET_V4;EDGEGAP_PLUGIN_SERVERS
   additionalCompilerArguments: {}
