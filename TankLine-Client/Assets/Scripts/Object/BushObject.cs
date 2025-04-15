@@ -1,12 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using FishNet.Object;
 using UnityEngine;
-// using FishNet.Object;
 
 // Creation of a bush belonging to a BushGroup which becomes transparent on contact.
 public class BushObject : MonoBehaviour
-// à mettre quand ajout de FishNet/multi
-// public class BushObject : NetworkBehaviour
 {
     private Renderer bushRenderer;
     private Color originalColor;
@@ -46,10 +44,7 @@ public class BushObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if it's a player and if it's the local player (FishNet)
-        // à mettre quand ajout de FishNet/multi
-        // if (other.CompareTag("Player") && other.TryGetComponent(out NetworkObject netObj) && netObj.IsOwner)
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && other.gameObject.GetComponent<NetworkBehaviour>().IsOwner) 
         {
             // Add this bush to the player's bush list
             if (!playerBushes.ContainsKey(other.gameObject))
@@ -69,10 +64,7 @@ public class BushObject : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Check if it's the local player
-        // à mettre quand ajout de FishNet/multi
-        // if (other.CompareTag("Player") && other.TryGetComponent(out NetworkObject netObj) && netObj.IsOwner)
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && other.gameObject.GetComponent<NetworkBehaviour>().IsOwner)
         {
             if (playerBushes.ContainsKey(other.gameObject))
             {
@@ -92,7 +84,6 @@ public class BushObject : MonoBehaviour
 
                 // If the player is no longer in any bushes of the parentGroup, remove transparency
                 if (!stillInSameGroup)
-                // if (playerBushes[other.gameObject].Count == 0)
                 {
                     parentGroup?.SetTransparencyForGroup(1f); // Restore full opacity
                 }
