@@ -29,8 +29,8 @@ namespace GameApi.Controllers
             return await _context.PlayedGames.ToListAsync();
         }
 
-        // GET: api/PlayedGames/by-user/{username}
-        [HttpGet("by-user/{username}")]
+        // GET: api/PlayedGames/by-user
+        [HttpGet("by-user/")]
         public async Task<ActionResult<IEnumerable<PlayedGame>>> GetGamesByUser(string username)
         {
             var games = await _context.PlayedGames
@@ -45,8 +45,9 @@ namespace GameApi.Controllers
             return games;
         }
 
-        // GET: api/PlayedGames/summary/{username}
-        [HttpGet("summary/{username}")]
+
+        // GET: api/PlayedGames/summary
+        [HttpGet("summary/")]
         public async Task<ActionResult<PlayedGameStatsDto>> GetSummary(string username)
         {
             var games = await _context.PlayedGames
