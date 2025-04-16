@@ -24,12 +24,28 @@ public class AuthController : MonoBehaviour
 
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
+    public string playedGameUrl = "https://185.155.93.105:17008/api/PlayedGames/by-user/"; 
+
     private static X509Certificate2 trustedCertificate;  
 
     public bool IsRequestSuccessful { get; private set; }
     public string ErrorResponse { get; private set; }
     public UserData CurrentUser { get; private set; }
     public UserStatistics CurrentUserStatistics { get; private set; }
+
+
+
+    // UI Elements (Leaderboard)
+    public TextMeshProUGUI map;
+    public TextMeshProUGUI victories;
+    public TextMeshProUGUI username;
+    public TextMeshProUGUI ratio;
+    public TextMeshProUGUI tanks_destroyed;
+    public TextMeshProUGUI nb_games_played;
+    public TextMeshProUGUI victory_or_defeat;
+    public TextMeshProUGUI rank;
+    public TextMeshProUGUI date;
+
 
     private void Awake()
     {
@@ -197,6 +213,13 @@ public class AuthController : MonoBehaviour
     public IEnumerator ResetPassword(string email, string code, string newPassword, string confirmNewPassword)
     {
         yield return StartCoroutine(ResetPasswordCoroutine(email, code, newPassword, confirmNewPassword));
+    }
+
+
+
+    public IEnumerator GamesPlayedStatistics()
+    {
+        yield return StartCoroutine(GetGamePlayedStats());
     }
 
     private IEnumerator RegisterUser(string username, string email, string password, string confirmPassword, string firstName, string lastName, string day, string month, string year)
@@ -540,7 +563,68 @@ public class AuthController : MonoBehaviour
             }
         );
     }
+
+    
+    private IEnumerator GetGamePlayedStats()
+    {
+        UnityWebRequest request = new UnityWebRequest(userStatisticsUrl, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.certificateHandler = new CustomCertificateHandler();
+
+        yield return SendRequestWithAutoRefresh(
+            userStatisticsUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // No body for a GET request
+            onSuccess: (response) =>
+            {
+                Debug.Log("Game Played Statistics : " + response.downloadHandler.text);
+
+                try
+                {
+                    var stats = JsonUtility.FromJson<PlayedGameStats>(response.downloadHandler.text);
+                    CurrentUserStatistics = stats;
+                    IsRequestSuccessful = true;
+
+                    float victoryRatio = stats.totalGames > 0
+                        ? (float)stats.totalVictories / stats.totalGames
+                        : 0f;
+
+                    username.text = stats.username;
+                    nb_games_played.text = stats.totalGames.ToString();
+                    victories.text = stats.totalVictories.ToString();
+                    ratio.text = victoryRatio.ToString("P1");
+                    tanks_destroyed.text = stats.tanksDestroyed.ToString();
+                    map.text = stats.mapPlayed;
+                    rank.text = stats.playerRank.ToString();
+                    victory_or_defeat.text = stats.gameWon ? "Victory" : "Defeat";
+                    date.text = stats.gameDate.ToString("dd/MM/yyyy HH:mm");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error parsing user statistics: {ex.Message}");
+                    IsRequestSuccessful = false;
+                }
+            },
+            onError: (response) =>
+            {
+                Debug.LogError("Failed to retrieve user statistics: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text)
+                    ? request.downloadHandler.text
+                    : "An unknown error occurred.";
+                IsRequestSuccessful = false;
+            }
+        );
+    }
+
+
+
 }
+
+
+
 
 public class CustomCertificateHandler : CertificateHandler
 {
@@ -623,3 +707,19 @@ public class UserStatistics
     public int highestScore;
     public int ranking;
 }
+
+
+[System.Serializable]
+public class PlayedGameStats
+    {
+        public string username;
+        public bool gameWon;
+        public int tanksDestroyed;
+        public int totalScore;
+        public int playerRank;
+        public string mapPlayed;
+        public DateTime gameDate;
+
+        public int totalGames;
+        public int totalVictories;
+    }
