@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 using System;
 using System.Security.Claims;
 
-
 namespace GameApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Protège toutes les routes de ce contrôleur
+    [Authorize]
     public class PlayedGamesController : ControllerBase
     {
         private readonly GameDbContext _context;
@@ -24,18 +23,15 @@ namespace GameApi.Controllers
             _context = context;
         }
 
-        // GET: api/PlayedGames
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlayedGame>>> GetAllGames()
         {
             return await _context.PlayedGames.ToListAsync();
         }
 
-        // GET: api/PlayedGames/summary
         [HttpGet("summary/")]
         public async Task<ActionResult<PlayedGameStatsDto>> GetSummary()
         {
-            // Récupération de l'identifiant utilisateur depuis le token
             var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
             {
@@ -44,7 +40,6 @@ namespace GameApi.Controllers
 
             var username = subClaim.Value;
 
-            // Recherche des jeux joués par cet utilisateur
             var games = await _context.PlayedGames
                 .Where(pg => pg.Username == username)
                 .OrderByDescending(pg => pg.GameDate)
@@ -57,9 +52,9 @@ namespace GameApi.Controllers
 
             var lastGame = games.First();
 
-            // Création de l'objet de statistiques à retourner
             var stats = new PlayedGameStatsDto
             {
+                Username = username,
                 GameWon = lastGame.GameWon,
                 TanksDestroyed = lastGame.TanksDestroyed,
                 TotalScore = lastGame.TotalScore,
@@ -73,11 +68,9 @@ namespace GameApi.Controllers
             return Ok(stats);
         }
 
-        // POST: api/PlayedGames
         [HttpPost]
         public async Task<ActionResult<PlayedGame>> AddGame(PlayedGame newGame)
         {
-            // Récupérer le nom d'utilisateur depuis le token
             var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
             {
@@ -86,13 +79,11 @@ namespace GameApi.Controllers
 
             var username = subClaim.Value;
 
-            // Vérification que l'utilisateur existe
             if (!_context.UserAccounts.Any(u => u.Username == username))
             {
                 return BadRequest("User does not exist.");
             }
 
-            // Vérification que la carte existe
             var mapExists = await _context.GeneratedMaps
                                 .AnyAsync(m => m.MapId == newGame.MapId);
             if (!mapExists)
@@ -100,15 +91,14 @@ namespace GameApi.Controllers
                 return BadRequest("Map does not exist.");
             }
 
-            newGame.Username = username;  // Assigner le username récupéré depuis le token
+            newGame.Username = username;
 
             _context.PlayedGames.Add(newGame);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetSummary), new { username = username }, newGame);
         }
-}
-
+    }
 
     public class PlayedGameStatsDto
     {
@@ -120,5 +110,6 @@ namespace GameApi.Controllers
         public DateTime GameDate { get; set; }
         public int TotalGames { get; set; }
         public int TotalVictories { get; set; }
+        public required string Username { get; set; }
     }
 }
