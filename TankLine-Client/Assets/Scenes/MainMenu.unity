@@ -36041,7 +36041,19 @@ MonoBehaviour:
       m_Calls: []
   m_OnSelect:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2020324187}
+        m_TargetAssemblyTypeName: Clavier, Assembly-CSharp
+        m_MethodName: OpenTouchKeyboard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnDeselect:
     m_PersistentCalls:
       m_Calls: []
@@ -76091,6 +76103,7 @@ GameObject:
   - component: {fileID: 2020324185}
   - component: {fileID: 2020324184}
   - component: {fileID: 2020324186}
+  - component: {fileID: 2020324187}
   m_Layer: 5
   m_Name: PagePrincipale
   m_TagString: Untagged
@@ -76183,6 +76196,19 @@ MonoBehaviour:
   eyeImage: {fileID: 710454791}
   eyeOpenTexture: {fileID: 2800000, guid: 6222172aa3efe8a429232bed6ed5a72e, type: 3}
   eyeClosedTexture: {fileID: 2800000, guid: ae48c06670a8122498db5ce6f089c777, type: 3}
+--- !u!114 &2020324187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020324182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db45687af91745e4e8d436750e2d7c1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tmpInputField: {fileID: 979700262}
 --- !u!1 &2020327190
 GameObject:
   m_ObjectHideFlags: 0

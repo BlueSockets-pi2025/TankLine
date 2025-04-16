@@ -10,6 +10,7 @@ public class OptionGeneral : MonoBehaviour
 
     private string selectedHub = "Small";
     private string selectedLang = "En";
+
     public Sprite normalSprite;
     public Sprite selectedSprite;
 
