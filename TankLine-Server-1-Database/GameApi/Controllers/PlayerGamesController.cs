@@ -31,25 +31,7 @@ namespace GameApi.Controllers
             return await _context.PlayedGames.ToListAsync();
         }
 
-        // GET: api/PlayedGames/by-user
-        [HttpGet("by-user/")]
-        public async Task<ActionResult<IEnumerable<PlayedGame>>> GetGamesByUser(string username)
-        {
-            var games = await _context.PlayedGames
-                .Where(pg => pg.Username == username)
-                .ToListAsync();
-
-            if (!games.Any())
-            {
-                return NotFound($"No games found for user '{username}'.");
-            }
-
-            return games;
-        }
-
-
         // GET: api/PlayedGames/summary
-
         [HttpGet("summary/")]
         public async Task<ActionResult<PlayedGameStatsDto>> GetSummary()
         {
@@ -78,7 +60,6 @@ namespace GameApi.Controllers
             // Création de l'objet de statistiques à retourner
             var stats = new PlayedGameStatsDto
             {
-                Username = lastGame.Username,
                 GameWon = lastGame.GameWon,
                 TanksDestroyed = lastGame.TanksDestroyed,
                 TotalScore = lastGame.TotalScore,
@@ -96,11 +77,22 @@ namespace GameApi.Controllers
         [HttpPost]
         public async Task<ActionResult<PlayedGame>> AddGame(PlayedGame newGame)
         {
-            if (!_context.UserAccounts.Any(u => u.Username == newGame.Username))
+            // Récupérer le nom d'utilisateur depuis le token
+            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
+            {
+                return Unauthorized("Invalid token or missing user information.");
+            }
+
+            var username = subClaim.Value;
+
+            // Vérification que l'utilisateur existe
+            if (!_context.UserAccounts.Any(u => u.Username == username))
             {
                 return BadRequest("User does not exist.");
             }
 
+            // Vérification que la carte existe
             var mapExists = await _context.GeneratedMaps
                                 .AnyAsync(m => m.MapId == newGame.MapId);
             if (!mapExists)
@@ -108,16 +100,18 @@ namespace GameApi.Controllers
                 return BadRequest("Map does not exist.");
             }
 
+            newGame.Username = username;  // Assigner le username récupéré depuis le token
+
             _context.PlayedGames.Add(newGame);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetGamesByUser), new { username = newGame.Username }, newGame);
+            return CreatedAtAction(nameof(GetSummary), new { username = username }, newGame);
         }
-    }
+}
+
 
     public class PlayedGameStatsDto
     {
-        public required string Username { get; set; }
         public bool GameWon { get; set; }
         public int TanksDestroyed { get; set; }
         public int TotalScore { get; set; }
