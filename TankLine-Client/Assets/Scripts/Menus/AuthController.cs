@@ -570,66 +570,157 @@ public class AuthController : MonoBehaviour
             }
         );
     }
+private IEnumerator GetGamePlayedStats()
+{
+    UnityWebRequest request = new UnityWebRequest(playedGameUrl, "GET");
 
-    
-    private IEnumerator GetGamePlayedStats()
-    {
-        // Construire l'URL avec le nom d'utilisateur
+    request.downloadHandler = new DownloadHandlerBuffer();
+    request.SetRequestHeader("Content-Type", "application/json");
+    request.certificateHandler = new CustomCertificateHandler();
 
-        UnityWebRequest request = new UnityWebRequest(playedGameUrl, "GET");
+    yield return SendRequestWithAutoRefresh(
+        playedGameUrl,
+        "GET",
+        new Dictionary<string, string> { { "Content-Type", "application/json" } },
+        null, // No body for GET
+        onSuccess: (response) =>
+        {
+            string json = response.downloadHandler?.text; 
 
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-        request.certificateHandler = new CustomCertificateHandler();
-
-
-        yield return SendRequestWithAutoRefresh(
-            playedGameUrl,
-            "GET",
-            new Dictionary<string, string> { { "Content-Type", "application/json" } },
-            null, // No body for a GET request
-            onSuccess: (response) =>
+            if (json == null)
             {
-                Debug.Log("Game Played Statistics : " + response.downloadHandler.text);
+                Debug.LogError("DownloadHandler text is null.");
+                IsRequestSuccessful = false;
+                return;
+            }
+
+            Debug.Log("Game Played Statistics (Raw JSON): " + json);
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(json) || json.Trim() == "null")
+                {
+                    Debug.LogWarning("No game stats returned or content is 'null'.");
+                    IsRequestSuccessful = false;
+                    return;
+                }
+
+                var stats = JsonUtility.FromJson<PlayedGameStats>(json);
+
+                if (stats == null)
+                {
+                    Debug.LogWarning("Deserialization failed: 'stats' is null.");
+                    IsRequestSuccessful = false;
+                    return;
+                }
+
+                if (stats.totalGames == 0 || stats.totalVictories < 0 || stats.tanksDestroyed < 0 || string.IsNullOrEmpty(stats.mapPlayed))
+                {
+                    Debug.LogWarning("Some critical game stats are missing or invalid.");
+                    IsRequestSuccessful = false;
+                    return;
+                }
+
+                CurrentPlayedGameStats = stats;
+                IsRequestSuccessful = true;
+
+                float victoryRatio = stats.totalGames > 0
+                    ? (float)stats.totalVictories / stats.totalGames
+                    : 0f;
+
+                Debug.LogWarning("Updating UI with game stats.");
+                
+                if (username != null ) 
+                {
+                    username.text = stats.username.ToString();
+
+
+                }
+                if (nb_games_played != null)
+                {
+                    nb_games_played.text = stats.totalGames.ToString();
+                    Debug.LogWarning("Updated nb_games_played.");
+                }
+
+                if (victories != null)
+                {
+                    victories.text = stats.totalVictories.ToString();
+                    Debug.LogWarning("Updated victories.");
+                }
+
+                if (ratio != null)
+                {
+                    ratio.text = victoryRatio.ToString("P1");
+                    Debug.LogWarning("Updated ratio.");
+                }
+
+                if (tanks_destroyed != null)
+                {
+                    tanks_destroyed.text = stats.tanksDestroyed.ToString();
+                    Debug.LogWarning("Updated tanks_destroyed.");
+                }
+
+                if (map != null)
+                {
+                    map.text = stats.mapPlayed;
+                    Debug.LogWarning("Updated map.");
+                }
+
+                if (rank != null)
+                {
+                    rank.text = stats.playerRank.ToString();
+                    Debug.LogWarning("Updated rank.");
+                }
+
+                if (victory_or_defeat != null)
+                {
+                    victory_or_defeat.text = stats.gameWon ? "Victory" : "Defeat";
+                    Debug.LogWarning("Updated victory_or_defeat.");
+                }
 
                 try
                 {
-                    var stats = JsonUtility.FromJson<PlayedGameStats>(response.downloadHandler.text);
-                    CurrentPlayedGameStats = stats;
-                    IsRequestSuccessful = true;
-
-                    float victoryRatio = stats.totalGames > 0
-                        ? (float)stats.totalVictories / stats.totalGames
-                        : 0f;
-
-                    nb_games_played.text = stats.totalGames.ToString();
-                    victories.text = stats.totalVictories.ToString();
-                    ratio.text = victoryRatio.ToString("P1");
-                    tanks_destroyed.text = stats.tanksDestroyed.ToString();
-                    map.text = stats.mapPlayed;
-                    rank.text = stats.playerRank.ToString();
-                    victory_or_defeat.text = stats.gameWon ? "Victory" : "Defeat";
-                    date.text = stats.gameDate.ToString("dd/MM/yyyy HH:mm");
+                    DateTime parsedGameDate = DateTime.Parse(stats.gameDate);
+                    if (date != null)
+                    {
+                        date.text = parsedGameDate.ToString("dd/MM/yyyy HH:mm");
+                        Debug.LogWarning("Updated date.");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"Error parsing game statistics: {ex.Message}");
-                    IsRequestSuccessful = false;
+                    Debug.LogError("Failed to parse gameDate: " + ex.Message);
                 }
-            },
-            onError: (response) =>
+
+            }
+            catch (Exception ex)
             {
-                Debug.LogError("Failed to retrieve game statistics: " + response.error);
-                Debug.LogError("Details: " + response.downloadHandler.text);
-                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text)
-                    ? request.downloadHandler.text
-                    : "An unknown error occurred.";
+                Debug.LogError($"Exception while parsing or using game stats: {ex.Message}");
                 IsRequestSuccessful = false;
             }
-        );
-    }
+        },
+        onError: (response) =>
+        {
+            long responseCode = response.responseCode;
+            string responseText = response.downloadHandler != null ? response.downloadHandler.text : "";
 
+            if (responseCode == 404)
+            {
+                Debug.LogWarning("No games found for the current user (404).");
+            }
+            else
+            {
+                Debug.LogError($"Failed to retrieve game statistics. HTTP {responseCode}: {response.error}");
+                Debug.LogError("Details: " + responseText);
+            }
 
+            ErrorResponse = !string.IsNullOrEmpty(responseText)
+                ? responseText
+                : "An unknown error occurred.";
+            IsRequestSuccessful = false;
+        }
+    );
+}
 }
 
 
@@ -728,5 +819,5 @@ public class PlayedGameStats
     public string mapPlayed;
     public int playerRank;
     public bool gameWon;
-    public DateTime gameDate;
+    public string gameDate;  
 }
