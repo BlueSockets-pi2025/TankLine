@@ -47,9 +47,20 @@ namespace GameApi.Controllers
 
 
         // GET: api/PlayedGames/summary
+
         [HttpGet("summary/")]
-        public async Task<ActionResult<PlayedGameStatsDto>> GetSummary(string username)
+        public async Task<ActionResult<PlayedGameStatsDto>> GetSummary()
         {
+            // Récupération de l'identifiant utilisateur depuis le token
+            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
+            {
+                return Unauthorized("Invalid token or missing user information.");
+            }
+
+            var username = subClaim.Value;
+
+            // Recherche des jeux joués par cet utilisateur
             var games = await _context.PlayedGames
                 .Where(pg => pg.Username == username)
                 .OrderByDescending(pg => pg.GameDate)
@@ -57,11 +68,12 @@ namespace GameApi.Controllers
 
             if (games == null || !games.Any())
             {
-                return NotFound();
+                return NotFound("No games found for the current user.");
             }
 
             var lastGame = games.First();
 
+            // Création de l'objet de statistiques à retourner
             var stats = new PlayedGameStatsDto
             {
                 Username = lastGame.Username,
@@ -80,7 +92,6 @@ namespace GameApi.Controllers
 
         // POST: api/PlayedGames
         [HttpPost]
-        [AllowAnonymous] // Facultatif : tu peux retirer cette ligne si tu veux aussi sécuriser cette route
         public async Task<ActionResult<PlayedGame>> AddGame(PlayedGame newGame)
         {
             if (!_context.UserAccounts.Any(u => u.Username == newGame.Username))
