@@ -549,4 +549,24 @@ public class MenuSwapper : MonoBehaviour {
         }
         return null;
     }
+
+
+    public void GamesPlayed()
+    {
+        StartCoroutine(GamesPlayedAndNavigate());
+    }    
+    
+    private IEnumerator GamesPlayedAndNavigate() {
+        yield return authController.GamesPlayedStatistics();
+
+        if (authController.IsRequestSuccessful) {
+            OpenPage("ACHIEVEMENTS"); 
+        } else {
+            OpenMessage("You have not played a game yet. Start your epic journey now !"); 
+        }
+    }
+
+
+
+
 }
