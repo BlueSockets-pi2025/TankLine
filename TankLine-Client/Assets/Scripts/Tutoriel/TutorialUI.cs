@@ -1,68 +1,126 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
-public class TutorialUI : MonoBehaviour
+public class TankTutorial : MonoBehaviour
 {
     [Header("UI Elements")]
-    public TextMeshProUGUI tutorialText;
-    public Image controlsImage;
-    public TextMeshProUGUI bulletCountText;
-    public TextMeshProUGUI livesText;
+    public GameObject tutorialPanel;
+    public TMP_Text tutorialText;
+    public Button nextButton;
     
     [Header("Tutorial Steps")]
-    public string[] tutorialMessages;
-    public Sprite[] controlImages;
+    public string[] tutorialSteps = {
+        "Welcome to Tank Battle!",
+        "You can move your tank using QSZD or Arrow keys",
+        "Move your mouse to change the direction of your tank's turret",
+        "Left-click to shoot bullets at your enemies",
+        "You're now ready to start your journey! Destroy the enemy tanks"
+    };
+    
+    [Header("References")]
+    public GameObject playerTank;
+    public GameObject enemyTanksContainer;
     
     private int currentStep = 0;
-    private Tank_Offline playerTank;
+    private bool waitingForInput = false;
+    private bool[] stepCompleted;
     
-    void Start()
+    private void Start()
     {
-        playerTank = FindObjectOfType<Tank_Offline>();
-        ShowCurrentStep();
-        UpdateBulletCount(playerTank.MaxBulletShot - playerTank.nbBulletShot);
-        UpdateLives((int)playerTank.nbLifeLeft);
+        stepCompleted = new bool[tutorialSteps.Length];
+        
+        tutorialPanel.SetActive(true);
+        tutorialText.text = tutorialSteps[0];
+        nextButton.onClick.AddListener(NextStep);
+        
+        if (enemyTanksContainer != null)
+        {
+            enemyTanksContainer.SetActive(false);
+        }
     }
     
-    void Update()
+    private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!waitingForInput) return;
+        
+        switch (currentStep)
         {
-            NextStep();
+            case 1:
+                if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.Z) ||
+                    Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
+                {
+                    CompleteStep();
+                }
+                break;
+                
+            case 2: 
+                if (Mathf.Abs(Input.GetAxis("Mouse X")) > 1.5f || Mathf.Abs(Input.GetAxis("Mouse Y")) > 1.5f)
+                {
+                    CompleteStep();
+                }
+                break;
+                
+            case 3:
+                if (Input.GetMouseButtonDown(0))
+                {
+                    CompleteStep();
+                }
+                break;
         }
     }
     
     public void NextStep()
     {
-        if (currentStep < tutorialMessages.Length - 1)
+        if (currentStep < tutorialSteps.Length - 1)
         {
             currentStep++;
-            ShowCurrentStep();
+            tutorialText.text = tutorialSteps[currentStep];
+            
+            if (currentStep >= 1 && currentStep <= 3)
+            {
+                nextButton.gameObject.SetActive(false);
+                waitingForInput = true;
+            }
+            else
+            {
+                nextButton.gameObject.SetActive(true);
+                waitingForInput = false;
+            }
+            
+            if (currentStep == tutorialSteps.Length - 1 && enemyTanksContainer != null)
+            {
+                enemyTanksContainer.SetActive(true);
+            }
         }
         else
         {
-            // Tutorial complete
-            tutorialText.text = "Press ESC to exit";
+        
+            tutorialPanel.SetActive(false);
+            this.enabled = false; 
         }
     }
     
-    private void ShowCurrentStep()
+    private void CompleteStep()
     {
-        tutorialText.text = tutorialMessages[currentStep];
-        if (currentStep < controlImages.Length)
+        if (!stepCompleted[currentStep])
         {
-            controlsImage.sprite = controlImages[currentStep];
+            stepCompleted[currentStep] = true;
+            waitingForInput = false;
+            nextButton.gameObject.SetActive(true);
+            
+            StartCoroutine(ShowCompletionFeedback());
         }
     }
     
-    public void UpdateBulletCount(int count)
+    private IEnumerator ShowCompletionFeedback()
     {
-        bulletCountText.text = $"Bullets: {count}/{playerTank.MaxBulletShot}";
-    }
-    
-    public void UpdateLives(int lives)
-    {
-        livesText.text = $"Lives: {lives}/3";
+        string originalText = tutorialText.text;
+        tutorialText.text = originalText + "\n<color=green>(Completed!)</color>";
+        
+        yield return new WaitForSeconds(2f);
+        
+        tutorialText.text = originalText;
     }
 }
