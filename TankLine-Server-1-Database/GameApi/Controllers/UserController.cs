@@ -33,6 +33,7 @@ namespace GameApi.Controllers
                 return StatusCode(500, $"ERROR : FAILED CONNECTION {ex.Message}\n");
             }
         }
+
         [Authorize]
         [HttpGet("{username}")]
         public async Task<IActionResult> GetUser(string username)
@@ -143,13 +144,33 @@ namespace GameApi.Controllers
 
             statistics.GamesPlayed += request.GamesPlayed; // Adds the number of games played
             statistics.HighestScore = Math.Max(statistics.HighestScore, request.HighestScore); // Replace if higher
-            statistics.Ranking = request.Ranking; // Replaces ranking
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // To include the new stats when calculating rankings
+
+            // Update ranking based on the highest score
+            await RecalculateRankings();
             
             return Ok(statistics);
         }
 
+        private async Task RecalculateRankings()
+        {
+            // Retrieve all users with a score greater than 0, sorted by descending score
+            var usersWithScores = await _context.UserStatistics
+                .Where(s => s.HighestScore > 0)
+                .OrderByDescending(s => s.HighestScore)
+                .ToListAsync();
+
+            // Update ranking according to order
+            int rank = 1;
+            foreach (var user in usersWithScores)
+            {
+                user.Ranking = rank;
+                rank++;
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
 
@@ -157,7 +178,6 @@ public class UpdateStatisticsRequest
 {
     public int GamesPlayed { get; set; }
     public int HighestScore { get; set; }
-    public int Ranking { get; set; }
 }
 
 public class UserDto

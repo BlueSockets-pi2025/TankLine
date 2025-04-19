@@ -294,7 +294,7 @@ public class ConnectionRegistrationController : Controller
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
+            Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:ExpiryMinutes"]))
         });
 
         Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
@@ -383,7 +383,7 @@ public class ConnectionRegistrationController : Controller
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"]))
+            Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:ExpiryMinutes"]))
         });
 
         Response.Cookies.Append("RefreshToken", newRefreshToken, new CookieOptions
@@ -487,7 +487,7 @@ public class ConnectionRegistrationController : Controller
             issuer: _configuration["JwtSettings:Issuer"] ?? string.Empty,
             audience: _configuration["JwtSettings:Audience"] ?? string.Empty,
             claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["JwtSettings:ExpirySeconds"])),
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:ExpiryMinutes"])),
             signingCredentials: creds
         );
 
