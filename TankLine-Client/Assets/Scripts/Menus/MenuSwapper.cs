@@ -43,10 +43,10 @@ public class MenuSwapper : MonoBehaviour {
             Debug.LogError("AuthController not found.");
             return;
         }
-        AutoLogin();
+        //AutoLogin();
 
         // load first page
-        //OpenPage("ResetPasswordStep2"); 
+        OpenPage("PagePrincipale"); 
 
         //OpenPagePrincipal();
     }
