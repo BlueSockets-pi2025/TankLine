@@ -23,7 +23,6 @@ public class Tank_Offline : MonoBehaviour
     /// <summary> The bullet prefab </summary>
     public GameObject bulletPrefab;
 
-
     /// <summary> The number of bullet already shot </summary>
     [HideInInspector]
     public int nbBulletShot = 0;
@@ -44,6 +43,8 @@ public class Tank_Offline : MonoBehaviour
     /// <summary> The gun current angle in radians </summary>
     protected float gunRotation = 0;
 
+    protected GameObject effectPullPrefab;
+
 
     protected virtual void Start()
     {
@@ -51,6 +52,8 @@ public class Tank_Offline : MonoBehaviour
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
+
+        effectPullPrefab = thisTank.transform.Find("tankGun").Find("effect_pull").gameObject;
     }
 
     /// <summary>
@@ -477,6 +480,10 @@ public class Tank_Offline : MonoBehaviour
             newBullet.direction = dir;
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
+            // --------------
+            effectPullPrefab.SetActive(true);
+            effectPullPrefab.GetComponent<explosionPull>().play();
+            // --------------
         }
     }
 
