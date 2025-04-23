@@ -22,6 +22,7 @@ public class AuthController : MonoBehaviour
     private const string userDataUrl = "https://185.155.93.105:17008/api/user/me";
     private const string userStatisticsUrl = "https://185.155.93.105:17008/api/user/me/statistics";
 
+
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
     private static X509Certificate2 trustedCertificate;  
@@ -540,6 +541,70 @@ public class AuthController : MonoBehaviour
             }
         );
     }
+
+    public IEnumerator UpdateUserStatistics(int gamesPlayed, int highestScore, Action onSuccess, Action<string> onError)
+    {
+        var requestData = new UpdateStatisticsRequest
+        {
+            GamesPlayed = gamesPlayed,
+            HighestScore = highestScore
+        };
+
+        string json = JsonUtility.ToJson(requestData);
+
+        yield return SendRequestWithAutoRefresh(
+            userStatisticsUrl + "/update",
+            "PUT",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            System.Text.Encoding.UTF8.GetBytes(json),
+            onSuccess: (response) =>
+            {
+                Debug.Log("User statistics updated successfully.");
+                onSuccess?.Invoke();
+            },
+            onError: (response) =>
+            {
+                string errorMessage = !string.IsNullOrEmpty(response.downloadHandler.text)
+                    ? response.downloadHandler.text
+                    : "An unknown error occurred.";
+                Debug.LogError($"Failed to update user statistics: {errorMessage}");
+                onError?.Invoke(errorMessage);
+            }
+        );
+    }
+    public IEnumerator GetLeaderboard(Action<List<LeaderboardEntry>> onSuccess, Action<string> onError)
+    {
+        const string leaderboardUrl = "https://185.155.93.105:17008/api/leaderboard";
+
+        yield return SendRequestWithAutoRefresh(
+            leaderboardUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // Pas de corps pour une requête GET
+            onSuccess: (response) =>
+            {
+                try
+                {
+                    string jsonResponse = response.downloadHandler.text;
+                    List<LeaderboardEntry> leaderboardEntries = JsonUtility.FromJson<LeaderboardList>($"{{\"entries\":{jsonResponse}}}").entries;
+                    onSuccess?.Invoke(leaderboardEntries);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error parsing leaderboard data: {ex.Message}");
+                    onError?.Invoke("Failed to parse leaderboard data.");
+                }
+            },
+            onError: (response) =>
+            {
+                string errorMessage = !string.IsNullOrEmpty(response.downloadHandler.text)
+                    ? response.downloadHandler.text
+                    : "An unknown error occurred.";
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                onError?.Invoke(errorMessage);
+            }
+        );
+    }
 }
 
 public class CustomCertificateHandler : CertificateHandler
@@ -622,4 +687,26 @@ public class UserStatistics
     public int gamesPlayed;
     public int highestScore;
     public int ranking;
+}
+
+[System.Serializable]
+public class UpdateStatisticsRequest
+{
+    public int GamesPlayed;
+    public int HighestScore;
+}
+
+[System.Serializable]
+public class LeaderboardEntry
+{
+    public string username;
+    public int highestScore;
+    public int ranking;
+    public int gamesPlayed;
+}
+
+[System.Serializable]
+public class LeaderboardList
+{
+    public List<LeaderboardEntry> entries;
 }
