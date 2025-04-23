@@ -32,6 +32,7 @@ public class RoomManager : NetworkBehaviour
   [ServerRpc(RequireOwnership = false)]
   public void RequestCreateRoom(int maxPlayers, bool isPublic, NetworkConnection conn = null)
   {
+    Debug.Log($"[RoomManager] Request to create room");
     int roomId = GenerateUniqueRoomId();
     CreateRoom(conn, roomId, maxPlayers, isPublic);
   }
@@ -60,6 +61,7 @@ public class RoomManager : NetworkBehaviour
   [ServerRpc(RequireOwnership = false)]
   public void RequestJoinRoom(int roomId, NetworkConnection conn = null)
   {
+    Debug.Log($"[RoomManager] Request to join room {roomId}");
     JoinRoom(conn, roomId);
   }
 
@@ -137,7 +139,13 @@ public class RoomManager : NetworkBehaviour
   [TargetRpc]
   private void TargetConfirmRoomJoin(NetworkConnection conn, int roomId)
   {
-    Debug.Log("You have joined room " + roomId);
+    if (conn == null)
+    {
+        Debug.LogError("TargetConfirmRoomJoin called with null connection.");
+        return;
+    }
+
+    Debug.Log("[RoomManager] You have joined room " + roomId);
 
     RoomClientData.CurrentRoomId = roomId;
 

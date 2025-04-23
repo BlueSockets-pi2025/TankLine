@@ -527,14 +527,6 @@ public class MenuSwapper : MonoBehaviour {
         }
     }
 
-    public void ConnectToRandomWaitingRoom() {
-        ConnectToWaitingRoom();
-    }
-
-    public void ConnectToWaitingRoom() {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
-    }
-
     // Recursive search for a GameObject by name
     private Transform FindDeepChild(Transform parent, string childName)
     {

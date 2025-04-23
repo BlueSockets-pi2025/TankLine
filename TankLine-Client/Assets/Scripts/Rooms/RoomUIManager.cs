@@ -39,12 +39,32 @@ public class RoomUIManager : MonoBehaviour
 
   void Start()
   {
+    SetRoomButtonsInteractable(false);
+    StartCoroutine(ConfirmClientConn());
+    UpdateSelectionTexts();
+  }
+
+  private void SetRoomButtonsInteractable(bool value)
+{
+    CreateRoomBtn.interactable = value;
+    JoinRoomBtn.interactable = value;
+    returnBtn.interactable = value;
+}
+
+  private System.Collections.IEnumerator ConfirmClientConn()
+  {
+    yield return new WaitUntil(() =>
+      InstanceFinder.IsClient &&
+      InstanceFinder.ClientManager.Connection.IsValid
+    );
+    Debug.Log("[RoomUI] Client connection confirmed.");
+
+    SetRoomButtonsInteractable(true);
+
     CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
     JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
     returnBtn.onClick.AddListener(HandleReturn);
     codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
-
-    UpdateSelectionTexts();
   }
 
   // === SELECTION BUTTONS ===
@@ -92,7 +112,7 @@ public class RoomUIManager : MonoBehaviour
     bool isPublic = selectedMode == "Public";
     Debug.Log($"[RoomUI] Requesting room creation | Public: {isPublic} | Max Players: {maxPlayers}");
 
-    RoomManager.Instance.RequestCreateRoom(maxPlayers, isPublic);
+    RoomManager.Instance.RequestCreateRoom(maxPlayers, isPublic, InstanceFinder.ClientManager.Connection);
   }
 
   // === ROOM JOINING ===
@@ -109,7 +129,7 @@ public class RoomUIManager : MonoBehaviour
       if (roomId.HasValue)
       {
         Debug.Log($"[RoomUI] Joining public room {roomId.Value}");
-        RoomManager.Instance.RequestJoinRoom(roomId.Value);
+        RoomManager.Instance.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
       }
       else
       {
@@ -124,7 +144,7 @@ public class RoomUIManager : MonoBehaviour
       if (IsValidRoomCode(codeInput.text, out int roomId))
       {
         Debug.Log($"[RoomUI] Joining private room {roomId}");
-        RoomManager.Instance.RequestJoinRoom(roomId);
+        RoomManager.Instance.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
       }
       else
       {
@@ -147,7 +167,7 @@ public class RoomUIManager : MonoBehaviour
 
     if (input.Length == 6 && int.TryParse(input, out roomId))
       return true;
-    
+
     roomId = -1;
     return false;
   }
