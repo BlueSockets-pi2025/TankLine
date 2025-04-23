@@ -1,6 +1,8 @@
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
+using Scripts.Tutoriel;
+//using UnityEngine.SceneManagement;
 
 public class Tank_Player : Tank
 {
@@ -27,8 +29,6 @@ public class Tank_Player : Tank
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
-
-
     }
 
     /// <summary>
@@ -36,11 +36,15 @@ public class Tank_Player : Tank
     /// </summary>
     protected void Update() {
         if (!base.IsOwner) return;
-
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
+        if(GetCurrentSceneName()=="Tuto")
+        {
+            var tutorial = FindObjectOfType<TankTutorial>();
+            if(!tutorial.IsInShootingStep) return;
+        }
         // if left click recorded, try to shoot
         if (Input.GetMouseButtonDown(LEFT_CLICK)) {
             if (this.CanShoot()) {
@@ -302,5 +306,10 @@ public class Tank_Player : Tank
 
     public void DecreaseNbBulletShot() {
         nbBulletShot--;
+    }
+    public string GetCurrentSceneName()
+    {
+        string haja= Application.loadedLevelName;
+        return haja;
     }
 }
