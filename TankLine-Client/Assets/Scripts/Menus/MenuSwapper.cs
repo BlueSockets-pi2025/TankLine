@@ -1,18 +1,31 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class MenuSwapper : MonoBehaviour
 {
     public static MenuSwapper Instance { get; private set; }
     private AuthController authController;
 
-
     public GameObject _canvas;
     private Transform Canvas;
     public GameObject ErrorPopup, MessagePopup;
 
     public GameObject CurrentPage;
+
+    public GameObject EmailErrorText;
+    public GameObject PasswordErrorText;
+    public GameObject ConfirmationErrorText;
+
+    public GameObject PasswordErrorTextReset;
+    public GameObject ConfirmationErrorTextReset;
+
+    public GameObject top1, top2, top3, top4;
+
+    // Testing : 
+    public TMP_InputField gamesPlayedInputField;
+    public TMP_InputField highestScoreInputField;
 
     void Awake()
     {
@@ -33,10 +46,10 @@ public class MenuSwapper : MonoBehaviour
             Debug.LogError("AuthController not found.");
             return;
         }
-        AutoLogin();
+        //AutoLogin();
 
         // load first page
-        OpenPage(CurrentPage.name);
+        OpenPage("PagePrincipale");
 
         //OpenPagePrincipal();
     }
@@ -88,6 +101,12 @@ public class MenuSwapper : MonoBehaviour
         }
 
         CurrentPage.SetActive(true);
+
+        if (pageName == "Score")
+        {
+            Debug.Log("Opening Score page. Updating leaderboard...");
+            UpdateLeaderboard();
+        }
 
         // if switch to mainMenu or play, load stats & name
         if (pageName == "MainMenu" || pageName == "Play")
@@ -233,13 +252,12 @@ public class MenuSwapper : MonoBehaviour
         TMP_InputField Password = CurrentPage.transform.Find("PasswordInputField1").GetComponent<TMP_InputField>();
         TMP_InputField ConfirmPassword = CurrentPage.transform.Find("PasswordInputField2").GetComponent<TMP_InputField>();
 
-        ValidatePasswordField(Password);
-        ValidatePasswordField(ConfirmPassword);
-        ValidateConfirmPasswordField(Password, ConfirmPassword);
+        FieldsValidation.ValidatePasswordField(Password, PasswordErrorTextReset);
+        FieldsValidation.ValidateConfirmPasswordField(Password, ConfirmPassword, ConfirmationErrorTextReset);
 
         if (!InputCheckers.IsValidPassword(Password.text))
         {
-            OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+            OpenErr("Password must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 digit, and 1 special character.");
             return;
         }
 
@@ -326,9 +344,8 @@ public class MenuSwapper : MonoBehaviour
         TMP_InputField ConfirmPassword = CurrentPage.transform.Find("ConfirmPasswordInputField").GetComponent<TMP_InputField>();
 
         ValidateEmailField(Email);
-        ValidatePasswordField(Password);
-        ValidatePasswordField(ConfirmPassword);
-        ValidateConfirmPasswordField(Password, ConfirmPassword);
+        FieldsValidation.ValidatePasswordField(Password, PasswordErrorText);
+        FieldsValidation.ValidateConfirmPasswordField(Password, ConfirmPassword, ConfirmationErrorText);
 
         TMP_InputField DateInputField = FindDeepChild(Canvas.Find("SignUpStep1"), "DateInputField")?.GetComponent<TMP_InputField>();
         if (DateInputField == null)
@@ -359,7 +376,7 @@ public class MenuSwapper : MonoBehaviour
 
         if (!InputCheckers.IsValidPassword(Password.text))
         {
-            OpenErr("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+            OpenErr("Password must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 digit, and 1 special character.");
             return;
         }
 
@@ -377,113 +394,6 @@ public class MenuSwapper : MonoBehaviour
         Debug.Log($"Parsed Date - Year: {year}, Month: {month}, Day: {day}");
 
         StartCoroutine(SignUpUser2Coroutine(FirstName, LastName, UserName, Email, Password, ConfirmPassword, day, month, year));
-    }
-
-    public void ValidateEmailField(TMP_InputField emailField)
-    {
-        var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
-
-        if (outline != null)
-        {
-            if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text))
-            {
-                outline.enabled = true;
-            }
-            else
-            {
-                outline.enabled = false;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Outline component not found on the input field.");
-        }
-    }
-
-    public void ValidatePasswordField(TMP_InputField passwordField)
-    {
-        var outline = passwordField.GetComponent<UnityEngine.UI.Outline>();
-
-        if (outline != null)
-        {
-            if (string.IsNullOrEmpty(passwordField.text) || !InputCheckers.IsValidPassword(passwordField.text))
-            {
-                outline.enabled = true;
-            }
-            else
-            {
-                outline.enabled = false;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Outline component not found on the input field.");
-        }
-    }
-
-    public void ValidateConfirmPasswordField(TMP_InputField passwordField, TMP_InputField confirmPasswordField)
-    {
-        var outline = confirmPasswordField.GetComponent<UnityEngine.UI.Outline>();
-
-        if (outline != null)
-        {
-            if (passwordField.text != confirmPasswordField.text)
-            {
-                outline.enabled = true;
-            }
-            else
-            {
-                outline.enabled = false;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Outline component not found on the confirm password field.");
-        }
-    }
-
-    public void ValidateConfirmPasswordRegistration()
-    {
-        Transform signUpStep2Page = Canvas.Find("SignUpStep2");
-
-        if (signUpStep2Page == null)
-        {
-            Debug.LogError("Page 'SignUpStep2' not found.");
-            return;
-        }
-
-        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
-        TMP_InputField confirmPasswordField = signUpStep2Page.Find("ConfirmPasswordInputField")?.GetComponent<TMP_InputField>();
-
-        if (passwordField == null || confirmPasswordField == null)
-        {
-            Debug.LogError("PasswordInputField or ConfirmPasswordInputField not found in 'SignUpStep2'.");
-            return;
-        }
-
-        ValidateConfirmPasswordField(passwordField, confirmPasswordField);
-    }
-
-    public void ValidateConfirmPasswordReset()
-    {
-        Transform signUpStep2Page = Canvas.Find("ResetPasswordStep2");
-
-        if (signUpStep2Page == null)
-        {
-            Debug.LogError("Page 'ResetPasswordStep2' not found.");
-            return;
-        }
-
-        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
-        TMP_InputField confirmPasswordField = signUpStep2Page.Find("PasswordInputField2")?.GetComponent<TMP_InputField>();
-
-        if (passwordField == null || confirmPasswordField == null)
-        {
-            Debug.LogError("PasswordInputField1 or PasswordInputField1 not found in 'ResetPasswordStep2'.");
-            return;
-        }
-
-        ValidateConfirmPasswordField(passwordField, confirmPasswordField);
     }
 
     private IEnumerator SignUpUser2Coroutine(TMP_InputField FirstName, TMP_InputField LastName, TMP_InputField UserName,
@@ -623,6 +533,405 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    public void SetPlayerStatistics(int gamesPlayed, int highestScore)
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(authController.UpdateUserStatistics(
+            gamesPlayed,
+            highestScore,
+            onSuccess: () =>
+            {
+                Debug.Log("Player statistics updated successfully.");
+                OpenMessage("Statistics updated successfully.");
+            },
+            onError: (errorMessage) =>
+            {
+                Debug.LogError($"Failed to update player statistics: {errorMessage}");
+                OpenErr($"Failed to update statistics: {errorMessage}");
+            }
+        ));
+    }
+
+    public void OnUpdateStatisticsButtonClick()
+    {
+        int gamesPlayed;
+        int highestScore;
+
+        if (!int.TryParse(gamesPlayedInputField.text, out gamesPlayed))
+        {
+            Debug.LogError("Invalid input for Games Played.");
+            return;
+        }
+
+        if (!int.TryParse(highestScoreInputField.text, out highestScore))
+        {
+            Debug.LogError("Invalid input for Highest Score.");
+            return;
+        }
+        SetPlayerStatistics(gamesPlayed, highestScore);
+    }
+
+    public void ValidatePasswordRegistration()
+    {
+        Transform signUpStep2Page = Canvas.Find("SignUpStep2");
+        if (signUpStep2Page == null)
+        {
+            Debug.LogError("Page 'SignUpStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
+        if (passwordField == null)
+        {
+            Debug.LogError("PasswordInputField not found in 'SignUpStep2'.");
+            return;
+        }
+        FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorText);
+    }
+
+    public void ValidatePasswordReset()
+    {
+        Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
+        if (resetPasswordStep2Page == null)
+        {
+            Debug.LogError("Page 'ResetPasswordStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = resetPasswordStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
+        if (passwordField == null)
+        {
+            Debug.LogError("PasswordInputField1 not found in 'ResetPasswordStep2'.");
+            return;
+        }
+        FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorTextReset);
+    }
+
+    public void ValidateConfirmPasswordRegistration()
+    {
+        Transform signUpStep2Page = Canvas.Find("SignUpStep2");
+        if (signUpStep2Page == null)
+        {
+            Debug.LogError("Page 'SignUpStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = signUpStep2Page.Find("ConfirmPasswordInputField")?.GetComponent<TMP_InputField>();
+        if (passwordField == null || confirmPasswordField == null)
+        {
+            Debug.LogError("PasswordInputField or ConfirmPasswordInputField not found in 'SignUpStep2'.");
+            return;
+        }
+        FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorText);
+    }
+
+    public void ValidateConfirmPasswordReset()
+    {
+        Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
+        if (resetPasswordStep2Page == null)
+        {
+            Debug.LogError("Page 'ResetPasswordStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = resetPasswordStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = resetPasswordStep2Page.Find("PasswordInputField2")?.GetComponent<TMP_InputField>();
+        if (passwordField == null || confirmPasswordField == null)
+        {
+            Debug.LogError("PasswordInputField1 or PasswordInputField1 not found in 'ResetPasswordStep2'.");
+            return;
+        }
+        FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorTextReset);
+    }
+
+    public void ValidateEmailField(TMP_InputField emailField)
+    {
+        var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
+
+        if (outline != null)
+        {
+            if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text))
+            {
+                outline.enabled = true;
+                EmailErrorText.SetActive(true);
+            }
+            else
+            {
+                outline.enabled = false;
+                EmailErrorText.SetActive(false);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Outline component not found on the input field.");
+        }
+    }
+
+
+    public void UpdateLeaderboard()
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(authController.GetLeaderboard(
+            onSuccess: (leaderboardEntries) =>
+            {
+                Debug.Log("Leaderboard data fetched successfully.");
+                UpdateLeaderboardUI(leaderboardEntries);
+            },
+            onError: (errorMessage) =>
+            {
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                OpenErr($"Failed to fetch leaderboard: {errorMessage}");
+            }
+        ));
+    }
+
+    private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
+    {
+        // Update GameObjects for the first 4
+        UpdateLeaderboardEntry(top1, leaderboardEntries.Count > 0 ? leaderboardEntries[0] : null);
+        UpdateLeaderboardEntry(top2, leaderboardEntries.Count > 1 ? leaderboardEntries[1] : null);
+        UpdateLeaderboardEntry(top3, leaderboardEntries.Count > 2 ? leaderboardEntries[2] : null);
+        UpdateLeaderboardEntry(top4, leaderboardEntries.Count > 3 ? leaderboardEntries[3] : null);
+    }
+
+    private void UpdateLeaderboardEntry(GameObject entryObject, LeaderboardEntry entry)
+    {
+        if (entryObject == null) return;
+
+        // Retrieve sub-GameObjects for Rank, Name and Score
+        TMP_Text rankText = entryObject.transform.Find("Rank")?.GetComponent<TMP_Text>();
+        TMP_Text nameText = entryObject.transform.Find("Name")?.GetComponent<TMP_Text>();
+        TMP_Text scoreText = entryObject.transform.Find("Score")?.GetComponent<TMP_Text>();
+
+        if (entry != null)
+        {
+            // Update text fields
+            if (rankText != null) rankText.text = $"{entry.ranking}";
+            if (nameText != null) nameText.text = entry.username;
+            if (scoreText != null) scoreText.text = $"{entry.highestScore}";
+
+            entryObject.SetActive(true); // Display entry
+        }
+        else
+        {
+            // Hide fields if no data available
+            if (rankText != null) rankText.text = "";
+            if (nameText != null) nameText.text = "";
+            if (scoreText != null) scoreText.text = "";
+
+            entryObject.SetActive(false); // Hide entry
+        }
+    }
+
+    public void ConnectToRandomWaitingRoom()
+    {
+        ConnectToWaitingRoom();
+    }
+
+    public void SetPlayerStatistics(int gamesPlayed, int highestScore)
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(authController.UpdateUserStatistics(
+            gamesPlayed,
+            highestScore,
+            onSuccess: () =>
+            {
+                Debug.Log("Player statistics updated successfully.");
+                OpenMessage("Statistics updated successfully.");
+            },
+            onError: (errorMessage) =>
+            {
+                Debug.LogError($"Failed to update player statistics: {errorMessage}");
+                OpenErr($"Failed to update statistics: {errorMessage}");
+            }
+        ));
+    }
+
+    public void OnUpdateStatisticsButtonClick()
+    {
+        int gamesPlayed;
+        int highestScore;
+
+        if (!int.TryParse(gamesPlayedInputField.text, out gamesPlayed))
+        {
+            Debug.LogError("Invalid input for Games Played.");
+            return;
+        }
+
+        if (!int.TryParse(highestScoreInputField.text, out highestScore))
+        {
+            Debug.LogError("Invalid input for Highest Score.");
+            return;
+        }
+        SetPlayerStatistics(gamesPlayed, highestScore);
+    }
+
+    public void ValidatePasswordRegistration()
+    {
+        Transform signUpStep2Page = Canvas.Find("SignUpStep2");
+        if (signUpStep2Page == null)
+        {
+            Debug.LogError("Page 'SignUpStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
+        if (passwordField == null)
+        {
+            Debug.LogError("PasswordInputField not found in 'SignUpStep2'.");
+            return;
+        }
+        FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorText);
+    }
+
+    public void ValidatePasswordReset()
+    {
+        Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
+        if (resetPasswordStep2Page == null)
+        {
+            Debug.LogError("Page 'ResetPasswordStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = resetPasswordStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
+        if (passwordField == null)
+        {
+            Debug.LogError("PasswordInputField1 not found in 'ResetPasswordStep2'.");
+            return;
+        }
+        FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorTextReset);
+    }
+
+    public void ValidateConfirmPasswordRegistration()
+    {
+        Transform signUpStep2Page = Canvas.Find("SignUpStep2");
+        if (signUpStep2Page == null)
+        {
+            Debug.LogError("Page 'SignUpStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = signUpStep2Page.Find("ConfirmPasswordInputField")?.GetComponent<TMP_InputField>();
+        if (passwordField == null || confirmPasswordField == null)
+        {
+            Debug.LogError("PasswordInputField or ConfirmPasswordInputField not found in 'SignUpStep2'.");
+            return;
+        }
+        FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorText);
+    }
+
+    public void ValidateConfirmPasswordReset()
+    {
+        Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
+        if (resetPasswordStep2Page == null)
+        {
+            Debug.LogError("Page 'ResetPasswordStep2' not found.");
+            return;
+        }
+        TMP_InputField passwordField = resetPasswordStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
+        TMP_InputField confirmPasswordField = resetPasswordStep2Page.Find("PasswordInputField2")?.GetComponent<TMP_InputField>();
+        if (passwordField == null || confirmPasswordField == null)
+        {
+            Debug.LogError("PasswordInputField1 or PasswordInputField1 not found in 'ResetPasswordStep2'.");
+            return;
+        }
+        FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorTextReset);
+    }
+
+    public void ValidateEmailField(TMP_InputField emailField)
+    {
+        var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
+
+        if (outline != null)
+        {
+            if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text))
+            {
+                outline.enabled = true;
+                EmailErrorText.SetActive(true);
+            }
+            else
+            {
+                outline.enabled = false;
+                EmailErrorText.SetActive(false);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Outline component not found on the input field.");
+        }
+    }
+
+
+    public void UpdateLeaderboard()
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(authController.GetLeaderboard(
+            onSuccess: (leaderboardEntries) =>
+            {
+                Debug.Log("Leaderboard data fetched successfully.");
+                UpdateLeaderboardUI(leaderboardEntries);
+            },
+            onError: (errorMessage) =>
+            {
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                OpenErr($"Failed to fetch leaderboard: {errorMessage}");
+            }
+        ));
+    }
+
+    private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
+    {
+        // Update GameObjects for the first 4
+        UpdateLeaderboardEntry(top1, leaderboardEntries.Count > 0 ? leaderboardEntries[0] : null);
+        UpdateLeaderboardEntry(top2, leaderboardEntries.Count > 1 ? leaderboardEntries[1] : null);
+        UpdateLeaderboardEntry(top3, leaderboardEntries.Count > 2 ? leaderboardEntries[2] : null);
+        UpdateLeaderboardEntry(top4, leaderboardEntries.Count > 3 ? leaderboardEntries[3] : null);
+    }
+
+    private void UpdateLeaderboardEntry(GameObject entryObject, LeaderboardEntry entry)
+    {
+        if (entryObject == null) return;
+
+        // Retrieve sub-GameObjects for Rank, Name and Score
+        TMP_Text rankText = entryObject.transform.Find("Rank")?.GetComponent<TMP_Text>();
+        TMP_Text nameText = entryObject.transform.Find("Name")?.GetComponent<TMP_Text>();
+        TMP_Text scoreText = entryObject.transform.Find("Score")?.GetComponent<TMP_Text>();
+
+        if (entry != null)
+        {
+            // Update text fields
+            if (rankText != null) rankText.text = $"{entry.ranking}";
+            if (nameText != null) nameText.text = entry.username;
+            if (scoreText != null) scoreText.text = $"{entry.highestScore}";
+
+            entryObject.SetActive(true); // Display entry
+        }
+        else
+        {
+            // Hide fields if no data available
+            if (rankText != null) rankText.text = "";
+            if (nameText != null) nameText.text = "";
+            if (scoreText != null) scoreText.text = "";
+
+            entryObject.SetActive(false); // Hide entry
+        }
+    }
+
     public void ConnectToRandomWaitingRoom()
     {
         ConnectToWaitingRoom();
@@ -646,5 +955,29 @@ public class MenuSwapper : MonoBehaviour
                 return result;
         }
         return null;
+    }
+
+    public static void ShowTooltip(GameObject tooltip)
+    {
+        if (tooltip != null)
+        {
+            tooltip.SetActive(true); // Affiche le tooltip
+        }
+        else
+        {
+            Debug.LogWarning("Tooltip is not assigned in the inspector.");
+        }
+    }
+
+    public static void HideTooltip(GameObject tooltip)
+    {
+        if (tooltip != null)
+        {
+            tooltip.SetActive(false); // Cache le tooltip
+        }
+        else
+        {
+            Debug.LogWarning("Tooltip is not assigned in the inspector.");
+        }
     }
 }
