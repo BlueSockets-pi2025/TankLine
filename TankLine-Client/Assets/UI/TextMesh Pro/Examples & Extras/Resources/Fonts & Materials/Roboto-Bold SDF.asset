@@ -12346,7 +12346,7 @@ MonoBehaviour:
         m_XPositionAdjustment: 8.305664
         m_YPositionAdjustment: 18.457031
     - m_BaseGlyphID: 67
-      m_BaseGlyphAnchorPoint:
+      m_BaseGlyphAnchorPoint:w
         m_XCoordinate: 41.308594
         m_YCoordinate: 41.572266
       m_MarkGlyphID: 502
