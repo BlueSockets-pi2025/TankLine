@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using FishNet.Object;
 
-public class Tank_Bot : MonoBehaviour
+public class Tank_Bot : Tank
 {
     public Transform target;
     public GameObject bulletPrefab;
@@ -29,7 +29,6 @@ public class Tank_Bot : MonoBehaviour
     {
         if (!IsServer || target == null)
         {
-            Debug.Log("Target mouch majoud");
             return;
         }
         AimAtTarget();
@@ -57,60 +56,6 @@ public class Tank_Bot : MonoBehaviour
 
         float moveForce = FaceDirection(x, y);
         GoForward(moveForce);
-    }
-
-    float FaceDirection(float x, float y)
-    {
-        if (x == 0 && y == 0) return 0;
-
-        float targetDirection;
-        float angle = Mathf.Repeat(math.atan2(x, y), math.PI2);
-        int isBackward = 1;
-
-        float angle2 = angle + math.PI2;
-        float angle3 = angle - math.PI2;
-
-        if (math.abs(tankRotation - angle) < math.abs(tankRotation - angle2))
-        {
-            targetDirection = (math.abs(tankRotation - angle) < math.abs(tankRotation - angle3)) ? angle : angle3;
-        }
-        else
-        {
-            targetDirection = (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3)) ? angle2 : angle3;
-        }
-
-        float angle1 = Mathf.Repeat(angle + math.PI, math.PI2);
-        angle2 = angle1 + math.PI2;
-        angle3 = angle1 - math.PI2;
-
-        if (math.abs(tankRotation - angle1) > math.abs(tankRotation - angle3))
-            angle1 = angle3;
-        else if (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3))
-            angle1 = angle2;
-
-        if (math.abs(tankRotation - targetDirection) > math.abs(tankRotation - angle1))
-        {
-            isBackward = -1;
-            targetDirection = angle1;
-        }
-
-        if (math.abs(targetDirection - tankRotation) <= 0.0001f)
-            return math.max(math.abs(x), math.abs(y)) * isBackward;
-
-        float forceRotation = (targetDirection - tankRotation) / rotationSpeed;
-        if (math.abs(forceRotation) > 1)
-        {
-            RotateTank(forceRotation > 0 ? 1 : -1);
-        }
-        else
-        {
-            SetRotationTank(targetDirection);
-        }
-
-        if (math.abs(targetDirection - tankRotation) > MIN_ROTATION_BEFORE_MOVEMENT)
-            return 0;
-
-        return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * math.max(math.abs(x), math.abs(y)) * isBackward;
     }
 
     void TryShoot()
@@ -162,9 +107,28 @@ public class Tank_Bot : MonoBehaviour
             Die();
         }
     }
+    private float FaceDirection(float x, float y)
+    {
+        Vector3 desiredDirection = new Vector3(x, 0, y).normalized;
+
+        // Calculate the angle we want to face (in degrees)
+        float targetAngle = Mathf.Atan2(desiredDirection.x, desiredDirection.z) * Mathf.Rad2Deg;
+
+        // Smoothly rotate the tank toward the target angle
+        Quaternion targetRotation = Quaternion.Euler(0, targetAngle, 0);
+        thisTank.rotation = Quaternion.RotateTowards(thisTank.rotation, targetRotation, 180f * Time.fixedDeltaTime); // Adjust rotation speed as needed
+
+        // Calculate angle difference
+        float angleDiff = Quaternion.Angle(thisTank.rotation, targetRotation);
+
+        // Only move forward if mostly facing the target
+        return angleDiff < MIN_ROTATION_BEFORE_MOVEMENT * Mathf.Rad2Deg ? 1f : 0f;
+    }
+
+
 
     private void Die()
     {
-        Destroy(gameObject); // or add explosion VFX
+        Destroy(gameObject); 
     }
 }

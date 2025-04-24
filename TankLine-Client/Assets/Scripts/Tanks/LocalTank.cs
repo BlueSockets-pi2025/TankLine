@@ -2,6 +2,7 @@ using System;
 using Unity.Mathematics;
 using UnityEngine;
 using Scripts.Tutoriel;
+
 public class Tank_Offline : MonoBehaviour
 {
 
@@ -52,13 +53,12 @@ public class Tank_Offline : MonoBehaviour
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
     }
-    
 
     /// <summary>
     /// Automatically called by unity every frame after the physic engine
     /// </summary>
     protected void Update() {
-
+        
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
@@ -67,7 +67,6 @@ public class Tank_Offline : MonoBehaviour
             var tutorial = FindObjectOfType<TankTutorial>();
             if(!tutorial.IsInShootingStep) return;
         }
-
         // if left click recorded, try to shoot
         if (Input.GetMouseButtonDown(LEFT_CLICK)) {
             if (this.CanShoot()) {
