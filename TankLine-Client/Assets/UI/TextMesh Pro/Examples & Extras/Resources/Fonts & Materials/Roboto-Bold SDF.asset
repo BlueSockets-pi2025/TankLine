@@ -12019,11 +12019,7 @@ MonoBehaviour:
           m_YPlacement: 0
           m_XAdvance: 0
           m_YAdvance: 0
-<<<<<<< HEAD
-      m_FeatureLookupFlags: 1953720652
-=======
       m_FeatureLookupFlags: 0
->>>>>>> origin/main
     - m_FirstAdjustmentRecord:
         m_GlyphIndex: 67
         m_GlyphValueRecord:
@@ -12038,11 +12034,7 @@ MonoBehaviour:
           m_YPlacement: 0
           m_XAdvance: 0
           m_YAdvance: 0
-<<<<<<< HEAD
-      m_FeatureLookupFlags: 1358835568
-=======
       m_FeatureLookupFlags: 0
->>>>>>> origin/main
     - m_FirstAdjustmentRecord:
         m_GlyphIndex: 67
         m_GlyphValueRecord:
@@ -12057,11 +12049,7 @@ MonoBehaviour:
           m_YPlacement: 0
           m_XAdvance: 0
           m_YAdvance: 0
-<<<<<<< HEAD
-      m_FeatureLookupFlags: 31957
-=======
       m_FeatureLookupFlags: 0
->>>>>>> origin/main
     - m_FirstAdjustmentRecord:
         m_GlyphIndex: 67
         m_GlyphValueRecord:
