@@ -46,7 +46,7 @@ public class MenuSwapper : MonoBehaviour
             Debug.LogError("AuthController not found.");
             return;
         }
-        //AutoLogin();
+        AutoLogin();
 
         // load first page
         // OpenPage("PagePrincipale"); 
@@ -81,7 +81,11 @@ public class MenuSwapper : MonoBehaviour
         if (authController.IsRequestSuccessful)
         {
             Debug.Log("Auto-login successful. Skipping login page.");
-            OpenPage("MainMenu"); // Go directly to the main page
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (currentScene == "ConnectionMenu")
+            {
+                MainMenuScene();
+            }
         }
         else
         {
@@ -112,11 +116,11 @@ public class MenuSwapper : MonoBehaviour
 
         CurrentPage.SetActive(true);
 
-        if (pageName == "Score")
-        {
-            Debug.Log("Opening Score page. Updating leaderboard...");
-            UpdateLeaderboard();
-        }
+        // if (pageName == "Score")
+        // {
+        //     Debug.Log("Opening Score page. Updating leaderboard...");
+        //     UpdateLeaderboard();
+        // }
 
         // if switch to mainMenu or play, load stats & name
         if (pageName == "MainMenu" || pageName == "Play")
@@ -192,7 +196,7 @@ public class MenuSwapper : MonoBehaviour
 
                 if (authController.IsRequestSuccessful)
                 {
-                    OpenPage("MainMenu");
+                    MainMenuScene();
                 }
                 else
                 {
