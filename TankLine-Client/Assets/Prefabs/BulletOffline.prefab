@@ -182,6 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47e77d9ee753a67788c0db8f41315c7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletVFXPrefab: {fileID: 8969514995445616614, guid: ef9f3361664e450418dab53e80c9b805, type: 3}
   direction: {x: 0, y: 0, z: 0}
   nbRebounds: 1
   bulletSpeed: 5

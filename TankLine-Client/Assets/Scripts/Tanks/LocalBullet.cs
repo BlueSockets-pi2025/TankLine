@@ -9,6 +9,7 @@ public class Bullet_Offline : MonoBehaviour
     const int SHELL_LAYER = 9;
     const int PLAYER_LAYER = 10;
     const float THRESHOLD_CORRECTION_DISTANCE = 2;
+    public GameObject bulletVFXPrefab;
 
     /// <summary> This bullet direction </summary>
     public Vector3 direction;
@@ -69,7 +70,8 @@ public class Bullet_Offline : MonoBehaviour
             if (collision.gameObject.CompareTag(BREAKABLE_TAG))
             {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
-
+                
+                Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
                 wall.TakeDamage();
                 Destroy(thisBullet);
             }
@@ -81,6 +83,7 @@ public class Bullet_Offline : MonoBehaviour
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0)
                 {
+                    Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
                     Destroy(thisBullet);
                     return;
                 }
@@ -121,7 +124,7 @@ public class Bullet_Offline : MonoBehaviour
             {
                 hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
             }
-
+            Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
             Destroy(thisBullet);
 
             return;
@@ -132,6 +135,7 @@ public class Bullet_Offline : MonoBehaviour
         */
         else if (collision.gameObject.layer == SHELL_LAYER)
         {
+            Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
             Destroy(collision.gameObject);
             Destroy(thisBullet);
             return;

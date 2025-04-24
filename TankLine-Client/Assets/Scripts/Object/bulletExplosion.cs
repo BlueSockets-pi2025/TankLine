@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Collections; 
 using UnityEngine.Formats.Alembic.Importer;
 
-public class explosionPull : MonoBehaviour
+
+public class bulletExplosion : MonoBehaviour
 {
     private List<Material> allMaterials = new List<Material>();
     private AlembicStreamPlayer alembicPlayer;
@@ -32,41 +33,36 @@ public class explosionPull : MonoBehaviour
 
         alembicPlayer = GetComponent<AlembicStreamPlayer>();
         alembicPlayer.CurrentTime = 0;
-        alembicPlayer.enabled = false;
-
         finished = false;
 
-        StartCoroutine(PreloadAlembic());
+        //StartCoroutine(PreloadAlembic());
+        play();
     }
 
     private IEnumerator PreloadAlembic()
     {
-        alembicPlayer.enabled = true;
         alembicPlayer.CurrentTime = alembicPlayer.Duration;
         yield return null; // attend une frame pour forcer le chargement
-        alembicPlayer.enabled = false;
         alembicPlayer.CurrentTime = 0;
+        play();
     }
 
     public void play() {
-        alembicPlayer.enabled = true;
         foreach (Material mat in allMaterials)
         {
             if (mat.HasProperty("Fade"))
             {
-                mat.SetFloat("Fade", 0f);
+                mat.SetFloat("Fade", 1f);
             }
         }
         finished = false;
         StartCoroutine(PerformAnimation());
-        // alembicPlayer.CurrentTime = 1f;
-        // finished = true;
+
     }
 
     protected void Update() {
         if (finished)
         {
-            alembicPlayer.enabled = false;
             finished = false;
             alembicPlayer.CurrentTime = 0f;
             
@@ -77,7 +73,7 @@ public class explosionPull : MonoBehaviour
                     mat.SetFloat("Fade", 1f);
                 }
             }
-            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 
