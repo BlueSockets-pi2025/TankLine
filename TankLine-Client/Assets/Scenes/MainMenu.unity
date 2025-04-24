@@ -9070,8 +9070,8 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 897803373}
           m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
-          m_MethodName: OpenPage
-          m_Mode: 5
+          m_MethodName: ConnectionScene
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
