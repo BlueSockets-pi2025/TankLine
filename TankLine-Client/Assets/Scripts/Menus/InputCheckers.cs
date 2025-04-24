@@ -12,6 +12,12 @@ public class InputCheckers : MonoBehaviour
 
     public static bool IsValidPassword(string password)
     {
+
+        if (password.Length < 8)
+        {
+            return false;
+        }
+       
         string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         return Regex.IsMatch(password, pattern);
     }

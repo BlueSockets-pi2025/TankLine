@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 3f41849761d1b4fe29d2293e8906786d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -124,11 +124,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3206ac5ff6acc444e8846460c000f202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 3
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 8698092546795375699}
+  _networkObjectCache: {fileID: 0}
+  nbStartingLife: 3
   textures:
-  - {fileID: 2100000, guid: c8e5de65b705d424185ffc4c80aa5822, type: 2}
-  - {fileID: 2100000, guid: 9dde8464b7b31cf42986b73dc35bd61d, type: 2}
-  - {fileID: 2100000, guid: 8d910be011af94442a26a215571d7271, type: 2}
+  - {fileID: 2100000, guid: bc44e7456769f4a3d893dfd2d8a4729b, type: 2}
+  - {fileID: 2100000, guid: ae3c9f9b34fa347d7a918add2076f479, type: 2}
+  - {fileID: 2100000, guid: 87412924fbd7dd42090db77a88e3d248, type: 2}
 --- !u!54 &607243356454637606
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -168,6 +171,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours:
+  - {fileID: -966180124480256630}
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -191,22 +210,6 @@ MonoBehaviour:
     Rotation: {x: -0, y: -0, z: -0, w: 1}
     Scale: {x: 1, y: 2, z: 1}
     IsValid: 1
-  <IsNested>k__BackingField: 0
-  <ComponentIndex>k__BackingField: 0
-  <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours:
-  - {fileID: -966180124480256630}
-  InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects: []
-  RuntimeParentNetworkBehaviour: {fileID: 0}
-  RuntimeChildNetworkBehaviours: []
-  _isNetworked: 1
-  _isSpawnable: 1
-  _isGlobal: 0
-  _initializeOrder: 0
-  _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 0
 --- !u!114 &-966180124480256630
 MonoBehaviour:
   m_ObjectHideFlags: 0
