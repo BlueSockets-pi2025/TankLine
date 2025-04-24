@@ -24,8 +24,10 @@ public class MenuSwapper : MonoBehaviour
     public GameObject top1, top2, top3, top4;
 
     // Testing : 
-    public TMP_InputField gamesPlayedInputField;
-    public TMP_InputField highestScoreInputField;
+    public TMP_Text gamesPlayedInputField;
+    public TMP_Text highestScoreInputField;
+    public TMP_Text UserNameField;
+    public TMP_Text UserRankField;
 
     void Awake()
     {
@@ -533,7 +535,7 @@ public class MenuSwapper : MonoBehaviour
                 badge.Find("GamePlayed").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.gamesPlayed.ToString();
                 badge.Find("HighScore").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.highestScore.ToString();
                 badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();
-                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUser.username;
+                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUser.username.ToString();
 
             }
             else
@@ -741,16 +743,6 @@ public class MenuSwapper : MonoBehaviour
 
             entryObject.SetActive(false); // Hide entry
         }
-    }
-
-    public void ConnectToRandomWaitingRoom()
-    {
-        ConnectToWaitingRoom();
-    }
-
-    public void ConnectToWaitingRoom()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
     public void ConnectionScene()
