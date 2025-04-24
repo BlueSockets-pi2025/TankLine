@@ -49,7 +49,17 @@ public class MenuSwapper : MonoBehaviour
         //AutoLogin();
 
         // load first page
-        OpenPage("PagePrincipale");
+        // OpenPage("PagePrincipale"); 
+        string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (currentScene == "ConnectionMenu")
+        {
+            OpenPage("PagePrincipale");
+        }
+        else if (currentScene == "MainMenu")
+        {
+            OpenPage("MainMenu");
+        }
+
 
         //OpenPagePrincipal();
     }
@@ -940,6 +950,15 @@ public class MenuSwapper : MonoBehaviour
     public void ConnectToWaitingRoom()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
+    }
+
+    public void ConnectionScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
+    }
+    public void MainMenuScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 
     // Recursive search for a GameObject by name
