@@ -13,22 +13,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AuthController))]
 [RequireComponent(typeof(NetworkObserver))]
 [RequireComponent(typeof(PlayerSpawner))]
-public class WaitingRoomManager : NetworkBehaviour 
+public class LobbyManager : NetworkBehaviour 
 {
-    private readonly Dictionary<NetworkConnection, string> serverPlayerList = new();
-
-    private List<string> clientPlayerList = new();
-    private PlayerSpawner playerSpawner;
-    private AuthController authController;
-
-    private WaitingRoomUiManager uiManager;
-
-    [Header("UI References")]
-    [Space(5)]
-    
-    public GameObject playerEntryPrefab;
-    [Range(1,6)]
-    public int minimumPlayerToStart = 2;
 
     void Awake() {
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
@@ -60,6 +46,124 @@ public class WaitingRoomManager : NetworkBehaviour
             StartCoroutine(SendPlayerName());
         }
     }
+
+
+
+
+
+
+    /*
+        ############################################################
+                            Spawner management
+        ############################################################
+    */
+
+    private PlayerSpawner playerSpawner;
+    private int nbPlayerReady = 0;
+
+    [Space(15)]
+    [Header("Player Prefabs")]
+    [Space(5)]
+    public GameObject WaitingRoomTankPrefab;
+    public GameObject InGameTankPrefab;
+
+    public void ChangeSpawnPrefab(string sceneName) {
+        switch (sceneName) {
+            case "InGameScene":
+                playerSpawner.playerObjectPrefab = InGameTankPrefab;
+                break;
+            case "Waitingroom":
+                playerSpawner.playerObjectPrefab = WaitingRoomTankPrefab;
+                break;
+            
+            default:
+                Debug.LogError("Scene not found for ChangeSpawnPrefab");
+                break;
+        }
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void NewPlayerReady() {
+        nbPlayerReady++;
+
+        // if everyone ready, spawn everyone
+        if (nbPlayerReady == serverPlayerList.Count) {
+            foreach (KeyValuePair<NetworkConnection, string> entry in serverPlayerList) {
+                playerSpawner.SpawnPlayer(entry.Key, entry.Value);
+            }
+        }
+    }
+
+
+
+
+
+
+    /*
+        ############################################################
+                               Scene management
+        ############################################################
+    */
+
+    public string CurrentSceneName() {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void LaunchGame_Server()
+    {
+        // Despawn every players
+        playerSpawner.DespawnEveryone(clientPlayerList);
+
+        // launch game on every client
+        LaunchGame_Client();
+
+        // change scene on the server
+        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
+    }
+
+    [ObserversRpc]
+    private void LaunchGame_Client()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
+    }
+
+    private void OnSceneChangement() {
+        if (CurrentSceneName() == "MainMenu") {
+            Destroy(gameObject);
+            NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
+            Destroy(networkManager);
+        }
+
+        ChangeSpawnPrefab(CurrentSceneName());
+
+        if (base.IsServerInitialized) {
+            nbPlayerReady = 0;
+        }
+
+        // if in game, tell the server we are ready
+        else {
+            if (CurrentSceneName() == "InGameScene") {
+                NewPlayerReady();
+            }
+        }
+    }
+
+
+
+
+
+
+    /*
+        ############################################################
+                            Player list management
+        ############################################################
+    */
+
+    private readonly Dictionary<NetworkConnection, string> serverPlayerList = new();
+    private List<string> clientPlayerList = new();
+    
+
 
     private IEnumerator SendPlayerName() {
         // fetch user data
@@ -140,19 +244,9 @@ public class WaitingRoomManager : NetworkBehaviour
         uiManager.UpdateUI(clientPlayerList, playerEntryPrefab, minimumPlayerToStart);
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    public void LaunchGame_Server() {
-        // launch game on every client
-        LaunchGame_Client();
 
-        // change scene on the server
-        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
-    }
 
-    [ObserversRpc]
-    private void LaunchGame_Client() {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
-    }
+
 
 
     /*
@@ -160,6 +254,16 @@ public class WaitingRoomManager : NetworkBehaviour
                           UI Manager (waiting room)
         ############################################################
     */
+    [Space(15)]
+    [Header("UI References")]
+    [Space(5)]
+    public GameObject playerEntryPrefab;
+    [Range(1, 6)]
+    public int minimumPlayerToStart = 2;
+    private WaitingRoomUiManager uiManager;
+    private AuthController authController;
+
+
 
     private class WaitingRoomUiManager 
     {

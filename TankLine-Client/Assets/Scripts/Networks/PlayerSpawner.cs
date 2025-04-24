@@ -56,4 +56,14 @@ public class PlayerSpawner : NetworkBehaviour
         GameObject playerObject = GameObject.Find("Player:"+playerName);
         Despawn(playerObject);
     }
+
+    /// <summary>
+    /// Despawn every player
+    /// </summary>
+    public void DespawnEveryone(List<string> playersName) {
+        foreach (string player in playersName) {
+            GameObject playerObject = GameObject.Find("Player:"+player);
+            Despawn(playerObject);
+        }
+    }
 }

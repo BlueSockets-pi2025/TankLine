@@ -2272,19 +2272,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 711527970}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1905176438}
-        m_TargetAssemblyTypeName: WaitingRoomManager, Assembly-CSharp
-        m_MethodName: ExitToMenu
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &711527970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7749,7 +7737,7 @@ GameObject:
   - component: {fileID: 1905176439}
   - component: {fileID: 1905176438}
   m_Layer: 0
-  m_Name: WaitingRoomManager
+  m_Name: LobbyManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7770,6 +7758,8 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 1905176441}
   _networkObjectCache: {fileID: 0}
+  WaitingRoomTankPrefab: {fileID: 2936260714432119890, guid: b13e84cec43517b98998b8ab8096499c, type: 3}
+  InGameTankPrefab: {fileID: 5713213973998924859, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
   playerEntryPrefab: {fileID: 3750445552347481031, guid: 3ee84746511846d1d8941743bc0fea7c, type: 3}
   minimumPlayerToStart: 1
 --- !u!114 &1905176439
@@ -7849,7 +7839,7 @@ MonoBehaviour:
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
   _isSpawnable: 1
-  _isGlobal: 0
+  _isGlobal: 1
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
