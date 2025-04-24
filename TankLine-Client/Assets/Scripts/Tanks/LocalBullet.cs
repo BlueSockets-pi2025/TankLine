@@ -115,15 +115,13 @@ public class Bullet_Offline : MonoBehaviour
         */
         else if (collision.gameObject.layer == PLAYER_LAYER)
         {
-            Tank hitTank = collision.gameObject.GetComponent<Tank>();
-
-            if (hitTank != null)
+            //Tank_Offline hitTank = collision.gameObject.GetComponent<Tank_Offline>();
+            Tank_Bot hitTank = collision.gameObject.GetComponent<Tank_Bot>();
+             if (hitTank != null)
             {
-                hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
+                hitTank.LoseSingleLife();
             }
-
             Destroy(thisBullet);
-
             return;
         }
 

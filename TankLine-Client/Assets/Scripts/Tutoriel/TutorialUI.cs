@@ -103,7 +103,7 @@ public class TankTutorial : MonoBehaviour
         {
             currentStep++;
             tutorialText.text = tutorialSteps[currentStep];
-            IsInShootingStep = currentStep >= 4;
+            IsInShootingStep = currentStep >= 3;
 
             if (currentStep >= 1 && currentStep <= 3)
             {

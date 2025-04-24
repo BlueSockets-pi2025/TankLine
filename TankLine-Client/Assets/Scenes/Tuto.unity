@@ -4911,6 +4911,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -4517498443145168945, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -1598429286657545220, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
       propertyPath: <SceneId>k__BackingField
       value: 4219432887
@@ -4963,8 +4967,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: tank
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: -4517498443145168945, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

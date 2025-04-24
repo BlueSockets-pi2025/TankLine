@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using FishNet.Object;
 
-public class Tank_Bot : Tank
+public class Tank_Bot : MonoBehaviour
 {
     public Transform target;
     public GameObject bulletPrefab;
@@ -10,32 +10,31 @@ public class Tank_Bot : Tank
     private float fireCooldown = 2f;
     private float lastShotTime = -10f;
 
-    private const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 2;
+    private const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 4; 
     private int nbBulletShot = 0;
     public int MaxBulletShot = 5;
+
+    public int maxLives = 3;
+    private int currentLives;
 
     protected override void Start()
     {
         base.Start();
         thisTank = transform;
         thisGun = thisTank.Find("tankGun");
+        currentLives = maxLives;
     }
 
     void Update()
     {
-        if (!IsServer || target == null) return;
+        if (!IsServer || target == null)
+        {
+            Debug.Log("Target mouch majoud");
+            return;
+        }
         AimAtTarget();
         TryShoot();
     }
-    void TryShoot()
-{
-    if (Time.time - lastShotTime >= fireCooldown && CanShoot())
-    {
-        Shoot();
-        lastShotTime = Time.time;
-    }
-}
-
 
     void FixedUpdate()
     {
@@ -73,29 +72,21 @@ public class Tank_Bot : Tank
 
         if (math.abs(tankRotation - angle) < math.abs(tankRotation - angle2))
         {
-            if (math.abs(tankRotation - angle) < math.abs(tankRotation - angle3))
-                targetDirection = angle;
-            else
-                targetDirection = angle3;
+            targetDirection = (math.abs(tankRotation - angle) < math.abs(tankRotation - angle3)) ? angle : angle3;
         }
-        else if (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3))
-            targetDirection = angle2;
         else
-            targetDirection = angle3;
+        {
+            targetDirection = (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3)) ? angle2 : angle3;
+        }
 
         float angle1 = Mathf.Repeat(angle + math.PI, math.PI2);
         angle2 = angle1 + math.PI2;
         angle3 = angle1 - math.PI2;
 
-        if (math.abs(tankRotation - angle1) < math.abs(tankRotation - angle2))
-        {
-            if (math.abs(tankRotation - angle1) > math.abs(tankRotation - angle3))
-                angle1 = angle3;
-        }
+        if (math.abs(tankRotation - angle1) > math.abs(tankRotation - angle3))
+            angle1 = angle3;
         else if (math.abs(tankRotation - angle2) < math.abs(tankRotation - angle3))
             angle1 = angle2;
-        else
-            angle1 = angle3;
 
         if (math.abs(tankRotation - targetDirection) > math.abs(tankRotation - angle1))
         {
@@ -117,15 +108,17 @@ public class Tank_Bot : Tank
         }
 
         if (math.abs(targetDirection - tankRotation) > MIN_ROTATION_BEFORE_MOVEMENT)
-        {
             return 0;
-        }
-        else
+
+        return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * math.max(math.abs(x), math.abs(y)) * isBackward;
+    }
+
+    void TryShoot()
+    {
+        if (Time.time - lastShotTime >= fireCooldown && CanShoot())
         {
-            if (math.abs(targetDirection - tankRotation) < 0.0001f)
-                return math.max(math.abs(x), math.abs(y)) * isBackward;
-            else
-                return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * math.max(math.abs(x), math.abs(y)) * isBackward;
+            Shoot();
+            lastShotTime = Time.time;
         }
     }
 
@@ -148,16 +141,30 @@ public class Tank_Bot : Tank
 
         GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f * dir, Quaternion.identity);
 
-        Bullet newBullet = newBulletObject.GetComponent<Bullet>();
-        newBullet.direction.Value = dir;
+        Bullet_Offline newBullet = newBulletObject.GetComponent<Bullet_Offline>();
+        newBullet.direction = dir;
         newBullet.tankOwner = gameObject;
-        nbBulletShot++;
 
+        nbBulletShot++;
         Spawn(newBulletObject);
     }
 
     public void DecreaseNbBulletShot()
     {
         nbBulletShot--;
+    }
+
+    public void LoseSingleLife()
+    {
+        currentLives--;
+        if (currentLives <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject); // or add explosion VFX
     }
 }
