@@ -1,7 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 public class MenuSwapper : MonoBehaviour
 {
@@ -14,18 +14,18 @@ public class MenuSwapper : MonoBehaviour
 
     public GameObject CurrentPage;
 
-    public GameObject EmailErrorText; 
-    public GameObject PasswordErrorText; 
-    public GameObject ConfirmationErrorText; 
+    public GameObject EmailErrorText;
+    public GameObject PasswordErrorText;
+    public GameObject ConfirmationErrorText;
 
-    public GameObject PasswordErrorTextReset; 
-    public GameObject ConfirmationErrorTextReset; 
+    public GameObject PasswordErrorTextReset;
+    public GameObject ConfirmationErrorTextReset;
 
-    public GameObject top1, top2, top3, top4; 
+    public GameObject top1, top2, top3, top4;
 
     // Testing : 
-    public TMP_InputField gamesPlayedInputField; 
-    public TMP_InputField highestScoreInputField; 
+    public TMP_InputField gamesPlayedInputField;
+    public TMP_InputField highestScoreInputField;
 
     void Awake()
     {
@@ -53,13 +53,13 @@ public class MenuSwapper : MonoBehaviour
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         if (currentScene == "ConnectionMenu")
         {
-            OpenPage("PagePrincipale"); 
+            OpenPage("PagePrincipale");
         }
         else if (currentScene == "MainMenu")
         {
             OpenPage("MainMenu");
         }
-        
+
 
         //OpenPagePrincipal();
     }
@@ -126,6 +126,11 @@ public class MenuSwapper : MonoBehaviour
         if (pageName == "MainMenu" || pageName == "Play")
         {
             StartCoroutine(UpdateStatisticsCoroutine(CurrentPage.transform.Find("Badge")));
+        }
+
+        if (pageName == "MainMenu")
+        {
+            GameManager.Instance?.UpdateGameState(GameState.Menu);
         }
     }
 
@@ -264,7 +269,8 @@ public class MenuSwapper : MonoBehaviour
         FieldsValidation.ValidatePasswordField(Password, PasswordErrorTextReset);
         FieldsValidation.ValidateConfirmPasswordField(Password, ConfirmPassword, ConfirmationErrorTextReset);
 
-        if (!InputCheckers.IsValidPassword(Password.text)) {
+        if (!InputCheckers.IsValidPassword(Password.text))
+        {
             OpenErr("Password must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 digit, and 1 special character.");
             return;
         }
@@ -540,7 +546,6 @@ public class MenuSwapper : MonoBehaviour
             OpenErr($"Failed to retrieve user statistics: \n {authController.ErrorResponse}");
         }
     }
-
     public void SetPlayerStatistics(int gamesPlayed, int highestScore)
     {
         if (authController == null)
@@ -587,12 +592,14 @@ public class MenuSwapper : MonoBehaviour
     public void ValidatePasswordRegistration()
     {
         Transform signUpStep2Page = Canvas.Find("SignUpStep2");
-        if (signUpStep2Page == null) {
+        if (signUpStep2Page == null)
+        {
             Debug.LogError("Page 'SignUpStep2' not found.");
             return;
         }
         TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
-        if (passwordField == null) {
+        if (passwordField == null)
+        {
             Debug.LogError("PasswordInputField not found in 'SignUpStep2'.");
             return;
         }
@@ -602,60 +609,75 @@ public class MenuSwapper : MonoBehaviour
     public void ValidatePasswordReset()
     {
         Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
-        if (resetPasswordStep2Page == null) {
+        if (resetPasswordStep2Page == null)
+        {
             Debug.LogError("Page 'ResetPasswordStep2' not found.");
             return;
         }
         TMP_InputField passwordField = resetPasswordStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
-        if (passwordField == null) {
+        if (passwordField == null)
+        {
             Debug.LogError("PasswordInputField1 not found in 'ResetPasswordStep2'.");
             return;
         }
         FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorTextReset);
     }
 
-    public void ValidateConfirmPasswordRegistration() {
+    public void ValidateConfirmPasswordRegistration()
+    {
         Transform signUpStep2Page = Canvas.Find("SignUpStep2");
-        if (signUpStep2Page == null) {
+        if (signUpStep2Page == null)
+        {
             Debug.LogError("Page 'SignUpStep2' not found.");
             return;
         }
         TMP_InputField passwordField = signUpStep2Page.Find("PasswordInputField")?.GetComponent<TMP_InputField>();
         TMP_InputField confirmPasswordField = signUpStep2Page.Find("ConfirmPasswordInputField")?.GetComponent<TMP_InputField>();
-        if (passwordField == null || confirmPasswordField == null) {
+        if (passwordField == null || confirmPasswordField == null)
+        {
             Debug.LogError("PasswordInputField or ConfirmPasswordInputField not found in 'SignUpStep2'.");
             return;
         }
         FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorText);
     }
 
-    public void ValidateConfirmPasswordReset() {
+    public void ValidateConfirmPasswordReset()
+    {
         Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
-        if (resetPasswordStep2Page == null) {
+        if (resetPasswordStep2Page == null)
+        {
             Debug.LogError("Page 'ResetPasswordStep2' not found.");
             return;
         }
         TMP_InputField passwordField = resetPasswordStep2Page.Find("PasswordInputField1")?.GetComponent<TMP_InputField>();
         TMP_InputField confirmPasswordField = resetPasswordStep2Page.Find("PasswordInputField2")?.GetComponent<TMP_InputField>();
-        if (passwordField == null || confirmPasswordField == null) {
+        if (passwordField == null || confirmPasswordField == null)
+        {
             Debug.LogError("PasswordInputField1 or PasswordInputField1 not found in 'ResetPasswordStep2'.");
             return;
         }
         FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorTextReset);
     }
 
-    public void ValidateEmailField(TMP_InputField emailField) {
+    public void ValidateEmailField(TMP_InputField emailField)
+    {
         var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
 
-        if (outline != null) {
-            if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text)) {
-                outline.enabled = true; 
+        if (outline != null)
+        {
+            if (string.IsNullOrEmpty(emailField.text) || !InputCheckers.IsValidEmail(emailField.text))
+            {
+                outline.enabled = true;
                 EmailErrorText.SetActive(true);
-            } else {
+            }
+            else
+            {
                 outline.enabled = false;
                 EmailErrorText.SetActive(false);
             }
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("Outline component not found on the input field.");
         }
     }
@@ -721,7 +743,8 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
-    public void ConnectToRandomWaitingRoom() {
+    public void ConnectToRandomWaitingRoom()
+    {
         ConnectToWaitingRoom();
     }
 
@@ -754,18 +777,26 @@ public class MenuSwapper : MonoBehaviour
         return null;
     }
 
-    public static void ShowTooltip(GameObject tooltip) {
-        if (tooltip != null) {
+    public static void ShowTooltip(GameObject tooltip)
+    {
+        if (tooltip != null)
+        {
             tooltip.SetActive(true); // Affiche le tooltip
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("Tooltip is not assigned in the inspector.");
         }
     }
 
-    public static void HideTooltip(GameObject tooltip) {
-        if (tooltip != null) {
+    public static void HideTooltip(GameObject tooltip)
+    {
+        if (tooltip != null)
+        {
             tooltip.SetActive(false); // Cache le tooltip
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("Tooltip is not assigned in the inspector.");
         }
     }
