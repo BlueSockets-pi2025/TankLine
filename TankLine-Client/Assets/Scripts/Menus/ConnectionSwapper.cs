@@ -3,9 +3,9 @@ using TMPro;
 using UnityEngine;
 using System.Collections.Generic; 
 
-public class MenuSwapper : MonoBehaviour
+public class ConnectionSwapper : MonoBehaviour
 {
-    public static MenuSwapper Instance { get; private set; }
+    public static ConnectionSwapper Instance { get; private set; }
     private AuthController authController;
 
     public GameObject _canvas;

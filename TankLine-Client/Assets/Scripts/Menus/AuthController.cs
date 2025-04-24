@@ -137,7 +137,7 @@ public class AuthController : MonoBehaviour
                 if (refreshRequest.responseCode == 400 || refreshRequest.responseCode == 401)
                 {
                     Debug.Log("Refresh token is invalid or missing. Redirecting to login page...");
-                    MenuSwapper.Instance.HandleSessionExpired(); // Redirects to login page
+                    MainMenuSwapper.Instance.HandleSessionExpired(); // Redirects to login page
                 }
                 else
                 {

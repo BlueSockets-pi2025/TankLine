@@ -8,7 +8,7 @@ public class TooltipHandler : MonoBehaviour
     {
         if (tooltip != null)
         {
-            MenuSwapper.HideTooltip(tooltip); 
+            MainMenuSwapper.HideTooltip(tooltip); 
         }
     }
 }
