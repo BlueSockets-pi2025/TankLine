@@ -5,21 +5,19 @@ using UnityEngine;
 
 public class PlayerSpawner : NetworkBehaviour
 {
-    [Header("Spawner objects references")]
+    [Header("Prefabs references")]
     [Space(10)]
-    public NetworkObject playerObjectPrefab = null;
-    public List<GameObject> spawnPoints = new();
+    public GameObject playerObjectPrefab = null;
+    private List<GameObject> spawnPoints = new();
 
     private int currentSpawnIndex = 0;
 
-    void Awake()
+    void InitSpawnPoint()
     {
-        if (playerObjectPrefab == null) {
-            Debug.LogError("[ERROR] Player object prefab not referenced");
-            this.enabled = false;
-        } else if (spawnPoints.Count == 0) {
-            Debug.LogError("[ERROR] No spawn point referenced");
-            this.enabled = false;
+        Transform spawnPointsParent = GameObject.Find("PlayerSpawns").transform;
+
+        foreach (Transform child in spawnPointsParent) {
+            spawnPoints.Add(child.gameObject);
         }
     }
 
@@ -30,7 +28,7 @@ public class PlayerSpawner : NetworkBehaviour
     public void SpawnPlayer(NetworkConnection ownerConnection, string ownerName) {
 
         // instantiate the new player at the current spawnpoint position
-        GameObject newPlayer = Instantiate(playerObjectPrefab.gameObject);
+        GameObject newPlayer = Instantiate(playerObjectPrefab);
         newPlayer.transform.position = spawnPoints[currentSpawnIndex].transform.position;
 
         // spawn the player
