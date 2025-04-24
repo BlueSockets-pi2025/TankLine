@@ -1,10 +1,8 @@
 using UnityEngine;
-// using FishNet.Object;
-// using FishNet.Managing;
 
 public enum GameState
 {
-    Connection, Menu, WaitingRoom, Playing, Victory, Lose, Score //add ready?
+    Connection, Menu, WaitingRoom, Playing, Victory, Lose, Score
 }
 
 public class GameManager : MonoBehaviour
@@ -28,15 +26,19 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // CurrentStat = GameState.Menu;
         UpdateGameState(GameState.Connection);
         Debug.Log("Start GameManager");
+
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+#if UNITY_ANDROID
+		Screen.SetResolution(1280, 720, true);
+		Application.targetFrameRate = 60;
+#endif
     }
 
     //Update when the GameState changes
     public void UpdateGameState(GameState newState)
     {
-        // State = newState;
         if (CurrentStat != newState)
         {
             CurrentStat = newState;
@@ -60,7 +62,6 @@ public class GameManager : MonoBehaviour
                 case GameState.Score:
                     break;
                 default:
-                    // throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
                     Debug.Log("ERROR: Unknown game state: " + newState);
                     break;
             }
