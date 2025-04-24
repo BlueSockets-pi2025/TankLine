@@ -12,9 +12,13 @@ public class PlayerSpawner : NetworkBehaviour
 
     private int currentSpawnIndex = 0;
 
-    void InitSpawnPoint()
+    public void InitSpawnPoint()
     {
         Transform spawnPointsParent = GameObject.Find("PlayerSpawns").transform;
+        if (spawnPointsParent == null) {
+            Debug.Log("[ERROR] spawnpoint parent not found");
+            return;
+        }
 
         foreach (Transform child in spawnPointsParent) {
             spawnPoints.Add(child.gameObject);

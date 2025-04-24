@@ -8,6 +8,7 @@ using FishNet.Object;
 using FishNet.Observing;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(AuthController))]
@@ -17,6 +18,9 @@ public class LobbyManager : NetworkBehaviour
 {
 
     void Awake() {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneChangement;
+
+
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
 
         // find networkManager
@@ -39,6 +43,8 @@ public class LobbyManager : NetworkBehaviour
     void Start() {
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
         uiManager = new(GameObject.Find("Canvas"));
+        ChangeSpawnPrefab(CurrentSceneName());
+        playerSpawner.InitSpawnPoint();
 
         // send username to DB
         if (base.IsClientInitialized) {
@@ -68,11 +74,12 @@ public class LobbyManager : NetworkBehaviour
     public GameObject InGameTankPrefab;
 
     public void ChangeSpawnPrefab(string sceneName) {
+        if (playerSpawner == null) return;
         switch (sceneName) {
             case "InGameScene":
                 playerSpawner.playerObjectPrefab = InGameTankPrefab;
                 break;
-            case "Waitingroom":
+            case "WaitingRoom":
                 playerSpawner.playerObjectPrefab = WaitingRoomTankPrefab;
                 break;
             
@@ -113,7 +120,7 @@ public class LobbyManager : NetworkBehaviour
     public void LaunchGame_Server()
     {
         // Despawn every players
-        playerSpawner.DespawnEveryone(clientPlayerList);
+        // playerSpawner.DespawnEveryone(clientPlayerList);
 
         // launch game on every client
         LaunchGame_Client();
@@ -128,14 +135,16 @@ public class LobbyManager : NetworkBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
     }
 
-    private void OnSceneChangement() {
-        if (CurrentSceneName() == "MainMenu") {
+    private void OnSceneChangement(Scene scene, LoadSceneMode mode) {
+        if (scene.name == "MainMenu") {
             Destroy(gameObject);
             NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
             Destroy(networkManager);
         }
 
         ChangeSpawnPrefab(CurrentSceneName());
+        if (playerSpawner == null) return;
+        playerSpawner.InitSpawnPoint();
 
         if (base.IsServerInitialized) {
             nbPlayerReady = 0;
