@@ -329,39 +329,57 @@ public class AuthController : MonoBehaviour
         }
     }
 
-    private IEnumerator LoginUser(string usernameOrEmail, string password)
+private IEnumerator LoginUser(string usernameOrEmail, string password)
+{
+    var loginRequest = new LoginRequest
     {
-        var loginRequest = new LoginRequest
+        UsernameOrEmail = usernameOrEmail,
+        Password = password
+    };
+
+    string json = JsonUtility.ToJson(loginRequest);
+
+    UnityWebRequest request = new UnityWebRequest(loginUrl, "POST");
+    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+    request.downloadHandler = new DownloadHandlerBuffer();
+    request.SetRequestHeader("Content-Type", "application/json");
+
+    request.certificateHandler = new CustomCertificateHandler();
+
+    yield return request.SendWebRequest();
+
+    if (request.result == UnityWebRequest.Result.Success)
+    {
+        Debug.Log("Login successful: " + request.downloadHandler.text);
+        IsRequestSuccessful = true;
+    }
+    else
+    {
+        Debug.LogError("Login error: " + request.error);
+        Debug.LogError("Details: " + request.downloadHandler.text);
+
+        string serverMessage = request.downloadHandler.text;
+
+        if (!string.IsNullOrEmpty(serverMessage))
         {
-            UsernameOrEmail = usernameOrEmail,
-            Password = password
-        };
-
-        string json = JsonUtility.ToJson(loginRequest);
-
-        UnityWebRequest request = new UnityWebRequest(loginUrl, "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        request.certificateHandler = new CustomCertificateHandler();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Login successful: " + request.downloadHandler.text);
-            IsRequestSuccessful = true;
+            if (serverMessage.Contains("already logged in", StringComparison.OrdinalIgnoreCase))
+            {
+                ErrorResponse = "You are already logged in on another device.";
+            }
+            else
+            {
+                ErrorResponse = serverMessage;
+            }
         }
         else
         {
-            Debug.Log("Login error: " + request.error);
-            Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
-            IsRequestSuccessful = false;
+            ErrorResponse = "An unknown error occurred.";
         }
+
+        IsRequestSuccessful = false;
     }
+}
 
     private IEnumerator LogoutUser()
     {
