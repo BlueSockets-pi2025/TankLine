@@ -62,4 +62,10 @@ public class UserAccount
 
     [Column("refresh_token_expiration")]
     public DateTime? RefreshTokenExpiration { get; set; }
+
+
+    [Required]
+    [Column("is_logged_in")]
+    public bool IsLoggedIn { get; set; } = false;
+
 }

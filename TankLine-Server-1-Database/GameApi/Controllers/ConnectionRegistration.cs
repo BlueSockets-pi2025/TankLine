@@ -229,20 +229,20 @@ public class ConnectionRegistrationController : Controller
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest loginRequest)
      {
-        // if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
-        // {
-        //     return BadRequest("Username (or email) and password are required."); 
-        // }
+        if (loginRequest == null || string.IsNullOrEmpty(loginRequest.UsernameOrEmail) || string.IsNullOrEmpty(loginRequest.Password))
+        {
+            return BadRequest("Username (or email) and password are required."); 
+        }
 
-        // // Validate for special characters in UsernameOrEmail and Password
-        // string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
-        // foreach (var field in fieldsToCheck)
-        // {
-        //     if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
-        //     {
-        //         return BadRequest("Invalid characters detected in one or more fields.");
-        //     }
-        // }
+        // Validate for special characters in UsernameOrEmail and Password
+        string[] fieldsToCheck = { loginRequest.UsernameOrEmail, loginRequest.Password };
+        foreach (var field in fieldsToCheck)
+        {
+            if (field.Contains("'") || field.Contains("\"") || field.Contains(";") || field.Contains("--"))
+            {
+                return BadRequest("Invalid characters detected in one or more fields.");
+            }
+        }
 
         var user = _context.UserAccounts
             .FirstOrDefault(u => u.Username == loginRequest.UsernameOrEmail || u.Email == loginRequest.UsernameOrEmail);
@@ -262,6 +262,13 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("Account not verified. Please check your email.");
         }
 
+        if (user.IsLoggedIn) 
+        {
+            return BadRequest("User is already logged in.");
+        }
+
+
+
         var token = GenerateJwtToken(user);
 
         // Generate and hash refresh token
@@ -272,6 +279,7 @@ public class ConnectionRegistrationController : Controller
         // Save the hashed refresh token in the user's record
         user.RefreshTokenHash = hashedRefreshToken;
         user.RefreshTokenExpiration = DateTime.UtcNow.AddDays(7);
+        user.IsLoggedIn = true;
 
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
