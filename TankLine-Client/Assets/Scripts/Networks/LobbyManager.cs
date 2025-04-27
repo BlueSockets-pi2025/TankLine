@@ -111,6 +111,10 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
+    public void IsReady() {
+        NewPlayerReady();
+    }
+
 
 
 
@@ -164,12 +168,7 @@ public class LobbyManager : NetworkBehaviour
             // if on server, reset the number of player ready when reloading a new game
             if (base.IsServerInitialized) {
                 nbPlayerReady = 0;
-            } 
-
-            // if on client, tell the server we are ready
-            else {
-                NewPlayerReady();
-            }
+            } else IsReady();
         }
     }
 

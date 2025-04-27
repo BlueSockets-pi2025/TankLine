@@ -3,6 +3,7 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
 
 public class MapLoader : MonoBehaviour
 {
@@ -20,6 +21,13 @@ public class MapLoader : MonoBehaviour
 #endif
 
     private AssetBundle myBundle;
+
+    private bool isOnServer;
+
+    void Awake()
+    {
+        isOnServer = Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true";
+    }
 
     void Start()
     {
@@ -40,6 +48,9 @@ public class MapLoader : MonoBehaviour
         }
         //Load the map from the name of the file
         LoadMap(mapFileName);
+
+        // tell the server we are ready
+        FindFirstObjectByType<LobbyManager>().IsReady();
     }
 
     void LoadMap(string fileName)
@@ -77,14 +88,16 @@ public class MapLoader : MonoBehaviour
         else
         {
             //Search if there is a 3D Model.
-            prefab = LoadModelFromResources(objData.modelName);
+            if (!isOnServer) {
+                prefab = LoadModelFromResources(objData.modelName);
 
-            // If no model is found in the resources, creates a base Unity object.
-            if (prefab == null)
-            {
-                prefab = CreatePrimitiveObject(objData.modelName);
-                //CreatePrimitive creates a GameObjectEmpty. Destroy this GameObject to instantiate only the one needed.
-                Destroy(prefab);
+                // If no model is found in the resources, creates a base Unity object.
+                if (prefab == null)
+                {
+                    prefab = CreatePrimitiveObject(objData.modelName);
+                    //CreatePrimitive creates a GameObjectEmpty. Destroy this GameObject to instantiate only the one needed.
+                    Destroy(prefab);
+                }
             }
         }
 
@@ -140,7 +153,7 @@ public class MapLoader : MonoBehaviour
         //Foreach scripts, if there is any, add them to the gameObject.
         foreach (string scriptName in objData.scripts)
         {
-            System.Type scriptType = System.Type.GetType(scriptName);
+            Type scriptType = Type.GetType(scriptName);
             if (scriptType != null)
             {
                 if (instance.GetComponent(scriptType) == null)
