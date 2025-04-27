@@ -262,10 +262,10 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("Account not verified. Please check your email.");
         }
 
-        if (user.IsLoggedIn) 
-        {
-            return BadRequest("User is already logged in.");
-        }
+       // if (user.IsLoggedIn) 
+     //   {
+        //    return BadRequest("User is already logged in.");
+    //    }
 
 
 
