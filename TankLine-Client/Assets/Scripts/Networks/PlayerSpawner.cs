@@ -14,15 +14,21 @@ public class PlayerSpawner : NetworkBehaviour
 
     public void InitSpawnPoint()
     {
+        // find new spawnpoint transform
         Transform spawnPointsParent = GameObject.Find("PlayerSpawns").transform;
         if (spawnPointsParent == null) {
             Debug.Log("[ERROR] spawnpoint parent not found");
             return;
         }
 
+        // clear old spawnpoints
+        spawnPoints = new();
+
         foreach (Transform child in spawnPointsParent) {
             spawnPoints.Add(child.gameObject);
         }
+
+        Debug.Log($"{spawnPoints.Count} new spawn point initialized");
     }
 
     /// <summary>

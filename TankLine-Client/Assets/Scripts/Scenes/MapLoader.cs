@@ -155,7 +155,7 @@ public class MapLoader : MonoBehaviour
         }
 
         //Apply the material if there is one.
-        ApplyMaterial(instance, objData.materialName);
+        //ApplyMaterial(instance, objData.materialName);
 
         //Instantiate all the children, if there is any.
         foreach (var childData in objData.children)

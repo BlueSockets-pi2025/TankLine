@@ -12971,7 +12971,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3e6408a891e754f8341882b6bd2383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  musicSource: {fileID: 12633144}
   sfxSource: {fileID: 458100771}
   menuMusic: {fileID: 8300000, guid: caf2d87a35c14c74ab66e33eda6d558a, type: 3}
   inGameMusic: {fileID: 8300000, guid: 7869194553a329247bc1b8811c8bead2, type: 3}
@@ -31369,6 +31368,5 @@ SceneRoots:
   - {fileID: 788156275}
   - {fileID: 242109071}
   - {fileID: 1127350809}
-  - {fileID: 12633143}
   - {fileID: 458100770}
   - {fileID: 886281975}

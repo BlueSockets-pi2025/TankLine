@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
+using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Observing;
 using TMPro;
@@ -19,7 +21,7 @@ public class LobbyManager : NetworkBehaviour
 
     void Awake() {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneChangement;
-
+        gameObject.GetComponent<NetworkObject>().SetIsGlobal(true);
 
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
 
@@ -53,6 +55,11 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        Debug.Log("Destroying LobbyManager");       
+    }
+
 
 
 
@@ -74,7 +81,10 @@ public class LobbyManager : NetworkBehaviour
     public GameObject InGameTankPrefab;
 
     public void ChangeSpawnPrefab(string sceneName) {
-        if (playerSpawner == null) return;
+        if (playerSpawner == null) {
+            Debug.Log("[ERROR] : PlayerSpawner null in ChangeSpawnPrefab");
+            return;
+        }
         switch (sceneName) {
             case "InGameScene":
                 playerSpawner.playerObjectPrefab = InGameTankPrefab;
@@ -94,7 +104,7 @@ public class LobbyManager : NetworkBehaviour
         nbPlayerReady++;
 
         // if everyone ready, spawn everyone
-        if (nbPlayerReady == serverPlayerList.Count) {
+        if (nbPlayerReady >= serverPlayerList.Count) {
             foreach (KeyValuePair<NetworkConnection, string> entry in serverPlayerList) {
                 playerSpawner.SpawnPlayer(entry.Key, entry.Value);
             }
@@ -119,40 +129,45 @@ public class LobbyManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void LaunchGame_Server()
     {
-        // Despawn every players
-        // playerSpawner.DespawnEveryone(clientPlayerList);
+        // Load new scene
+        SceneLoadData newScene = new("InGameScene");
+        newScene.ReplaceScenes = ReplaceOption.All; // destroy every other object
+        newScene.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() }; // keep this object in the next scene
 
-        // launch game on every client
-        LaunchGame_Client();
+        Debug.Log($"[SERVER] : starting game - {newScene.MovedNetworkObjects}");
 
-        // change scene on the server
-        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
+        // change scene
+        InstanceFinder.SceneManager.LoadGlobalScenes(newScene);
     }
 
-    [ObserversRpc]
-    private void LaunchGame_Client()
+    public void ClickedStartGame()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameScene");
+        Debug.Log("[CLIENT] Starting game");
+        LaunchGame_Server();
     }
 
     private void OnSceneChangement(Scene scene, LoadSceneMode mode) {
         if (scene.name == "MainMenu") {
-            Destroy(gameObject);
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneChangement;
+            Debug.Log("MainMenu scene : destroying networkManager & LobbyManager");
             NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
             Destroy(networkManager);
+            Destroy(gameObject);
+            return;
         }
 
-        ChangeSpawnPrefab(CurrentSceneName());
-        if (playerSpawner == null) return;
+        playerSpawner = gameObject.GetComponent<PlayerSpawner>();
+        ChangeSpawnPrefab(scene.name);
         playerSpawner.InitSpawnPoint();
 
-        if (base.IsServerInitialized) {
-            nbPlayerReady = 0;
-        }
+        if (scene.name == "InGameScene") {
+            // if on server, reset the number of player ready when reloading a new game
+            if (base.IsServerInitialized) {
+                nbPlayerReady = 0;
+            } 
 
-        // if in game, tell the server we are ready
-        else {
-            if (CurrentSceneName() == "InGameScene") {
+            // if on client, tell the server we are ready
+            else {
                 NewPlayerReady();
             }
         }
@@ -300,6 +315,7 @@ public class LobbyManager : NetworkBehaviour
             // add onclick function to buttons
             canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickPanel);
             canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
+            canvas.transform.Find("StartButton").GetComponent<Button>().onClick.AddListener(FindFirstObjectByType<LobbyManager>().ClickedStartGame);
         }
 
 
