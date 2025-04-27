@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using FishNet;
+using FishNet.Object;
 using FishNet.Connection;
 using System.Collections.Generic;
 using TMPro;
@@ -43,7 +44,23 @@ public class RoomUIManager : MonoBehaviour
         StartCoroutine(ConfirmClientConn());
         UpdateSelectionTexts();
 
-        Debug.Log("HAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        if (RoomManager.Instance != null)
+        {
+            NetworkObject netObj = RoomManager.Instance.GetComponent<NetworkObject>();
+
+            if (InstanceFinder.IsServer)
+            {
+                if (netObj != null && !netObj.IsSpawned)
+                {
+                    Debug.Log("[RoomUI] Forcing RoomManager spawn.");
+
+                    if (netObj.IsSceneObject)
+                        InstanceFinder.ServerManager.Spawn(netObj);
+                    else
+                        InstanceFinder.ServerManager.Spawn(netObj);
+                }
+            }
+        }
     }
 
     private void SetRoomButtonsInteractable(bool value)
@@ -60,12 +77,14 @@ public class RoomUIManager : MonoBehaviour
             InstanceFinder.ClientManager.Connection.IsValid
         );
         Debug.Log("[RoomUI] Client connection confirmed.");
-
+        
         yield return new WaitUntil(() =>
             RoomManager.Instance != null && RoomManager.Instance.isActiveAndEnabled
         );
 
         Debug.Log("[RoomUI] Client and RoomManager are ready.");
+
+        
 
         SetRoomButtonsInteractable(true);
 

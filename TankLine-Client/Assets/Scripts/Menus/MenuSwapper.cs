@@ -60,8 +60,9 @@ public class MenuSwapper : MonoBehaviour
         else if (currentScene == "MainMenu")
         {
             OpenPage("MainMenu");
+            AutoLogin();
         }
-
+        
 
         //OpenPagePrincipal();
     }

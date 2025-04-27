@@ -7597,6 +7597,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: NetworkManager
       objectReference: {fileID: 0}
+    - target: {fileID: 7002734967816552031, guid: d80325bf1aae29f4488361726e61dcc5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7662184823708580924, guid: d80325bf1aae29f4488361726e61dcc5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -23450,7 +23454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CreateRoomBtn: {fileID: 352712798}
   JoinRoomBtn: {fileID: 1521003941}
-  ReturnBtn: {fileID: 0}
+  returnBtn: {fileID: 0}
   codeInput: {fileID: 850711434}
   selectedNumberText: {fileID: 0}
   selectedModeText: {fileID: 0}
@@ -27236,7 +27240,7 @@ MonoBehaviour:
   RuntimeParentNetworkBehaviour: {fileID: 0}
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
-  _isSpawnable: 1
+  _isSpawnable: 0
   _isGlobal: 0
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
