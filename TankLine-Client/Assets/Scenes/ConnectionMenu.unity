@@ -8589,7 +8589,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -485, y: 405}
+  m_AnchoredPosition: {x: -485, y: 385}
   m_SizeDelta: {x: 841.0279, y: 228.3329}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &357584074
@@ -20139,6 +20139,8 @@ MonoBehaviour:
   top4: {fileID: 0}
   gamesPlayedInputField: {fileID: 0}
   highestScoreInputField: {fileID: 0}
+  UserNameField: {fileID: 0}
+  UserRankField: {fileID: 0}
 --- !u!114 &897803374
 MonoBehaviour:
   m_ObjectHideFlags: 0

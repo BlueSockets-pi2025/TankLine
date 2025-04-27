@@ -7,173 +7,182 @@ using TMPro;
 
 public class RoomUIManager : MonoBehaviour
 {
-  public static RoomUIManager Instance { get; private set; }
+    public static RoomUIManager Instance { get; private set; }
 
-  [Header("Buttons")]
-  public Button CreateRoomBtn;
-  public Button JoinRoomBtn;
-  public Button returnBtn;
+    [Header("Buttons")]
+    public Button CreateRoomBtn;
+    public Button JoinRoomBtn;
+    public Button returnBtn;
 
-  [Header("Input Fields")]
-  public TMP_InputField codeInput;
+    [Header("Input Fields")]
+    public TMP_InputField codeInput;
 
-  [Header("Create Room Selection")]
-  public Text selectedNumberText;
-  public Text selectedModeText;
-  public List<Button> numberButtons; // players per room
-  public List<Button> modeButtons; // public/private
+    [Header("Create Room Selection")]
+    public Text selectedNumberText;
+    public Text selectedModeText;
+    public List<Button> numberButtons; // players per room
+    public List<Button> modeButtons; // public/private
 
-  private int selectedNumber = 2;
-  private string selectedMode = "Public";
+    private int selectedNumber = 2;
+    private string selectedMode = "Public";
 
-  private Color normalColor = Color.white;
-  private Color selectedColor = Color.red;
+    private Color normalColor = Color.white;
+    private Color selectedColor = Color.red;
 
-  void Awake()
-  {
-    if (Instance == null)
-      Instance = this;
-    else
-      Destroy(gameObject);
-  }
-
-  void Start()
-  {
-    SetRoomButtonsInteractable(false);
-    StartCoroutine(ConfirmClientConn());
-    UpdateSelectionTexts();
-  }
-
-  private void SetRoomButtonsInteractable(bool value)
-{
-    CreateRoomBtn.interactable = value;
-    JoinRoomBtn.interactable = value;
-    returnBtn.interactable = value;
-}
-
-  private System.Collections.IEnumerator ConfirmClientConn()
-  {
-    yield return new WaitUntil(() =>
-      InstanceFinder.IsClient &&
-      InstanceFinder.ClientManager.Connection.IsValid
-    );
-    Debug.Log("[RoomUI] Client connection confirmed.");
-
-    SetRoomButtonsInteractable(true);
-
-    CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
-    JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
-    returnBtn.onClick.AddListener(HandleReturn);
-    codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
-  }
-
-  // === SELECTION BUTTONS ===
-
-  public void SelectNumber(int number)
-  {
-    selectedNumber = number;
-    UpdateSelectionTexts();
-    UpdateButtonColors(numberButtons, number);
-  }
-
-  public void SelectMode(string mode)
-  {
-    selectedMode = mode;
-    UpdateSelectionTexts();
-    UpdateButtonColors(modeButtons, mode);
-  }
-
-  private void UpdateSelectionTexts()
-  {
-    if (selectedNumberText != null)
-      selectedNumberText.text = "Selected Number: " + selectedNumber;
-    if (selectedModeText != null)
-      selectedModeText.text = "Selected Mode: " + selectedMode;
-  }
-
-  private void UpdateButtonColors<T>(List<Button> buttons, T selectedValue)
-  {
-    foreach (Button btn in buttons)
+    void Awake()
     {
-      bool isSelected = btn.name == selectedValue.ToString();
-
-      if (btn.image != null)
-      {
-        btn.image.color = isSelected ? selectedColor : normalColor;
-      }
-    }
-  }
-
-  // === ROOM CREATION ===
-
-  private void HandleCreateRoom()
-  {
-    int maxPlayers = selectedNumber;
-    bool isPublic = selectedMode == "Public";
-    Debug.Log($"[RoomUI] Requesting room creation | Public: {isPublic} | Max Players: {maxPlayers}");
-
-    RoomManager.Instance.RequestCreateRoom(maxPlayers, isPublic, InstanceFinder.ClientManager.Connection);
-  }
-
-  // === ROOM JOINING ===
-
-  private void HandleJoinRoom()
-  {
-    bool isPublic = selectedMode == "Public";
-
-    // if the room is public then:
-    if (isPublic)
-    {
-      int? roomId = RoomManager.Instance.GetFirstAvaliablePublicRoom();
-
-      if (roomId.HasValue)
-      {
-        Debug.Log($"[RoomUI] Joining public room {roomId.Value}");
-        RoomManager.Instance.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
-      }
-      else
-      {
-        Debug.Log("[RoomUI] No public rooms available.");
-        HandleCreateRoom();
-      }
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
     }
 
-    // if the room is private then:
-    else
+    void Start()
     {
-      if (IsValidRoomCode(codeInput.text, out int roomId))
-      {
-        Debug.Log($"[RoomUI] Joining private room {roomId}");
-        RoomManager.Instance.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
-      }
-      else
-      {
-        Debug.LogWarning("[RoomUI] Invalid room code.");
-      }
-    }
-  }
+        SetRoomButtonsInteractable(true);
+        StartCoroutine(ConfirmClientConn());
+        UpdateSelectionTexts();
 
-  private void HandlePrivateCodeEntered(string input)
-  {
-    if (!IsValidRoomCode(input, out int roomId))
+        Debug.Log("HAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    }
+
+    private void SetRoomButtonsInteractable(bool value)
     {
-      Debug.LogWarning("[RoomUI] Invalid room code entered.");
+        CreateRoomBtn.interactable = value;
+        JoinRoomBtn.interactable = value;
+        //returnBtn.interactable = value;
     }
-  }
 
-  private bool IsValidRoomCode(string input, out int roomId)
-  {
-    input = input.Trim();
+    private System.Collections.IEnumerator ConfirmClientConn()
+    {
+        yield return new WaitUntil(() =>
+            InstanceFinder.IsClientStarted &&
+            InstanceFinder.ClientManager.Connection.IsValid
+        );
+        Debug.Log("[RoomUI] Client connection confirmed.");
 
-    if (input.Length == 6 && int.TryParse(input, out roomId))
-      return true;
+        yield return new WaitUntil(() =>
+            RoomManager.Instance != null && RoomManager.Instance.isActiveAndEnabled
+        );
 
-    roomId = -1;
-    return false;
-  }
+        Debug.Log("[RoomUI] Client and RoomManager are ready.");
 
-  private void HandleReturn()
-  {
-    Debug.Log("[RoomUI] Return button clicked. Returning to main menu.");
-  }
+        SetRoomButtonsInteractable(true);
+
+        CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
+        JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
+        //returnBtn.onClick.AddListener(HandleReturn);
+        codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
+    }
+
+    // === SELECTION BUTTONS ===
+
+    public void SelectNumber(int number)
+    {
+        selectedNumber = number;
+        UpdateSelectionTexts();
+        UpdateButtonColors(numberButtons, number);
+    }
+
+    public void SelectMode(string mode)
+    {
+        selectedMode = mode;
+        UpdateSelectionTexts();
+        UpdateButtonColors(modeButtons, mode);
+    }
+
+    private void UpdateSelectionTexts()
+    {
+        if (selectedNumberText != null)
+            selectedNumberText.text = "Selected Number: " + selectedNumber;
+        if (selectedModeText != null)
+            selectedModeText.text = "Selected Mode: " + selectedMode;
+    }
+
+    private void UpdateButtonColors<T>(List<Button> buttons, T selectedValue)
+    {
+        foreach (Button btn in buttons)
+        {
+            bool isSelected = btn.name == selectedValue.ToString();
+
+            if (btn.image != null)
+            {
+                btn.image.color = isSelected ? selectedColor : normalColor;
+            }
+        }
+    }
+
+    // === ROOM CREATION ===
+
+    private void HandleCreateRoom()
+    {
+        int maxPlayers = selectedNumber;
+        bool isPublic = selectedMode == "Public";
+        Debug.Log($"[RoomUI] Requesting room creation | Public: {isPublic} | Max Players: {maxPlayers}");
+
+        RoomManager.Instance.RequestCreateRoom(maxPlayers, isPublic, InstanceFinder.ClientManager.Connection);
+    }
+
+    // === ROOM JOINING ===
+
+    private void HandleJoinRoom()
+    {
+        bool isPublic = selectedMode == "Public";
+        Debug.Log("JOINING");
+
+        // if the room is public then:
+        if (isPublic)
+        {
+            int? roomId = RoomManager.Instance.GetFirstAvaliablePublicRoom();
+
+            if (roomId.HasValue)
+            {
+                Debug.Log($"[RoomUI] Joining public room {roomId.Value}");
+                RoomManager.Instance.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
+            }
+            else
+            {
+                Debug.Log("[RoomUI] No public rooms available.");
+                HandleCreateRoom();
+            }
+        }
+
+        // if the room is private then:
+        else
+        {
+            if (IsValidRoomCode(codeInput.text, out int roomId))
+            {
+                Debug.Log($"[RoomUI] Joining private room {roomId}");
+                RoomManager.Instance.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
+            }
+            else
+            {
+                Debug.LogWarning("[RoomUI] Invalid room code.");
+            }
+        }
+    }
+
+    private void HandlePrivateCodeEntered(string input)
+    {
+        if (!IsValidRoomCode(input, out int roomId))
+        {
+            Debug.LogWarning("[RoomUI] Invalid room code entered.");
+        }
+    }
+
+    private bool IsValidRoomCode(string input, out int roomId)
+    {
+        input = input.Trim();
+
+        if (input.Length == 6 && int.TryParse(input, out roomId))
+            return true;
+
+        roomId = -1;
+        return false;
+    }
+
+    private void HandleReturn()
+    {
+        Debug.Log("[RoomUI] Return button clicked. Returning to main menu.");
+    }
 }

@@ -2253,7 +2253,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -9.0000305}
+  m_AnchoredPosition: {x: 0, y: -9}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192434540
@@ -4369,7 +4369,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 897803373}
         m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
-        m_MethodName: ConnectToWaitingRoom
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -23450,7 +23450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CreateRoomBtn: {fileID: 352712798}
   JoinRoomBtn: {fileID: 1521003941}
-  returnBtn: {fileID: 1140371313}
+  ReturnBtn: {fileID: 0}
   codeInput: {fileID: 850711434}
   selectedNumberText: {fileID: 0}
   selectedModeText: {fileID: 0}
@@ -25547,7 +25547,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 897803373}
         m_TargetAssemblyTypeName: MenuSwapper, Assembly-CSharp
-        m_MethodName: ConnectToRandomWaitingRoom
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
