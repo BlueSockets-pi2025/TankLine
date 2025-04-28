@@ -1077,12 +1077,13 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 313021601}
   _networkObjectCache: {fileID: 0}
-  movementSpeed: 3
-  rotationSpeed: 0.06544985
-  nbLifeLeft: 3
+  movementSpeed: 1.5
+  rotationSpeed: 0.057
+  nbLifeLeft: 2
   target: {fileID: 1320501024}
-  bulletPrefab: {fileID: 2376455214160315203, guid: e9034c1bffd998325b0031d88eefd419, type: 3}
+  bulletPrefab: {fileID: 5711717282606037894, guid: 479d9ed58408bbfbfa8fcca6367a07c8, type: 3}
   MaxBulletShot: 5
+  maxLives: 3
 --- !u!4 &322964780 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4294661913642588619, guid: 70f4f4bc2bc1bd446bfb8def7fbe6479, type: 3}
@@ -4925,7 +4926,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4900683280261623425, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.1
+      value: 0.26
       objectReference: {fileID: 0}
     - target: {fileID: 4900683280261623425, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4933,7 +4934,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4900683280261623425, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.97
+      value: 8.16
       objectReference: {fileID: 0}
     - target: {fileID: 4900683280261623425, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4967,7 +4968,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: tank
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -4517498443145168945, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

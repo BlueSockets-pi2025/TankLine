@@ -146,7 +146,8 @@ public class Bullet_Offline : MonoBehaviour
         if (tankOwner != null)
         {
             Tank_Offline playerOwner = tankOwner.GetComponent<Tank_Offline>();
-            playerOwner.DecreaseNbBulletShot();
+            if (playerOwner != null)
+                playerOwner.DecreaseNbBulletShot();
         }
     }
 }

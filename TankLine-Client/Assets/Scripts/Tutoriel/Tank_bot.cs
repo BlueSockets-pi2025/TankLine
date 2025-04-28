@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Mathematics;
-using FishNet.Object;
 
 public class Tank_Bot : Tank
 {
@@ -8,7 +7,7 @@ public class Tank_Bot : Tank
     public GameObject bulletPrefab;
 
     private float fireCooldown = 2f;
-    private float lastShotTime = -10f;
+    private float lastShotTime = -12f;
 
     private const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 4; 
     private int nbBulletShot = 0;
@@ -27,7 +26,7 @@ public class Tank_Bot : Tank
 
     void Update()
     {
-        if (!IsServer || target == null)
+        if (target == null)
         {
             return;
         }
@@ -37,7 +36,7 @@ public class Tank_Bot : Tank
 
     void FixedUpdate()
     {
-        if (!IsServer || target == null) return;
+        if (target == null) return;
         MoveTowardsTarget();
     }
 
@@ -50,23 +49,38 @@ public class Tank_Bot : Tank
 
     void MoveTowardsTarget()
     {
+        if (target == null) 
+        {
+            Debug.Log("Can't move - missing target or not server");
+            return;
+        }
+        
         Vector3 dir = (target.position - thisTank.position).normalized;
         float x = dir.x;
         float y = dir.z;
 
         float moveForce = FaceDirection(x, y);
-        GoForward(moveForce);
+        if (moveForce > 0)
+        {
+            GoForward(moveForce);
+        }
     }
 
     void TryShoot()
     {
-        if (Time.time - lastShotTime >= fireCooldown && CanShoot())
+        if (Time.time - lastShotTime >= fireCooldown)
         {
-            Shoot();
-            lastShotTime = Time.time;
+            if (CanShoot())
+            {
+                Shoot();
+                lastShotTime = Time.time;
+            }
+            else
+            {
+                Debug.Log("Can't shoot - obstacle in the way");
+            }
         }
     }
-
     protected bool CanShoot()
     {
         Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
@@ -74,26 +88,33 @@ public class Tank_Bot : Tank
         Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
         return !Physics.Raycast(origin, direction, 1.3f);
     }
-
-    [ServerRpc(RequireOwnership = false)]
     protected void Shoot()
     {
-        if (nbBulletShot >= MaxBulletShot) return;
-
-        Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
-        float rotation = thisGun.rotation.eulerAngles.y * Mathf.Deg2Rad;
-        Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
-
-        GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f * dir, Quaternion.identity);
-
-        Bullet_Offline newBullet = newBulletObject.GetComponent<Bullet_Offline>();
-        newBullet.direction = dir;
-        newBullet.tankOwner = gameObject;
-
-        nbBulletShot++;
-        Spawn(newBulletObject);
+        if (nbBulletShot < MaxBulletShot && bulletPrefab != null)
+        {
+            Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
+            float rotation = thisGun.rotation.eulerAngles.y * Mathf.Deg2Rad;
+            Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
+            
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f * dir, Quaternion.identity);
+            Bullet_Offline newBullet = newBulletObject.GetComponent<Bullet_Offline>();
+            
+            if (newBullet != null)
+            {
+                newBullet.direction = dir;
+                newBullet.tankOwner = gameObject;
+                nbBulletShot++;
+            }
+            else
+            {
+                Debug.LogError("Bullet prefab is missing Bullet_Offline component!");
+            }
+        }
+        else if (bulletPrefab == null)
+        {
+            Debug.LogError("Bullet prefab is not assigned in Tank_Bot!");
+        }
     }
-
     public void DecreaseNbBulletShot()
     {
         nbBulletShot--;
