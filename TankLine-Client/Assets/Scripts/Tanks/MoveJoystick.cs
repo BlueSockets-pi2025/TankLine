@@ -6,10 +6,12 @@ public class MoveJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPoi
     private Vector2 inputVector;
     public RectTransform handle;
     private Tank_Offline tank;
+    // protected Transform tank;
 
     private void Start()
     {
         tank = FindObjectOfType<Tank_Offline>();
+        // tank = gameObject.transform;
     }
 
     public void OnDrag(PointerEventData eventData)

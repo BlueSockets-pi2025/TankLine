@@ -9,10 +9,13 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
     private Vector2 startTouchPosition;
     private bool isDragging = false;
     private Tank_Offline tank;
+    // protected Transform tank;
+
 
     private void Start()
     {
         tank = FindObjectOfType<Tank_Offline>();
+        // tank = gameObject.transform;
     }
     public void OnDrag(PointerEventData eventData)
     {
@@ -54,6 +57,15 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
         if (!isDragging)
         {
             FindObjectOfType<Tank_Offline>().OnShootButtonClick();
+            //de Tank_player
+            // if (FindObjectOfType<Tank_Player>().CanShoot())
+            // {
+            //     FindObjectOfType<Tank_Player>().Shoot();
+            // }
+            // else
+            // {
+            //     Debug.Log("Prevent self-shoot. TODO : animation");
+            // }
         }
     }
 }

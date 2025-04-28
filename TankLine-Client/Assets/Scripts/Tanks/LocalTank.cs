@@ -48,7 +48,7 @@ public class Tank_Offline : MonoBehaviour
     //for mobile controls
     public MoveJoystick joystick;
     public ShootJoystick shootJoystick;
-    public Button shootButton;
+    // public Button shootButton;
 
 
     protected virtual void Start()
