@@ -262,10 +262,10 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("Account not verified. Please check your email.");
         }
 
-       // if (user.IsLoggedIn) 
-     //   {
-        //    return BadRequest("User is already logged in.");
-    //    }
+       if (user.IsLoggedIn) 
+       {
+           return BadRequest("User is already logged in.");
+       }
 
 
 
@@ -408,12 +408,38 @@ public class ConnectionRegistrationController : Controller
     [HttpPost("logout")]
     public IActionResult Logout()
     {
+        // Delete the cookies 
         Response.Cookies.Delete("AuthToken");
         Response.Cookies.Delete("RefreshToken");
 
-        // Refresh token
+        // Trouver l'utilisateur depuis le token
+
+        var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
+        {
+                return Unauthorized("Invalid token or missing user information.");
+        }
+
+        var username = subClaim.Value;
+
+        if (username == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Username == username);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        // Marquer l'utilisateur comme déconnecté
+        user.IsLoggedIn = false;
+        _context.SaveChanges();
+
         return Ok("Logged out successfully.");
     }
+
 
     [HttpPost("resend-verification-code")]
     public async Task<IActionResult> ResendVerificationCode([FromBody] ResendVerificationRequest request)
