@@ -10,7 +10,7 @@ public class MenuSwapper : MonoBehaviour
 
     public GameObject _canvas;
     private Transform Canvas;
-    public GameObject ErrorPopup, MessagePopup;
+    public GameObject ErrorPopup, MessagePopup, ExitGamePopup;
 
     public GameObject CurrentPage;
 
@@ -152,6 +152,19 @@ public class MenuSwapper : MonoBehaviour
     public void CloseMessage()
     {
         MessagePopup.SetActive(false);
+    }
+
+    public void OpenExitGame()
+    {
+        ExitGamePopup.SetActive(true);
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+    public void CloseExitGame()
+    {
+        ExitGamePopup.SetActive(false);
     }
 
     public void LoginUser()
