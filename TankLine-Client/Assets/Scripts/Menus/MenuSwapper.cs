@@ -2,6 +2,8 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
+using Heartbeat ; 
+
 
 public class MenuSwapper : MonoBehaviour
 {
@@ -29,6 +31,10 @@ public class MenuSwapper : MonoBehaviour
     public TMP_Text UserNameField;
     public TMP_Text UserRankField;
 
+
+
+
+    public static bool isFirstLaunch = true ; 
     void Awake()
     {
         // ensure there is only one instance of this script
@@ -48,7 +54,18 @@ public class MenuSwapper : MonoBehaviour
             Debug.LogError("AuthController not found.");
             return;
         }
-        AutoLogin();
+        if (isFirstLaunch)
+        {
+            HeartbeatManager.Instance.SetLoggedIn(true);
+
+            AutoLogin();
+            isFirstLaunch = false ; 
+        }
+        else 
+        {
+            Debug.Log ("NOT FIRST LAUNCH") ;
+        }
+
 
         // load first page
         // OpenPage("PagePrincipale"); 
@@ -81,8 +98,11 @@ public class MenuSwapper : MonoBehaviour
 
         // Request requiring an access token to check if the user is already logged in and set the current user 
         yield return authController.User();
+
+        
         if (authController.IsRequestSuccessful)
         {
+            
             Debug.Log("Auto-login successful. Skipping login page.");
             string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (currentScene == "ConnectionMenu")
@@ -193,8 +213,11 @@ public class MenuSwapper : MonoBehaviour
         {
             yield return authController.User();
 
+
             if (authController.IsRequestSuccessful)
             {
+                Debug.Log("DEBUGGGGGG"); 
+                Debug.Log(authController.CurrentUser.username); 
                 yield return authController.UserStatistics();
 
                 if (authController.IsRequestSuccessful)
@@ -246,6 +269,7 @@ public class MenuSwapper : MonoBehaviour
 
         if (authController.IsRequestSuccessful)
         {
+
             OpenPage("ResetPasswordStep2");
             OpenMessage("Password reset code sent to your email.");
         }
@@ -521,6 +545,8 @@ public class MenuSwapper : MonoBehaviour
 
     private IEnumerator UpdateStatisticsCoroutine(Transform badge)
     {
+
+        string found_badge  ; 
         if (authController == null)
         {
             Debug.LogError("AuthController is not initialized.");
@@ -531,13 +557,25 @@ public class MenuSwapper : MonoBehaviour
 
         if (authController.IsRequestSuccessful && authController.CurrentUserStatistics != null)
         {
+
             if (badge != null)
             {
                 badge.Find("GamePlayed").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.gamesPlayed.ToString();
                 badge.Find("HighScore").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.highestScore.ToString();
                 badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();
-                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUser.username.ToString();
+                
+                found_badge = badge.Find("UserName").GetComponent<TMP_Text>().text ; 
 
+                if (found_badge != null)
+                {
+                    badge.Find("UserName").GetComponent<TMP_Text>().text  = authController.CurrentUser.username ; 
+                    Debug.Log("FOUUUUNNDDDDDD" ) ; 
+                    Debug.Log(found_badge ) ; 
+                }
+                else 
+                {
+                    Debug.Log("NOOOOOOTTTT FOUNDDDDDD") ; 
+                }
             }
             else
             {
@@ -549,6 +587,8 @@ public class MenuSwapper : MonoBehaviour
             OpenErr($"Failed to retrieve user statistics: \n {authController.ErrorResponse}");
         }
     }
+
+    
     // public void SetPlayerStatistics(int gamesPlayed, int highestScore)
     // {
     //     if (authController == null)

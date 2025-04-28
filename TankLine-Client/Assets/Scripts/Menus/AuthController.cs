@@ -54,6 +54,9 @@ public class AuthController : MonoBehaviour
     private float heartbeatInterval = 30f;
     private bool isLoggedIn = false;  
 
+    private bool preventAutoLogin = false;
+
+
     // UI Elements (Leaderboard)
     public TMP_Text map;
     public TMP_Text victories;
@@ -80,28 +83,6 @@ public class AuthController : MonoBehaviour
 
 
 
-    private IEnumerator HeartbeatTimer()
-    {
-            Debug.Log("HEARTBEAT TRIGGERED...");
-            while (true)
-            {
-                // Attend 5 secondes
-                yield return new WaitForSeconds(5f);
-
-                
-                Debug.Log("HeartbeatTimer Is Logged In: " + isLoggedIn);
-                
-                if (isLoggedIn)
-                {
-                    Debug.Log("Starting SendHeartbeat coroutine...");
-                    yield return StartCoroutine(SendHeartbeat());
-                }
-            }
-        }
-
-
-
-
 
     private void Awake()
     {
@@ -109,21 +90,6 @@ public class AuthController : MonoBehaviour
 
     }
     
-    private void Update()
-    {
-        // On vérifie si l'intervalle est écoulé
-        timeSinceLastHeartbeat += Time.deltaTime;
-
-        if (timeSinceLastHeartbeat >= heartbeatInterval)
-        {
-            // Réinitialiser le timer et appeler la coroutine
-            timeSinceLastHeartbeat = 0f;
-
-            // Lancer la coroutine pour envoyer un heartbeat
-            StartCoroutine(SendHeartbeat());
-        }
-    }
-
 
     private void LoadCertificate()
     {
