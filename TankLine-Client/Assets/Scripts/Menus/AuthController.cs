@@ -6,6 +6,12 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System;
 using System.Collections.Generic;
+using System;
+using System.Timers;
+
+using Heartbeat ; 
+
+
 
 public class AuthController : MonoBehaviour
 {
@@ -24,8 +30,12 @@ public class AuthController : MonoBehaviour
 
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
-    public string playedGameUrl = "https://185.155.93.105:17008/api/PlayedGames/summary"; 
+    private string playedGameUrl = "https://185.155.93.105:17008/api/PlayedGames/summary"; 
 
+    private string heartbeatUrl = "https://185.155.93.105:17008/api/auth/heartbeat" ; 
+
+
+    private static AuthController instance;
 
 
     private static X509Certificate2 trustedCertificate;  
@@ -39,6 +49,11 @@ public class AuthController : MonoBehaviour
 
 
 
+    // Heartbeat (ping) to update is_logged_in 
+    private float timeSinceLastHeartbeat = 0f;
+    private float heartbeatInterval = 5f;
+    private bool isLoggedIn = false;  
+
     // UI Elements (Leaderboard)
     public TMP_Text map;
     public TMP_Text victories;
@@ -50,11 +65,65 @@ public class AuthController : MonoBehaviour
     public TMP_Text rank;
     public TMP_Text date;
 
+    
+    private static X509Certificate2 staticTrustedCertificate;
+
+
+
+    private void OnApplicationQuit()
+    {
+        
+        StartCoroutine(LogoutUser());
+    }
+
+    
+
+
+
+    private IEnumerator HeartbeatTimer()
+    {
+            Debug.Log("HEARTBEAT TRIGGERED...");
+            while (true)
+            {
+                // Attend 5 secondes
+                yield return new WaitForSeconds(5f);
+
+                
+                Debug.Log("HeartbeatTimer Is Logged In: " + isLoggedIn);
+                
+                if (isLoggedIn)
+                {
+                    Debug.Log("Starting SendHeartbeat coroutine...");
+                    yield return StartCoroutine(SendHeartbeat());
+                }
+            }
+        }
+
+
+
+
 
     private void Awake()
     {
         LoadCertificate();
+
     }
+    
+    private void Update()
+    {
+        // On vérifie si l'intervalle est écoulé
+        timeSinceLastHeartbeat += Time.deltaTime;
+
+        if (timeSinceLastHeartbeat >= heartbeatInterval)
+        {
+            // Réinitialiser le timer et appeler la coroutine
+            timeSinceLastHeartbeat = 0f;
+
+            // Lancer la coroutine pour envoyer un heartbeat
+            StartCoroutine(SendHeartbeat());
+        }
+    }
+
 
     private void LoadCertificate()
     {
@@ -63,6 +132,7 @@ public class AuthController : MonoBehaviour
         {
             byte[] certificateBytes = File.ReadAllBytes(certificatePath);
             trustedCertificate = new X509Certificate2(certificateBytes);
+            staticTrustedCertificate = trustedCertificate ; 
             Debug.Log("Certificate successfully loaded.");
         }
         else
@@ -382,6 +452,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Login successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
+            HeartbeatManager.Instance.SetLoggedIn(true);
         }
         else
         {
@@ -389,32 +460,35 @@ public class AuthController : MonoBehaviour
             Debug.Log("Details: " + request.downloadHandler.text);
             ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
+        
         }
     }
+
 
     private IEnumerator LogoutUser()
     {
-        UnityWebRequest request = new UnityWebRequest(logoutUrl, "POST");
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Logout successful: " + request.downloadHandler.text);
-            IsRequestSuccessful = true;
-        }
-        else
-        {
-            Debug.Log("Logout error: " + request.error);
-            Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
-            IsRequestSuccessful = false;
-        }
+        yield return SendRequestWithAutoRefresh(
+            logoutUrl,
+            "POST",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // no body for logout
+            onSuccess: (response) =>
+            {
+                Debug.Log("Logout successful: " + response.downloadHandler.text);
+                IsRequestSuccessful = true;
+                HeartbeatManager.Instance.SetLoggedIn(false);
+            },
+            onError: (response) =>
+            {
+                Debug.LogError("Logout error: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(response.downloadHandler.text) ? response.downloadHandler.text : "An unknown error occurred.";
+                IsRequestSuccessful = false;
+            }
+        );
     }
+
 
     private IEnumerator RequestPasswordResetCoroutine(string email)
     {
@@ -721,6 +795,40 @@ private IEnumerator GetGamePlayedStats()
         }
     );
 }
+
+    private IEnumerator SendHeartbeat()
+    {
+        Debug.Log("Is Logged In: " + isLoggedIn);
+
+        if (!isLoggedIn) 
+        {
+            Debug.LogWarning("User is not logged in. Heartbeat request not sent.");
+            yield break;  
+        }
+        else 
+        {
+             Debug.LogWarning("USER IS LOGGED IN");
+        }
+
+        Debug.LogWarning("SEND HEARTBEAT");
+        yield return SendRequestWithAutoRefresh(
+            heartbeatUrl,  
+            "POST",  
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null,  
+            onSuccess: (response) =>
+            {
+                Debug.LogWarning("Heartbeat SUCCESS");
+            },
+            onError: (response) =>
+            {
+                Debug.LogWarning("Heartbeat failed: " + response.error);
+            }
+        );
+
+     }
+
+
 }
 
 
