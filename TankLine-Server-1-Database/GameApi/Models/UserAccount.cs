@@ -70,7 +70,7 @@ public class UserAccount
 
 
     [Column("last_activity")]
-    public DateTime? LastActivity { get; set; }
+    public DateTime? LastActivity { get; set; }= DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
 
 }

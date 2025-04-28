@@ -303,6 +303,8 @@ public class ConnectionRegistrationController : Controller
             user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
         }
 
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
         _context.UserAccounts.Update(user);
         _context.SaveChanges();
 
@@ -321,6 +323,8 @@ public class ConnectionRegistrationController : Controller
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(7)
         });
+
+
 
         return Ok(new { Token = token, RefreshToken = refreshToken });
     }
@@ -730,6 +734,12 @@ public class ConnectionRegistrationController : Controller
     [HttpPost("heartbeat")]
     public IActionResult Heartbeat()
     {
+        
+        Console.WriteLine($"\n");
+
+        Console.WriteLine($"HEARTBEAAAAATTT");
+        Console.WriteLine($"\n");
+
 
        var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
         if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
@@ -750,10 +760,14 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("User not found.");
         }
 
-    user.LastActivity = DateTime.UtcNow;
-    _context.SaveChanges();
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        user.LastActivity = DateTime.UtcNow;
 
-    return Ok();
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
+        _context.SaveChanges();
+
+        return Ok();
 }
 
 
