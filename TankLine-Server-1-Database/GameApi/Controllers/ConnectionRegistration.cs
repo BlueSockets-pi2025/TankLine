@@ -429,7 +429,6 @@ public class ConnectionRegistrationController : Controller
     {
         // Delete the cookies 
         Response.Cookies.Delete("AuthToken");
-        Response.Cookies.Delete("RefreshToken");
 
 
         var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
