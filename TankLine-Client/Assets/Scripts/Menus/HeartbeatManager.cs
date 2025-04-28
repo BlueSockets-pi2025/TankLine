@@ -11,7 +11,7 @@ namespace Heartbeat
         public static HeartbeatManager Instance { get; private set; }
 
         [SerializeField] private string heartbeatUrl = "https://185.155.93.105:17008/api/auth/heartbeat";
-        [SerializeField] private float heartbeatInterval = 5f;
+        [SerializeField] private float heartbeatInterval = 30f;
 
         private float timeSinceLastHeartbeat = 0f;
         private bool isLoggedIn = false;

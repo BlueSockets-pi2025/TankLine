@@ -51,7 +51,7 @@ public class AuthController : MonoBehaviour
 
     // Heartbeat (ping) to update is_logged_in 
     private float timeSinceLastHeartbeat = 0f;
-    private float heartbeatInterval = 5f;
+    private float heartbeatInterval = 30f;
     private bool isLoggedIn = false;  
 
     // UI Elements (Leaderboard)
