@@ -385,6 +385,12 @@ public class ConnectionRegistrationController : Controller
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
 
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        user.LastActivity = DateTime.UtcNow;
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
+
         if (user.PasswordResetExpiration.HasValue)
         {
             user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
@@ -447,6 +453,12 @@ public class ConnectionRegistrationController : Controller
 
         // Marquer l'utilisateur comme déconnecté
         user.IsLoggedIn = false;
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        user.LastActivity = DateTime.UtcNow;
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
         _context.SaveChanges();
 
         return Ok("Logged out successfully.");
@@ -476,6 +488,12 @@ public class ConnectionRegistrationController : Controller
         
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        user.LastActivity = DateTime.UtcNow;
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
 
         if (user.PasswordResetExpiration.HasValue)
         {
@@ -573,6 +591,12 @@ public class ConnectionRegistrationController : Controller
 
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+        
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        user.LastActivity = DateTime.UtcNow;
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
 
         if (user.RefreshTokenExpiration.HasValue)
         {
@@ -695,6 +719,12 @@ public class ConnectionRegistrationController : Controller
 
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        user.LastActivity = DateTime.UtcNow;
+
+        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+
 
         if (user.RefreshTokenExpiration.HasValue)
         {
