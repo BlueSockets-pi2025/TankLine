@@ -68,4 +68,9 @@ public class UserAccount
     [Column("is_logged_in")]
     public bool IsLoggedIn { get; set; } = false;
 
+
+    [Column("last_activity")]
+    public DateTime? LastActivity { get; set; }
+
+
 }
