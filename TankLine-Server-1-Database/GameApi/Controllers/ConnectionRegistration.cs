@@ -262,10 +262,19 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("Account not verified. Please check your email.");
         }
 
-       if (user.IsLoggedIn) 
-       {
-           return BadRequest("User is already logged in.");
-       }
+        if (user.IsLoggedIn)
+        {
+            if (user.LastActivity.HasValue && (DateTime.UtcNow - user.LastActivity.Value).TotalSeconds > 60)
+            {
+                // we consider then that the user has been disconnected 
+                user.IsLoggedIn = false;
+            }
+            else
+            {
+                return BadRequest("User is already logged in.");
+            }
+        }
+
 
 
 
@@ -412,7 +421,6 @@ public class ConnectionRegistrationController : Controller
         Response.Cookies.Delete("AuthToken");
         Response.Cookies.Delete("RefreshToken");
 
-        // Trouver l'utilisateur depuis le token
 
         var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
         if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
@@ -717,6 +725,37 @@ public class ConnectionRegistrationController : Controller
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+
+    [HttpPost("heartbeat")]
+    public IActionResult Heartbeat()
+    {
+
+       var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
+        {
+                return Unauthorized("Invalid token or missing user information.");
+        }
+
+        var username = subClaim.Value;
+
+        if (username == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Username == username);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+    user.LastActivity = DateTime.UtcNow;
+    _context.SaveChanges();
+
+    return Ok();
+}
+
 
 }
 
