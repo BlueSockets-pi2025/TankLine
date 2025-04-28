@@ -86,7 +86,7 @@ public class LobbyManager : NetworkBehaviour
             return;
         }
         switch (sceneName) {
-            case "InGameScene":
+            case "LoadScene":
                 playerSpawner.playerObjectPrefab = InGameTankPrefab;
                 break;
             case "WaitingRoom":
@@ -112,6 +112,7 @@ public class LobbyManager : NetworkBehaviour
     }
 
     public void IsReady() {
+        playerSpawner.InitSpawnPoint();
         NewPlayerReady();
     }
 
@@ -134,7 +135,7 @@ public class LobbyManager : NetworkBehaviour
     public void LaunchGame_Server()
     {
         // Load new scene
-        SceneLoadData newScene = new("InGameScene");
+        SceneLoadData newScene = new("LoadScene");
         newScene.ReplaceScenes = ReplaceOption.All; // destroy every other object
         newScene.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() }; // keep this object in the next scene
 
@@ -164,7 +165,7 @@ public class LobbyManager : NetworkBehaviour
         ChangeSpawnPrefab(scene.name);
         playerSpawner.InitSpawnPoint();
 
-        if (scene.name == "InGameScene") {
+        if (scene.name == "LoadScene") {
             // if on server, reset the number of player ready when reloading a new game
             if (base.IsServerInitialized) {
                 nbPlayerReady = 0;
