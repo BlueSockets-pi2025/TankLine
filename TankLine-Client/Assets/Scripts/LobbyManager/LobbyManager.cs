@@ -8,10 +8,8 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Observing;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(AuthController))]
 [RequireComponent(typeof(NetworkObserver))]
@@ -44,7 +42,7 @@ public class LobbyManager : NetworkBehaviour
 
     void Start() {
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
-        uiManager = new(GameObject.Find("Canvas"));
+        uiManager = new(GameObject.Find("Canvas"), CurrentSceneName() == "LoadScene");
         ChangeSpawnPrefab(CurrentSceneName());
         playerSpawner.InitSpawnPoint();
 
@@ -102,9 +100,13 @@ public class LobbyManager : NetworkBehaviour
     [ServerRpc(RequireOwnership=false)]
     private void NewPlayerReady() {
         nbPlayerReady++;
+        Debug.Log($"[In-Game] Waiting to start game : nbPlayerReady : {nbPlayerReady} TotalPlayerInGame : {serverPlayerList.Count}");
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
+            OnPlayerListChange(serverPlayerList.Values.ToList()); // send names to update UI
+            Debug.Log("[In-Game] Starting game... Spawning player");
+
             foreach (KeyValuePair<NetworkConnection, string> entry in serverPlayerList) {
                 playerSpawner.SpawnPlayer(entry.Key, entry.Value);
             }
@@ -139,7 +141,7 @@ public class LobbyManager : NetworkBehaviour
         newScene.ReplaceScenes = ReplaceOption.All; // destroy every other object
         newScene.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() }; // keep this object in the next scene
 
-        Debug.Log($"[SERVER] : starting game - {newScene.MovedNetworkObjects}");
+        Debug.Log($"[SERVER] Launching game");
 
         // change scene
         InstanceFinder.SceneManager.LoadGlobalScenes(newScene);
@@ -147,7 +149,7 @@ public class LobbyManager : NetworkBehaviour
 
     public void ClickedStartGame()
     {
-        Debug.Log("[CLIENT] Starting game");
+        Debug.Log("[CLIENT] Launching game");
         LaunchGame_Server();
     }
 
@@ -161,15 +163,19 @@ public class LobbyManager : NetworkBehaviour
             return;
         }
 
+        // init new spawn points
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
         ChangeSpawnPrefab(scene.name);
         playerSpawner.InitSpawnPoint();
+
+        // init new ui manager
+        uiManager = new(GameObject.Find("Canvas"), scene.name == "LoadScene");
 
         if (scene.name == "LoadScene") {
             // if on server, reset the number of player ready when reloading a new game
             if (base.IsServerInitialized) {
                 nbPlayerReady = 0;
-            } else IsReady();
+            }
         }
     }
 
@@ -187,6 +193,7 @@ public class LobbyManager : NetworkBehaviour
     private readonly Dictionary<NetworkConnection, string> serverPlayerList = new();
     private List<string> clientPlayerList = new();
     
+    private readonly Dictionary<string, int> playersLifes = new();
 
 
     private IEnumerator SendPlayerName() {
@@ -209,7 +216,7 @@ public class LobbyManager : NetworkBehaviour
     /// <param name="name">The username to add</param>
     [ServerRpc(RequireOwnership = false)]
     public void AddPlayerToList(NetworkConnection connection, string name) {
-        Debug.Log($"[Waiting-Room] New player connected : {name}");
+        Debug.Log($"[Lobby #number] New player connected : {name}");
 
         // add player to list
         serverPlayerList.Add(connection, name);
@@ -227,18 +234,10 @@ public class LobbyManager : NetworkBehaviour
     public void DisconnectClient(NetworkConnection connection = null) {
         if (connection == null) return;
 
-        Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connection]}");
-
-        // despawn player
-        string playerName = serverPlayerList[connection];
-        playerSpawner.DespawnPlayer(playerName);
-
-        // remove player from list
-        serverPlayerList.Remove(connection);
-        OnPlayerListChange(serverPlayerList.Values.ToList());
+        Debug.Log($"[Lobby #number] Disconnecting player : {serverPlayerList[connection]}");
 
         // Break client connection
-        connection.Disconnect(false);
+        connection.Disconnect(true);
     }
 
     /// <summary>
@@ -246,7 +245,7 @@ public class LobbyManager : NetworkBehaviour
     /// </summary>
     /// <param name="connection">The connection to remove</param>
     private void RemovePlayerFromList_ServerSide(NetworkConnection connection) {
-        Debug.Log($"[Waiting-Room] Disconnecting player : {serverPlayerList[connection]}");
+        Debug.Log($"[Lobby #number] Removing player from list : {serverPlayerList[connection]}");
 
         // despawn player
         string playerName = serverPlayerList[connection];
@@ -275,7 +274,7 @@ public class LobbyManager : NetworkBehaviour
 
     /*
         ############################################################
-                          UI Manager (waiting room)
+                                  UI Manager 
         ############################################################
     */
     [Space(15)]
@@ -284,87 +283,7 @@ public class LobbyManager : NetworkBehaviour
     public GameObject playerEntryPrefab;
     [Range(1, 6)]
     public int minimumPlayerToStart = 2;
-    private WaitingRoomUiManager uiManager;
+    private InGameUiManager uiManager;
     private AuthController authController;
 
-
-
-    private class WaitingRoomUiManager 
-    {
-        private GameObject canvas;
-        private GameObject playerListDiv;
-        private GameObject playerCount;
-        private GameObject startButton;
-        private bool isSettingsPanelOpen = false;
-
-        public WaitingRoomUiManager(GameObject _canvas) {
-            canvas = _canvas;
-            if (canvas == null) {
-                Debug.LogError("Critical error, canvas is null");
-                return;
-            }
-
-            // search gameobject
-            playerListDiv = canvas.transform.Find("PlayersCanvas").gameObject;
-            playerCount = canvas.transform.Find("PlayerCount").gameObject;
-            startButton = canvas.transform.Find("StartButton").gameObject;
-
-            // disable start button at the beggining
-            DisableStartButton();
-
-            // add onclick function to buttons
-            canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickPanel);
-            canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
-            canvas.transform.Find("StartButton").GetComponent<Button>().onClick.AddListener(FindFirstObjectByType<LobbyManager>().ClickedStartGame);
-        }
-
-
-        public void ClickPanel() {
-            isSettingsPanelOpen = !isSettingsPanelOpen;
-            canvas.transform.Find("SettingsPanel").gameObject.SetActive(isSettingsPanelOpen);
-        }
-
-        public void ExitToMenu() {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
-        }
-
-        private void DisableStartButton() {
-            startButton.GetComponent<Button>().interactable = false;
-            startButton.transform.Find("startText").GetComponent<TMP_Text>().color = new(.5f, .5f, .5f, .5f);
-        }
-
-        private void EnableStartButton() {
-            startButton.GetComponent<Button>().interactable = true;
-            startButton.transform.Find("startText").GetComponent<TMP_Text>().color = new(0f, 0f, 0f, 1f);
-        }
-
-        /// <summary>
-        /// Update the whole UI of the waiting room (player names, player count & start button)
-        /// </summary>
-        /// <param name="clientPlayerList">The list of the player names</param>
-        /// <param name="playerEntryPrefab">The prefab of a single player name entry</param>
-        /// <param name="minimumPlayerToStart">The minimum number of player required to be able to start a game</param>
-        public void UpdateUI(List<string> clientPlayerList, GameObject playerEntryPrefab, int minimumPlayerToStart) {
-            // clear the name list
-            foreach (Transform child in playerListDiv.transform) {
-                Destroy(child.gameObject);
-            }
-
-            // put every entry in the UI list
-            foreach (string name in clientPlayerList) {
-                GameObject newEntry = Instantiate(playerEntryPrefab, playerListDiv.transform);
-                newEntry.name = name;
-                newEntry.GetComponent<TMP_Text>().text = name;
-            }
-
-            // change player count on UI
-            playerCount.GetComponent<TMP_Text>().text = clientPlayerList.Count.ToString() + "/6";
-
-            // enable/disable start button if enough people
-            if (clientPlayerList.Count >= minimumPlayerToStart)
-                EnableStartButton();
-            else
-                DisableStartButton();
-        }
-    }
 }

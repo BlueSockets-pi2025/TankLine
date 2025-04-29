@@ -149,4 +149,4 @@ MonoBehaviour:
   WaitingRoomTankPrefab: {fileID: 2936260714432119890, guid: b13e84cec43517b98998b8ab8096499c, type: 3}
   InGameTankPrefab: {fileID: 5713213973998924859, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
   playerEntryPrefab: {fileID: 3750445552347481031, guid: 3ee84746511846d1d8941743bc0fea7c, type: 3}
-  minimumPlayerToStart: 1
+  minimumPlayerToStart: 2

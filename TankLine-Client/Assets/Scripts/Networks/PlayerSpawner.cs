@@ -15,7 +15,7 @@ public class PlayerSpawner : NetworkBehaviour
     public void InitSpawnPoint()
     {
         // find new spawnpoint transform
-        Transform spawnPointsParent = GameObject.Find("PlayerSpawns").transform;
+        GameObject spawnPointsParent = GameObject.Find("PlayerSpawns");
         if (spawnPointsParent == null) {
             Debug.Log("[ERROR] spawnpoint parent not found");
             return;
@@ -24,7 +24,7 @@ public class PlayerSpawner : NetworkBehaviour
         // clear old spawnpoints
         spawnPoints = new();
 
-        foreach (Transform child in spawnPointsParent) {
+        foreach (Transform child in spawnPointsParent.transform) {
             spawnPoints.Add(child.gameObject);
         }
 
