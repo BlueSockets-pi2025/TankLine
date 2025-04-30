@@ -1,9 +1,12 @@
 using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
+using FishNet.Managing;
+using FishNet.Managing.Scened;
 
 public class RoomManager : NetworkBehaviour
 {
@@ -50,7 +53,10 @@ public class RoomManager : NetworkBehaviour
     Debug.Log($"[RoomManager] Created room {roomId} | Public: {isPublic} | Max Players: {maxPlayers}");
 
     OnRoomCreated?.Invoke(conn, roomId);
-    JoinRoom(conn, roomId);
+
+    room.AddPlayer(conn);
+    playerRooms[conn] = roomId;
+    LoadWaitingRoomScene(roomId, conn);
   }
 
   /// <summary>
@@ -141,15 +147,15 @@ public class RoomManager : NetworkBehaviour
   {
     if (conn == null)
     {
-        Debug.LogError("TargetConfirmRoomJoin called with null connection.");
-        return;
+      Debug.LogError("[RoomManager] TargetConfirmRoomJoin called with null connection.");
+      return;
     }
 
     Debug.Log("[RoomManager] You have joined room " + roomId);
 
     RoomClientData.CurrentRoomId = roomId;
 
-    UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
+    LoadWaitingRoomScene(roomId, conn);
   }
 
   [TargetRpc]
@@ -190,5 +196,35 @@ public class RoomManager : NetworkBehaviour
   {
     rooms.TryGetValue(roomId, out Room room);
     return room;
+  }
+
+  [ServerRpc(RequireOwnership = false)]
+  public void LoadWaitingRoomScene(int roomId, NetworkConnection newConn = null)
+  {
+    if (!rooms.TryGetValue(roomId, out Room room))
+    {
+      Debug.LogError($"[RoomManager] Can't load scene. Room {roomId} does not exist");
+      return;
+    }
+
+    var sld = new SceneLoadData("WaitingRoom");
+    sld.ReplaceScenes = ReplaceOption.All;
+    sld.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() };
+
+    NetworkConnection[] connections;
+
+
+    if (newConn != null)
+    {
+      connections = new NetworkConnection[] { newConn };
+    }
+    else
+    {
+      connections = room.GetPlayers().ToArray();
+    }
+
+    InstanceFinder.SceneManager.LoadConnectionScenes(connections, sld);
+
+    Debug.Log($"[RoomManager] Loaded 'WaitingRoom' for Room {roomId}. Connections: {connections.Length}");
   }
 }
