@@ -23,21 +23,17 @@ public class MenuSwapper : MonoBehaviour
     public GameObject PasswordErrorTextReset;
     public GameObject ConfirmationErrorTextReset;
 
-    public GameObject top1, top2, top3, top4;
-
     // Testing : 
     public TMP_Text gamesPlayedInputField;
     public TMP_Text highestScoreInputField;
     public TMP_Text UserNameField;
     public TMP_Text UserRankField;
 
-
-
-
     public static bool isFirstLaunch = true ; 
+
     void Awake()
     {
-        // ensure there is only one instance of this script
+        // Ensure there is only one instance of this script
         if (Instance == null)
             Instance = this;
         else
@@ -54,34 +50,28 @@ public class MenuSwapper : MonoBehaviour
             Debug.LogError("AuthController not found.");
             return;
         }
-        if (isFirstLaunch)
-        {
-            HeartbeatManager.Instance.SetLoggedIn(true);
 
-            AutoLogin();
-            isFirstLaunch = false ; 
-        }
-        else 
-        {
-            Debug.Log ("NOT FIRST LAUNCH") ;
-        }
-
-
-        // load first page
+        // Load first page
         // OpenPage("PagePrincipale"); 
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
         if (currentScene == "ConnectionMenu")
         {
             OpenPage("PagePrincipale");
+            if (isFirstLaunch)
+            {
+                AutoLogin();
+                isFirstLaunch = false; 
+                Debug.Log("FIRST LAUNCH");
+            }
+            else Debug.Log ("NOT FIRST LAUNCH");
         }
+
         else if (currentScene == "MainMenu")
         {
             OpenPage("MainMenu");
             AutoLogin();
         }
-        
-
-        //OpenPagePrincipal();
     }
 
     private void AutoLogin()
@@ -102,11 +92,11 @@ public class MenuSwapper : MonoBehaviour
         
         if (authController.IsRequestSuccessful)
         {
-            
             Debug.Log("Auto-login successful. Skipping login page.");
             string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (currentScene == "ConnectionMenu")
             {
+                HeartbeatManager.Instance.SetLoggedIn(true);
                 MainMenuScene();
             }
         }
@@ -521,20 +511,29 @@ public class MenuSwapper : MonoBehaviour
             return;
         }
         StartCoroutine(LogoutCoroutine());
+        
     }
 
     private IEnumerator LogoutCoroutine()
     {
+        Debug.Log("Logging out...");
         yield return authController.Logout();
 
         if (authController.IsRequestSuccessful)
         {
             OpenMessage("You have been logged out successfully.");
+
+            // Wait for popup to close
+            yield return new WaitUntil(() => !MessagePopup.activeSelf);
+
+            // Load scene after closing popup
+            UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
         }
         else
         {
             OpenErr($"Logout failed. Please try again: \n {authController.ErrorResponse}");
         }
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
     }
 
     public void HandleSessionExpired()
@@ -562,21 +561,10 @@ public class MenuSwapper : MonoBehaviour
             {
                 badge.Find("GamePlayed").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.gamesPlayed.ToString();
                 badge.Find("HighScore").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.highestScore.ToString();
-                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();
-                
-                found_badge = badge.Find("UserName").GetComponent<TMP_Text>().text ; 
-
-                if (found_badge != null)
-                {
-                    badge.Find("UserName").GetComponent<TMP_Text>().text  = authController.CurrentUser.username ; 
-                    Debug.Log("FOUUUUNNDDDDDD" ) ; 
-                    Debug.Log(found_badge ) ; 
-                }
-                else 
-                {
-                    Debug.Log("NOOOOOOTTTT FOUNDDDDDD") ; 
-                }
+                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();    
+                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.username ;
             }
+
             else
             {
                 Debug.LogWarning("Badge undefined");
@@ -827,7 +815,7 @@ public class MenuSwapper : MonoBehaviour
     {
         if (tooltip != null)
         {
-            tooltip.SetActive(false); // Cache le tooltip
+            tooltip.SetActive(false); // Hide the tooltip
         }
         else
         {

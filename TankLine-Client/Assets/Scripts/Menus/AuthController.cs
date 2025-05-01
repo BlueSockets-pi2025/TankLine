@@ -610,6 +610,7 @@ public class AuthController : MonoBehaviour
             }
         );
     }
+    
 private IEnumerator GetGamePlayedStats()
 {
     UnityWebRequest request = new UnityWebRequest(playedGameUrl, "GET");
@@ -877,6 +878,7 @@ public class UserData
 [System.Serializable]
 public class UserStatistics
 {
+    public string username;
     public int gamesPlayed;
     public int highestScore;
     public int ranking;

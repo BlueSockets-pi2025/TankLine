@@ -16,7 +16,6 @@ namespace Heartbeat
         private float timeSinceLastHeartbeat = 0f;
         private bool isLoggedIn = false;
 
-
         private IEnumerator HeartbeatTimer()
         {
                 Debug.Log("HEARTBEAT TRIGGERED...");
@@ -36,8 +35,6 @@ namespace Heartbeat
                 }
             }
 
-
-
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -49,8 +46,6 @@ namespace Heartbeat
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-
-
 
         private void Start()
         {
@@ -69,10 +64,10 @@ namespace Heartbeat
 
             Debug.LogWarning("SEND HEARTBEAT");
 
-            X509Certificate2 certificate = AuthController.GetTrustedCertificate(); // Récupère le certificat de AuthController
+            X509Certificate2 certificate = AuthController.GetTrustedCertificate(); // Retrieves AuthController certificate
 
-            // Appel à la méthode SendRequestWithAutoRefresh comme dans ton code
-            yield return SendRequestWithAutoRefresh(
+            // Call the SendHeartbeatRequest method
+            yield return SendHeartbeatRequest(
                 heartbeatUrl,
                 "POST",
                 new Dictionary<string, string> { { "Content-Type", "application/json" } },
@@ -89,7 +84,7 @@ namespace Heartbeat
             );
         }
 
-        private IEnumerator SendRequestWithAutoRefresh(
+        private IEnumerator SendHeartbeatRequest(
             string url, string method, Dictionary<string, string> headers, byte[] body, 
             X509Certificate2 certificate, System.Action<UnityWebRequest> onSuccess, 
             System.Action<UnityWebRequest> onError)
@@ -103,7 +98,7 @@ namespace Heartbeat
                     www.SetRequestHeader(header.Key, header.Value);
                 }
 
-                // Applique le certificat à la requête
+                // Apply the certificate to the request
                 www.certificateHandler = new CertificateHandlerCustom(certificate);
 
                 yield return www.SendWebRequest();
@@ -121,29 +116,27 @@ namespace Heartbeat
 
 
 
-    public void SetLoggedIn(bool loggedIn) 
-    {
-        isLoggedIn = loggedIn ; 
-    }
-
-    // Custom CertificateHandler pour appliquer le certificat
-    public class CertificateHandlerCustom : CertificateHandler
-    {
-        private X509Certificate2 certificate;
-
-        public CertificateHandlerCustom(X509Certificate2 cert)
+        public void SetLoggedIn(bool loggedIn) 
         {
-            certificate = cert;
+            isLoggedIn = loggedIn ; 
         }
 
-        protected override bool ValidateCertificate(byte[] certificateData)
+        // Custom CertificateHandler to apply the certificate
+        public class CertificateHandlerCustom : CertificateHandler
         {
-            // Logique de validation du certificat
-            X509Certificate2 cert = new X509Certificate2(certificateData);
-            return cert.Equals(certificate); // Comparaison simple, mais à adapter selon le besoin
-        }
-    }
+            private X509Certificate2 certificate;
 
+            public CertificateHandlerCustom(X509Certificate2 cert)
+            {
+                certificate = cert;
+            }
+
+            protected override bool ValidateCertificate(byte[] certificateData)
+            {
+                X509Certificate2 cert = new X509Certificate2(certificateData);
+                return cert.Equals(certificate);
+            }
+        }
 
     }
 
