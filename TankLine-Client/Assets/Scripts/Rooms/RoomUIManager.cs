@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-public class RoomUIManager : MonoBehaviour
+public class RoomUIManager : NetworkBehaviour
 {
     public static RoomUIManager Instance { get; private set; }
 
@@ -34,38 +34,51 @@ public class RoomUIManager : MonoBehaviour
     private Color normalColor = Color.white;
     private Color selectedColor = Color.red;
 
-    void Awake()
+    void Start()
     {
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
-    }
 
-    void Start()
-    {
-        StartCoroutine(ConfirmClientConn());
+        StartCoroutine(EnsureRoomManagerAndClientReady());
         UpdateSelectionTexts();
 
         CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
         JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
         codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
         Debug.Log("[RoomUI] Room UI initialized.");
+
+        Debug.Log($"ClientStarted: {InstanceFinder.IsClientStarted}");
+        Debug.Log($"ClientManager exists: {InstanceFinder.ClientManager != null}");
+        Debug.Log($"Connection exists: {InstanceFinder.ClientManager.Connection != null}");
+        Debug.Log($"Connection is valid: {InstanceFinder.ClientManager.Connection?.IsValid}");
+       
     }
 
-    private IEnumerator ConfirmClientConn()
+    private IEnumerator EnsureRoomManagerAndClientReady()
     {
+        Debug.Log("[RoomUI] Coroutine started");
+
+        // Debug.Log($"ClientStarted: {InstanceFinder.IsClientStarted}");
+        // Debug.Log($"ClientManager exists: {InstanceFinder.ClientManager != null}");
+        // Debug.Log($"Connection exists: {InstanceFinder.ClientManager.Connection != null}");
+        // Debug.Log($"Connection is valid: {InstanceFinder.ClientManager.Connection?.IsValid}");
+        // // // Wait for network client to be ready
+        // yield return new WaitUntil(() =>
+        //     InstanceFinder.IsClientStarted &&
+        //     InstanceFinder.ClientManager.Connection != null &&
+        //     InstanceFinder.ClientManager.Connection.IsValid
+        // );
+
+        // Wait until the manager is properly spawned
         yield return new WaitUntil(() =>
-            InstanceFinder.IsClientStarted &&
-            InstanceFinder.ClientManager.Connection.IsValid
-        );
-        Debug.Log("[RoomUI] Client connection confirmed.");
-        
-        yield return new WaitUntil(() =>
-            spawnedRoomManager != null && spawnedRoomManager.isActiveAndEnabled
+            RoomManager.Instance != null && RoomManager.Instance.isActiveAndEnabled
         );
 
-        Debug.Log("[RoomUI] Client and RoomManager are ready.");
+        spawnedRoomManager = RoomManager.Instance;
+
+        Debug.Log("[RoomUI] RoomManager is ready.");
     }
 
     // === SELECTION BUTTONS ===
@@ -109,19 +122,6 @@ public class RoomUIManager : MonoBehaviour
 
     private void HandleCreateRoom()
     {
-        if (!InstanceFinder.IsServer)
-        {
-            Debug.LogError("[RoomUI] Cannot create room. Not a server instance.");
-            return;
-        }
-
-        if (spawnedRoomManager == null)
-        {
-            NetworkObject roomObj = Instantiate(roomManagerPrefab).GetComponent<NetworkObject>();
-            InstanceFinder.ServerManager.Spawn(roomObj);
-            spawnedRoomManager = roomObj.GetComponent<RoomManager>();
-            Debug.Log("[RoomUI] RoomManager spawned.");
-        }
 
         int maxPlayers = selectedNumber;
         bool isPublic = selectedMode == "Public";

@@ -10,10 +10,20 @@ using FishNet.Managing.Scened;
 
 public class RoomManager : NetworkBehaviour
 {
+  public static RoomManager Instance { get; private set; }
+
   private Dictionary<int, Room> rooms = new Dictionary<int, Room>();
   private Dictionary<NetworkConnection, int> playerRooms = new Dictionary<NetworkConnection, int>();
 
   public event Action<NetworkConnection, int> OnRoomCreated;
+
+  private void Start()
+  {
+    if (Instance == null)
+      Instance = this;
+    else
+      Destroy(gameObject);
+  }
 
   public override void OnStopServer()
   {
