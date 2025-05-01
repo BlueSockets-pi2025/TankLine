@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using FishNet;
 using FishNet.Object;
 using FishNet.Connection;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
@@ -13,7 +14,6 @@ public class RoomUIManager : MonoBehaviour
     [Header("Buttons")]
     public Button CreateRoomBtn;
     public Button JoinRoomBtn;
-    public Button returnBtn;
 
     [Header("Input Fields")]
     public TMP_InputField codeInput;
@@ -23,6 +23,10 @@ public class RoomUIManager : MonoBehaviour
     public Text selectedModeText;
     public List<Button> numberButtons; // players per room
     public List<Button> modeButtons; // public/private
+
+    [Header("Room Manager")]
+    [SerializeField] private RoomManager roomManagerPrefab;
+    private RoomManager spawnedRoomManager;
 
     private int selectedNumber = 2;
     private string selectedMode = "Public";
@@ -40,37 +44,16 @@ public class RoomUIManager : MonoBehaviour
 
     void Start()
     {
-        SetRoomButtonsInteractable(true);
         StartCoroutine(ConfirmClientConn());
         UpdateSelectionTexts();
 
-        if (RoomManager.Instance != null)
-        {
-            NetworkObject netObj = RoomManager.Instance.GetComponent<NetworkObject>();
-
-            if (InstanceFinder.IsServer)
-            {
-                if (netObj != null && !netObj.IsSpawned)
-                {
-                    Debug.Log("[RoomUI] Forcing RoomManager spawn.");
-
-                    if (netObj.IsSceneObject)
-                        InstanceFinder.ServerManager.Spawn(netObj);
-                    else
-                        InstanceFinder.ServerManager.Spawn(netObj);
-                }
-            }
-        }
+        CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
+        JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
+        codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
+        Debug.Log("[RoomUI] Room UI initialized.");
     }
 
-    private void SetRoomButtonsInteractable(bool value)
-    {
-        CreateRoomBtn.interactable = value;
-        JoinRoomBtn.interactable = value;
-        //returnBtn.interactable = value;
-    }
-
-    private System.Collections.IEnumerator ConfirmClientConn()
+    private IEnumerator ConfirmClientConn()
     {
         yield return new WaitUntil(() =>
             InstanceFinder.IsClientStarted &&
@@ -79,19 +62,10 @@ public class RoomUIManager : MonoBehaviour
         Debug.Log("[RoomUI] Client connection confirmed.");
         
         yield return new WaitUntil(() =>
-            RoomManager.Instance != null && RoomManager.Instance.isActiveAndEnabled
+            spawnedRoomManager != null && spawnedRoomManager.isActiveAndEnabled
         );
 
         Debug.Log("[RoomUI] Client and RoomManager are ready.");
-
-        
-
-        SetRoomButtonsInteractable(true);
-
-        CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
-        JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
-        //returnBtn.onClick.AddListener(HandleReturn);
-        codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
     }
 
     // === SELECTION BUTTONS ===
@@ -135,11 +109,25 @@ public class RoomUIManager : MonoBehaviour
 
     private void HandleCreateRoom()
     {
+        if (!InstanceFinder.IsServer)
+        {
+            Debug.LogError("[RoomUI] Cannot create room. Not a server instance.");
+            return;
+        }
+
+        if (spawnedRoomManager == null)
+        {
+            NetworkObject roomObj = Instantiate(roomManagerPrefab).GetComponent<NetworkObject>();
+            InstanceFinder.ServerManager.Spawn(roomObj);
+            spawnedRoomManager = roomObj.GetComponent<RoomManager>();
+            Debug.Log("[RoomUI] RoomManager spawned.");
+        }
+
         int maxPlayers = selectedNumber;
         bool isPublic = selectedMode == "Public";
         Debug.Log($"[RoomUI] Requesting room creation | Public: {isPublic} | Max Players: {maxPlayers}");
 
-        RoomManager.Instance.RequestCreateRoom(maxPlayers, isPublic, InstanceFinder.ClientManager.Connection);
+        spawnedRoomManager.RequestCreateRoom(maxPlayers, isPublic, InstanceFinder.ClientManager.Connection);
     }
 
     // === ROOM JOINING ===
@@ -152,12 +140,12 @@ public class RoomUIManager : MonoBehaviour
         // if the room is public then:
         if (isPublic)
         {
-            int? roomId = RoomManager.Instance.GetFirstAvaliablePublicRoom();
+            int? roomId = spawnedRoomManager.GetFirstAvaliablePublicRoom();
 
             if (roomId.HasValue)
             {
                 Debug.Log($"[RoomUI] Joining public room {roomId.Value}");
-                RoomManager.Instance.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
+                spawnedRoomManager.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
             }
             else
             {
@@ -172,7 +160,7 @@ public class RoomUIManager : MonoBehaviour
             if (IsValidRoomCode(codeInput.text, out int roomId))
             {
                 Debug.Log($"[RoomUI] Joining private room {roomId}");
-                RoomManager.Instance.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
+                spawnedRoomManager.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
             }
             else
             {
