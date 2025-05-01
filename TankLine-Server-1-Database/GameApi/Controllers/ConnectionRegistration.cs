@@ -99,6 +99,21 @@ public class ConnectionRegistrationController : Controller
             user.VerificationCode = verificationCode;
             user.VerificationExpiration = DateTime.UtcNow.AddMinutes(5); // Code valid for 5 minutes
 
+            if (user.LastActivity.HasValue)
+            {
+                user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+            }
+
+            if (user.PasswordResetExpiration.HasValue)
+            {
+                user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+            }
+
+            if (user.RefreshTokenExpiration.HasValue)
+            {
+                user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
+            }
+
             // Add the new user to the database
             _context.UserAccounts.Add(user);
             await _context.SaveChangesAsync();
@@ -156,6 +171,11 @@ public class ConnectionRegistrationController : Controller
         if (user.PasswordResetExpiration.HasValue)
         {
             user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
         }
 
         _context.UserAccounts.Update(user);
@@ -303,7 +323,10 @@ public class ConnectionRegistrationController : Controller
             user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
         }
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+        }
 
         _context.UserAccounts.Update(user);
         _context.SaveChanges();
@@ -323,8 +346,6 @@ public class ConnectionRegistrationController : Controller
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(7)
         });
-
-
 
         return Ok(new { Token = token, RefreshToken = refreshToken });
     }
@@ -385,11 +406,7 @@ public class ConnectionRegistrationController : Controller
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
         user.LastActivity = DateTime.UtcNow;
-
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
-
 
         if (user.PasswordResetExpiration.HasValue)
         {
@@ -399,6 +416,11 @@ public class ConnectionRegistrationController : Controller
         if (user.VerificationExpiration.HasValue)
         {
             user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
         }
 
         _context.UserAccounts.Update(user);
@@ -450,13 +472,34 @@ public class ConnectionRegistrationController : Controller
             return BadRequest("User not found.");
         }
 
-        // Marquer l'utilisateur comme déconnecté
+        // Mark user as logged out
         user.IsLoggedIn = false;
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
         user.LastActivity = DateTime.UtcNow;
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+        }
+        
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+
+
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.VerificationExpiration.HasValue)
+        {
+            user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.RefreshTokenExpiration.HasValue)
+        {
+            user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
+        }
 
         _context.SaveChanges();
 
@@ -488,11 +531,12 @@ public class ConnectionRegistrationController : Controller
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
         user.LastActivity = DateTime.UtcNow;
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
-
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+        }
 
         if (user.PasswordResetExpiration.HasValue)
         {
@@ -591,11 +635,12 @@ public class ConnectionRegistrationController : Controller
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
         
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
         user.LastActivity = DateTime.UtcNow;
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
-
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+        }
 
         if (user.RefreshTokenExpiration.HasValue)
         {
@@ -719,11 +764,12 @@ public class ConnectionRegistrationController : Controller
         user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
         user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
         user.LastActivity = DateTime.UtcNow;
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
-
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+        }
 
         if (user.RefreshTokenExpiration.HasValue)
         {
@@ -759,14 +805,13 @@ public class ConnectionRegistrationController : Controller
         }
     }
 
-
     [HttpPost("heartbeat")]
     public IActionResult Heartbeat()
     {
         
         Console.WriteLine($"\n");
 
-        Console.WriteLine($"HEARTBEAAAAATTT");
+        Console.WriteLine($"HEARTBEAT");
         Console.WriteLine($"\n");
 
 
@@ -788,11 +833,31 @@ public class ConnectionRegistrationController : Controller
         {
             return BadRequest("User not found.");
         }
-
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+            
         user.LastActivity = DateTime.UtcNow;
 
-        user.LastActivity = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc) ;
+        if (user.LastActivity.HasValue)
+        {
+            user.LastActivity = DateTime.SpecifyKind(user.LastActivity.Value, DateTimeKind.Utc);
+        }
+
+        user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+        user.BirthDate = DateTime.SpecifyKind(user.BirthDate, DateTimeKind.Utc);
+
+        if (user.PasswordResetExpiration.HasValue)
+        {
+            user.PasswordResetExpiration = DateTime.SpecifyKind(user.PasswordResetExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.VerificationExpiration.HasValue)
+        {
+            user.VerificationExpiration = DateTime.SpecifyKind(user.VerificationExpiration.Value, DateTimeKind.Utc);
+        }
+
+        if (user.RefreshTokenExpiration.HasValue)
+        {
+            user.RefreshTokenExpiration = DateTime.SpecifyKind(user.RefreshTokenExpiration.Value, DateTimeKind.Utc);
+        }
 
         _context.SaveChanges();
 
