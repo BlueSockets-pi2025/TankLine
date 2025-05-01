@@ -79,7 +79,7 @@ MonoBehaviour:
   <AssetPathHash>k__BackingField: 13993801302970289841
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
-    Position: {x: -0.23131546, y: -3.8985317, z: 11.948371}
+    Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 1, y: 1, z: 1}
     IsValid: 1
@@ -150,3 +150,12 @@ MonoBehaviour:
   InGameTankPrefab: {fileID: 5713213973998924859, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
   playerEntryPrefab: {fileID: 3750445552347481031, guid: 3ee84746511846d1d8941743bc0fea7c, type: 3}
   minimumPlayerToStart: 2
+  maxPlayerLives: 3
+  skins:
+  - {fileID: 2100000, guid: 982f385553afb916593611edf6b725e4, type: 2}
+  - {fileID: 2100000, guid: f96f74a6ca86feb6db55ab1aa62a2d5a, type: 2}
+  - {fileID: 2100000, guid: 9c4e4052c8e20be8ba71d68b8dd96121, type: 2}
+  - {fileID: 2100000, guid: bbbf531e589d3696e839d6c14c397722, type: 2}
+  - {fileID: 2100000, guid: 70db84dd3bd063a0c93d5b7fbeb502d6, type: 2}
+  - {fileID: 2100000, guid: d7b5465b3e713b805bac4aa184a1e689, type: 2}
+  - {fileID: 2100000, guid: 842124da23c16dc11ba35b44543d9159, type: 2}

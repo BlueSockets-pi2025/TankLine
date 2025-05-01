@@ -8,6 +8,7 @@ using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Observing;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -45,6 +46,11 @@ public class LobbyManager : NetworkBehaviour
         uiManager = new(GameObject.Find("Canvas"), CurrentSceneName() == "LoadScene");
         ChangeSpawnPrefab(CurrentSceneName());
         playerSpawner.InitSpawnPoint();
+
+        // load skins
+        for (int i=0; i<skins.Count; i++) {
+            availableSkins.Add(i);
+        }
 
         // send username to DB
         if (base.IsClientInitialized) {
@@ -104,11 +110,12 @@ public class LobbyManager : NetworkBehaviour
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
-            OnPlayerListChange(serverPlayerList.Values.ToList()); // send names to update UI
+            OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList())); // send names to update UI
+            SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
             Debug.Log("[In-Game] Starting game... Spawning player");
 
-            foreach (KeyValuePair<NetworkConnection, string> entry in serverPlayerList) {
-                playerSpawner.SpawnPlayer(entry.Key, entry.Value);
+            foreach (KeyValuePair<NetworkConnection, PlayerData> entry in serverPlayerList) {
+                playerSpawner.SpawnPlayerWithSkin(entry.Key, entry.Value.name, skins[entry.Value.skinColor]);
             }
         }
     }
@@ -190,10 +197,8 @@ public class LobbyManager : NetworkBehaviour
         ############################################################
     */
 
-    private readonly Dictionary<NetworkConnection, string> serverPlayerList = new();
+    private readonly Dictionary<NetworkConnection, PlayerData> serverPlayerList = new();
     private List<string> clientPlayerList = new();
-    
-    private readonly Dictionary<string, int> playersLifes = new();
 
 
     private IEnumerator SendPlayerName() {
@@ -219,11 +224,15 @@ public class LobbyManager : NetworkBehaviour
         Debug.Log($"[Lobby #number] New player connected : {name}");
 
         // add player to list
-        serverPlayerList.Add(connection, name);
-        OnPlayerListChange(serverPlayerList.Values.ToList());
+        serverPlayerList.Add(connection, new(name, maxPlayerLives, availableSkins[0]));
+        OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList()));
+        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
 
         // spawn player object
-        playerSpawner.SpawnPlayer(connection, name);
+        playerSpawner.SpawnPlayerWithSkin(connection, name, skins[availableSkins[0]]);
+
+        // Remove the skin given to new player from availables ones
+        availableSkins.RemoveAt(0);
     }
 
     /// <summary>
@@ -234,7 +243,7 @@ public class LobbyManager : NetworkBehaviour
     public void DisconnectClient(NetworkConnection connection = null) {
         if (connection == null) return;
 
-        Debug.Log($"[Lobby #number] Disconnecting player : {serverPlayerList[connection]}");
+        Debug.Log($"[Lobby #number] Disconnecting player : {serverPlayerList[connection].name}");
 
         // Break client connection
         connection.Disconnect(true);
@@ -245,15 +254,19 @@ public class LobbyManager : NetworkBehaviour
     /// </summary>
     /// <param name="connection">The connection to remove</param>
     private void RemovePlayerFromList_ServerSide(NetworkConnection connection) {
-        Debug.Log($"[Lobby #number] Removing player from list : {serverPlayerList[connection]}");
+        Debug.Log($"[Lobby #number] Removing player from list : {serverPlayerList[connection].name}");
 
         // despawn player
-        string playerName = serverPlayerList[connection];
-        playerSpawner.DespawnPlayer(playerName);
+        PlayerData leavingPlayer = serverPlayerList[connection];
+        playerSpawner.DespawnPlayer(leavingPlayer.name);
+
+        // Add leaving player skins to available ones
+        availableSkins.Add(leavingPlayer.skinColor);
 
         // remove player from list
         serverPlayerList.Remove(connection);
-        OnPlayerListChange(serverPlayerList.Values.ToList());
+        OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList()));
+        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
 
     /// <summary>
@@ -286,4 +299,73 @@ public class LobbyManager : NetworkBehaviour
     private InGameUiManager uiManager;
     private AuthController authController;
 
+
+
+
+
+
+    /*
+        ############################################################
+                                Game Logic
+        ############################################################
+    */
+
+    [Space(15)]
+    [Header("Game parameters")]
+    [Space(5)]
+
+    [Range(1,5)]
+    public int maxPlayerLives = 3;
+    public List<Material> skins = new();
+    private readonly List<int> availableSkins = new();
+
+    [ObserversRpc]
+    private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins) {
+        Debug.Log("Changing player skins");
+        UnityEngine.Object[] players = FindObjectsByType(typeof(Tank), FindObjectsSortMode.None);
+
+        foreach (UnityEngine.Object player in players) {
+            GameObject go = player.GameObject();
+            Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().ClientManager.Connection]];
+
+            go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+
+            foreach (Transform tr in go.transform.Find("tankGun"))
+                tr.GetComponent<Renderer>().material = skinColor;
+        }
+    }
+}
+
+public class PlayerData
+{
+    public string name { get; set; }
+    public int livesLeft { get; set; }
+    public int skinColor { get; set; }
+
+    public PlayerData(string _name, int _livesLeft, int _skinColor)
+    {
+        name = _name;
+        livesLeft = _livesLeft;
+        skinColor = _skinColor;
+    }
+
+    static public List<string> GetNameList(List<PlayerData> playerDatas) {
+        List<string> names = new();
+
+        foreach(PlayerData player in playerDatas) {
+            names.Add(player.name);
+        }
+
+        return names;
+    }
+
+    static public Dictionary<NetworkConnection, int> GetSkinsDic(Dictionary<NetworkConnection, PlayerData> players) {
+        Dictionary<NetworkConnection, int> skins = new();
+
+        foreach (KeyValuePair<NetworkConnection, PlayerData> pair in players) {
+            skins.Add(pair.Key, pair.Value.skinColor);
+        }
+
+        return skins;
+    }
 }
