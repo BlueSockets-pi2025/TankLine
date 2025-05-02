@@ -525,7 +525,7 @@ public class MenuSwapper : MonoBehaviour
 
             // Wait for popup to close
             yield return new WaitUntil(() => !MessagePopup.activeSelf);
-
+            
             // Load scene after closing popup
             UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
         }
@@ -533,7 +533,6 @@ public class MenuSwapper : MonoBehaviour
         {
             OpenErr($"Logout failed. Please try again: \n {authController.ErrorResponse}");
         }
-        UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
     }
 
     public void HandleSessionExpired()
