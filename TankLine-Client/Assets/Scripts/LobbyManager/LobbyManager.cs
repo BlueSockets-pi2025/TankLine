@@ -106,16 +106,15 @@ public class LobbyManager : NetworkBehaviour
     [ServerRpc(RequireOwnership=false)]
     private void NewPlayerReady() {
         nbPlayerReady++;
-        Debug.Log($"[In-Game] Waiting to start game : nbPlayerReady : {nbPlayerReady} TotalPlayerInGame : {serverPlayerList.Count}");
+        Debug.Log($"[In-Game] Waiting to start game : {nbPlayerReady}/{serverPlayerList.Count}");
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
             OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList())); // send names to update UI
-            SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
             Debug.Log("[In-Game] Starting game... Spawning player");
 
             foreach (KeyValuePair<NetworkConnection, PlayerData> entry in serverPlayerList) {
-                playerSpawner.SpawnPlayerWithSkin(entry.Key, entry.Value.name, skins[entry.Value.skinColor]);
+                playerSpawner.SpawnPlayer(entry.Key, entry.Value.name);
             }
         }
     }
@@ -123,6 +122,11 @@ public class LobbyManager : NetworkBehaviour
     public void IsReady() {
         playerSpawner.InitSpawnPoint();
         NewPlayerReady();
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void OnPlayerSpawned() {
+        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
 
 
@@ -226,10 +230,9 @@ public class LobbyManager : NetworkBehaviour
         // add player to list
         serverPlayerList.Add(connection, new(name, maxPlayerLives, availableSkins[0]));
         OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList()));
-        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
 
         // spawn player object
-        playerSpawner.SpawnPlayerWithSkin(connection, name, skins[availableSkins[0]]);
+        playerSpawner.SpawnPlayer(connection, name);
 
         // Remove the skin given to new player from availables ones
         availableSkins.RemoveAt(0);
@@ -266,7 +269,6 @@ public class LobbyManager : NetworkBehaviour
         // remove player from list
         serverPlayerList.Remove(connection);
         OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList()));
-        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
 
     /// <summary>
@@ -318,20 +320,30 @@ public class LobbyManager : NetworkBehaviour
     public int maxPlayerLives = 3;
     public List<Material> skins = new();
     private readonly List<int> availableSkins = new();
+    
 
     [ObserversRpc]
     private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins) {
-        Debug.Log("Changing player skins");
-        UnityEngine.Object[] players = FindObjectsByType(typeof(Tank), FindObjectsSortMode.None);
 
-        foreach (UnityEngine.Object player in players) {
+        if (CurrentSceneName() == "LoadScene") {
+            // in game players
+            Tank_Player[] playersInGame = FindObjectsByType<Tank_Player>(FindObjectsSortMode.None);
+            foreach (Tank_Player player in playersInGame)
+            {
+                GameObject go = player.GameObject();
+                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
+
+                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+            }
+        }
+
+        // Lobby players
+        Tank_Lobby[] playersLobby = FindObjectsByType<Tank_Lobby>(FindObjectsSortMode.None);
+        foreach (Tank_Lobby player in playersLobby) {
             GameObject go = player.GameObject();
-            Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().ClientManager.Connection]];
+            Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
             go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
-
-            foreach (Transform tr in go.transform.Find("tankGun"))
-                tr.GetComponent<Renderer>().material = skinColor;
         }
     }
 }
