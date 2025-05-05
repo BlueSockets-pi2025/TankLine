@@ -2,7 +2,37 @@ fileFormatVersion: 2
 guid: 182f3111556bdcf4d8d666b81d766c70
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cube_405/Cube_416:000:'
+    second: {fileID: 2100000, guid: 5b9882f523e476845b992ff6c77884fb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cube_406/Cube_417:000:'
+    second: {fileID: 2100000, guid: a6e9a2f6d2b872942bf97891e45861f2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cube_411/Cube_422:000:'
+    second: {fileID: 2100000, guid: 5b9882f523e476845b992ff6c77884fb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cube_412/Cube_423:000:'
+    second: {fileID: 5632199595351488998, guid: a96899a752e0b374d87005ee8fa38987, type: 3}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cube_413/Cube_425:000:'
+    second: {fileID: 2100000, guid: 5b9882f523e476845b992ff6c77884fb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cube_418/Cube_430:000:'
+    second: {fileID: 5632199595351488998, guid: a96899a752e0b374d87005ee8fa38987, type: 3}
   serializedVersion: 2
   userData: 
   assetBundleName: 
