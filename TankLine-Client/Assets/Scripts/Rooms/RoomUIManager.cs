@@ -6,8 +6,9 @@ using FishNet.Connection;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using System;
 
-public class RoomUIManager : NetworkBehaviour
+public class RoomUIManager : MonoBehaviour
 {
     public static RoomUIManager Instance { get; private set; }
 
@@ -25,7 +26,6 @@ public class RoomUIManager : NetworkBehaviour
     public List<Button> modeButtons; // public/private
 
     [Header("Room Manager")]
-    [SerializeField] private RoomManager roomManagerPrefab;
     private RoomManager spawnedRoomManager;
 
     private int selectedNumber = 2;
@@ -34,22 +34,21 @@ public class RoomUIManager : NetworkBehaviour
     private Color normalColor = Color.white;
     private Color selectedColor = Color.red;
 
-    void Start()
+    private string isDedicatedServer = Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER");
+
+    void Awake()
     {
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
+    }
 
+    void Start()
+    {
         StartCoroutine(EnsureRoomManagerAndClientReady());
         UpdateSelectionTexts();
-        Debug.Log("[RoomUI] Room UI initialized.");
-
-        Debug.Log($"ClientStarted: {InstanceFinder.IsClientStarted}");
-        Debug.Log($"ClientManager exists: {InstanceFinder.ClientManager != null}");
-        Debug.Log($"Connection exists: {InstanceFinder.ClientManager.Connection != null}");
-        Debug.Log($"Connection is valid: {InstanceFinder.ClientManager.Connection?.IsValid}");
-       
+        Debug.Log("[RoomUI] Room UI initialized.");       
     }
 
     private IEnumerator EnsureRoomManagerAndClientReady()
@@ -61,6 +60,7 @@ public class RoomUIManager : NetworkBehaviour
             InstanceFinder.ClientManager.Connection != null &&
             InstanceFinder.ClientManager.Connection.IsValid
         );
+        Debug.Log("[RoomUI] Client is ready.");
 
         // Wait until the manager is properly spawned
         yield return new WaitUntil(() =>
@@ -72,6 +72,11 @@ public class RoomUIManager : NetworkBehaviour
         CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
         JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
         codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
+
+        Debug.Log($"[RoomUI] ClientStarted: {InstanceFinder.IsClientStarted}");
+        Debug.Log($"[RoomUI] ClientManager exists: {InstanceFinder.ClientManager != null}");
+        Debug.Log($"[RoomUI] Connection exists: {InstanceFinder.ClientManager.Connection != null}");
+        Debug.Log($"[RoomUI] Connection is valid: {InstanceFinder.ClientManager.Connection?.IsValid}");
 
         Debug.Log("[RoomUI] RoomManager is ready.");
     }
@@ -117,6 +122,7 @@ public class RoomUIManager : NetworkBehaviour
 
     private void HandleCreateRoom()
     {
+        if (isDedicatedServer == "true") return;
 
         int maxPlayers = selectedNumber;
         bool isPublic = selectedMode == "Public";
