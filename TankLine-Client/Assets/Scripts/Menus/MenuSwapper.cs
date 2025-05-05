@@ -2,6 +2,8 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
+using Heartbeat ; 
+
 
 public class MenuSwapper : MonoBehaviour
 {
@@ -21,15 +23,17 @@ public class MenuSwapper : MonoBehaviour
     public GameObject PasswordErrorTextReset;
     public GameObject ConfirmationErrorTextReset;
 
-    public GameObject top1, top2, top3, top4;
-
     // Testing : 
-    public TMP_InputField gamesPlayedInputField;
-    public TMP_InputField highestScoreInputField;
+    public TMP_Text gamesPlayedInputField;
+    public TMP_Text highestScoreInputField;
+    public TMP_Text UserNameField;
+    public TMP_Text UserRankField;
+
+    public static bool isFirstLaunch = true ; 
 
     void Awake()
     {
-        // ensure there is only one instance of this script
+        // Ensure there is only one instance of this script
         if (Instance == null)
             Instance = this;
         else
@@ -46,22 +50,28 @@ public class MenuSwapper : MonoBehaviour
             Debug.LogError("AuthController not found.");
             return;
         }
-        AutoLogin();
 
-        // load first page
+        // Load first page
         // OpenPage("PagePrincipale"); 
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
         if (currentScene == "ConnectionMenu")
         {
             OpenPage("PagePrincipale");
+            if (isFirstLaunch)
+            {
+                AutoLogin();
+                isFirstLaunch = false; 
+                Debug.Log("FIRST LAUNCH");
+            }
+            else Debug.Log ("NOT FIRST LAUNCH");
         }
+
         else if (currentScene == "MainMenu")
         {
             OpenPage("MainMenu");
+            AutoLogin();
         }
-
-
-        //OpenPagePrincipal();
     }
 
     private void AutoLogin()
@@ -78,12 +88,15 @@ public class MenuSwapper : MonoBehaviour
 
         // Request requiring an access token to check if the user is already logged in and set the current user 
         yield return authController.User();
+
+        
         if (authController.IsRequestSuccessful)
         {
             Debug.Log("Auto-login successful. Skipping login page.");
             string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (currentScene == "ConnectionMenu")
             {
+                HeartbeatManager.Instance.SetLoggedIn(true);
                 MainMenuScene();
             }
         }
@@ -203,8 +216,11 @@ public class MenuSwapper : MonoBehaviour
         {
             yield return authController.User();
 
+
             if (authController.IsRequestSuccessful)
             {
+                Debug.Log("DEBUGGGGGG"); 
+                Debug.Log(authController.CurrentUser.username); 
                 yield return authController.UserStatistics();
 
                 if (authController.IsRequestSuccessful)
@@ -256,6 +272,7 @@ public class MenuSwapper : MonoBehaviour
 
         if (authController.IsRequestSuccessful)
         {
+
             OpenPage("ResetPasswordStep2");
             OpenMessage("Password reset code sent to your email.");
         }
@@ -507,15 +524,23 @@ public class MenuSwapper : MonoBehaviour
             return;
         }
         StartCoroutine(LogoutCoroutine());
+        
     }
 
     private IEnumerator LogoutCoroutine()
     {
+        Debug.Log("Logging out...");
         yield return authController.Logout();
 
         if (authController.IsRequestSuccessful)
         {
             OpenMessage("You have been logged out successfully.");
+
+            // Wait for popup to close
+            yield return new WaitUntil(() => !MessagePopup.activeSelf);
+            
+            // Load scene after closing popup
+            UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
         }
         else
         {
@@ -531,6 +556,8 @@ public class MenuSwapper : MonoBehaviour
 
     private IEnumerator UpdateStatisticsCoroutine(Transform badge)
     {
+
+        string found_badge  ; 
         if (authController == null)
         {
             Debug.LogError("AuthController is not initialized.");
@@ -541,14 +568,15 @@ public class MenuSwapper : MonoBehaviour
 
         if (authController.IsRequestSuccessful && authController.CurrentUserStatistics != null)
         {
+
             if (badge != null)
             {
                 badge.Find("GamePlayed").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.gamesPlayed.ToString();
                 badge.Find("HighScore").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.highestScore.ToString();
-                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();
-                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUser.username;
-
+                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();    
+                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.username ;
             }
+
             else
             {
                 Debug.LogWarning("Badge undefined");
@@ -559,48 +587,50 @@ public class MenuSwapper : MonoBehaviour
             OpenErr($"Failed to retrieve user statistics: \n {authController.ErrorResponse}");
         }
     }
-    public void SetPlayerStatistics(int gamesPlayed, int highestScore)
-    {
-        if (authController == null)
-        {
-            Debug.LogError("AuthController is not initialized.");
-            return;
-        }
 
-        StartCoroutine(authController.UpdateUserStatistics(
-            gamesPlayed,
-            highestScore,
-            onSuccess: () =>
-            {
-                Debug.Log("Player statistics updated successfully.");
-                OpenMessage("Statistics updated successfully.");
-            },
-            onError: (errorMessage) =>
-            {
-                Debug.LogError($"Failed to update player statistics: {errorMessage}");
-                OpenErr($"Failed to update statistics: {errorMessage}");
-            }
-        ));
-    }
+    
+    // public void SetPlayerStatistics(int gamesPlayed, int highestScore)
+    // {
+    //     if (authController == null)
+    //     {
+    //         Debug.LogError("AuthController is not initialized.");
+    //         return;
+    //     }
 
-    public void OnUpdateStatisticsButtonClick()
-    {
-        int gamesPlayed;
-        int highestScore;
+    //     StartCoroutine(authController.UpdateUserStatistics(
+    //         gamesPlayed,
+    //         highestScore,
+    //         onSuccess: () =>
+    //         {
+    //             Debug.Log("Player statistics updated successfully.");
+    //             OpenMessage("Statistics updated successfully.");
+    //         },
+    //         onError: (errorMessage) =>
+    //         {
+    //             Debug.LogError($"Failed to update player statistics: {errorMessage}");
+    //             OpenErr($"Failed to update statistics: {errorMessage}");
+    //         }
+    //     ));
+    // }
 
-        if (!int.TryParse(gamesPlayedInputField.text, out gamesPlayed))
-        {
-            Debug.LogError("Invalid input for Games Played.");
-            return;
-        }
+    // public void OnUpdateStatisticsButtonClick()
+    // {
+    //     int gamesPlayed;
+    //     int highestScore;
 
-        if (!int.TryParse(highestScoreInputField.text, out highestScore))
-        {
-            Debug.LogError("Invalid input for Highest Score.");
-            return;
-        }
-        SetPlayerStatistics(gamesPlayed, highestScore);
-    }
+    //     if (!int.TryParse(gamesPlayedInputField.text, out gamesPlayed))
+    //     {
+    //         Debug.LogError("Invalid input for Games Played.");
+    //         return;
+    //     }
+
+    //     if (!int.TryParse(highestScoreInputField.text, out highestScore))
+    //     {
+    //         Debug.LogError("Invalid input for Highest Score.");
+    //         return;
+    //     }
+    //     SetPlayerStatistics(gamesPlayed, highestScore);
+    // }
 
     public void ValidatePasswordRegistration()
     {
@@ -696,75 +726,66 @@ public class MenuSwapper : MonoBehaviour
     }
 
 
-    public void UpdateLeaderboard()
-    {
-        if (authController == null)
-        {
-            Debug.LogError("AuthController is not initialized.");
-            return;
-        }
+    // public void UpdateLeaderboard()
+    // {
+    //     if (authController == null)
+    //     {
+    //         Debug.LogError("AuthController is not initialized.");
+    //         return;
+    //     }
 
-        StartCoroutine(authController.GetLeaderboard(
-            onSuccess: (leaderboardEntries) =>
-            {
-                Debug.Log("Leaderboard data fetched successfully.");
-                UpdateLeaderboardUI(leaderboardEntries);
-            },
-            onError: (errorMessage) =>
-            {
-                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
-                OpenErr($"Failed to fetch leaderboard: {errorMessage}");
-            }
-        ));
-    }
+    //     StartCoroutine(authController.GetLeaderboard(
+    //         onSuccess: (leaderboardEntries) =>
+    //         {
+    //             Debug.Log("Leaderboard data fetched successfully.");
+    //             UpdateLeaderboardUI(leaderboardEntries);
+    //         },
+    //         onError: (errorMessage) =>
+    //         {
+    //             Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+    //             OpenErr($"Failed to fetch leaderboard: {errorMessage}");
+    //         }
+    //     ));
+    // }
 
-    private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
-    {
-        // Update GameObjects for the first 4
-        UpdateLeaderboardEntry(top1, leaderboardEntries.Count > 0 ? leaderboardEntries[0] : null);
-        UpdateLeaderboardEntry(top2, leaderboardEntries.Count > 1 ? leaderboardEntries[1] : null);
-        UpdateLeaderboardEntry(top3, leaderboardEntries.Count > 2 ? leaderboardEntries[2] : null);
-        UpdateLeaderboardEntry(top4, leaderboardEntries.Count > 3 ? leaderboardEntries[3] : null);
-    }
+    // private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
+    // {
+    //     // Update GameObjects for the first 4
+    //     UpdateLeaderboardEntry(top1, leaderboardEntries.Count > 0 ? leaderboardEntries[0] : null);
+    //     UpdateLeaderboardEntry(top2, leaderboardEntries.Count > 1 ? leaderboardEntries[1] : null);
+    //     UpdateLeaderboardEntry(top3, leaderboardEntries.Count > 2 ? leaderboardEntries[2] : null);
+    //     UpdateLeaderboardEntry(top4, leaderboardEntries.Count > 3 ? leaderboardEntries[3] : null);
+    // }
 
-    private void UpdateLeaderboardEntry(GameObject entryObject, LeaderboardEntry entry)
-    {
-        if (entryObject == null) return;
 
-        // Retrieve sub-GameObjects for Rank, Name and Score
-        TMP_Text rankText = entryObject.transform.Find("Rank")?.GetComponent<TMP_Text>();
-        TMP_Text nameText = entryObject.transform.Find("Name")?.GetComponent<TMP_Text>();
-        TMP_Text scoreText = entryObject.transform.Find("Score")?.GetComponent<TMP_Text>();
+    // private void UpdateLeaderboardEntry(GameObject entryObject, LeaderboardEntry entry)
+    // {
+    //     if (entryObject == null) return;
 
-        if (entry != null)
-        {
-            // Update text fields
-            if (rankText != null) rankText.text = $"{entry.ranking}";
-            if (nameText != null) nameText.text = entry.username;
-            if (scoreText != null) scoreText.text = $"{entry.highestScore}";
+    //     // Retrieve sub-GameObjects for Rank, Name and Score
+    //     TMP_Text rankText = entryObject.transform.Find("Rank")?.GetComponent<TMP_Text>();
+    //     TMP_Text nameText = entryObject.transform.Find("Name")?.GetComponent<TMP_Text>();
+    //     TMP_Text scoreText = entryObject.transform.Find("Score")?.GetComponent<TMP_Text>();
 
-            entryObject.SetActive(true); // Display entry
-        }
-        else
-        {
-            // Hide fields if no data available
-            if (rankText != null) rankText.text = "";
-            if (nameText != null) nameText.text = "";
-            if (scoreText != null) scoreText.text = "";
+    //     if (entry != null)
+    //     {
+    //         // Update text fields
+    //         if (rankText != null) rankText.text = $"{entry.ranking}";
+    //         if (nameText != null) nameText.text = entry.username;
+    //         if (scoreText != null) scoreText.text = $"{entry.highestScore}";
 
-            entryObject.SetActive(false); // Hide entry
-        }
-    }
+    //         entryObject.SetActive(true); // Display entry
+    //     }
+    //     else
+    //     {
+    //         // Hide fields if no data available
+    //         if (rankText != null) rankText.text = "";
+    //         if (nameText != null) nameText.text = "";
+    //         if (scoreText != null) scoreText.text = "";
 
-    public void ConnectToRandomWaitingRoom()
-    {
-        ConnectToWaitingRoom();
-    }
-
-    public void ConnectToWaitingRoom()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
-    }
+    //         entryObject.SetActive(false); // Hide entry
+    //     }
+    // }
 
     public void ConnectionScene()
     {
@@ -806,11 +827,27 @@ public class MenuSwapper : MonoBehaviour
     {
         if (tooltip != null)
         {
-            tooltip.SetActive(false); // Cache le tooltip
+            tooltip.SetActive(false); // Hide the tooltip
         }
         else
         {
             Debug.LogWarning("Tooltip is not assigned in the inspector.");
+        }
+    }
+
+
+    public void GamesPlayed()
+    {
+        StartCoroutine(GamesPlayedAndNavigate());
+    }    
+    
+    private IEnumerator GamesPlayedAndNavigate() {
+        yield return authController.GamesPlayedStatistics();
+
+        if (authController.IsRequestSuccessful) {
+            OpenPage("ACHIEVEMENTS"); 
+        } else {
+            OpenMessage("You have not played a game yet. Start your epic journey now !"); 
         }
     }
 }
