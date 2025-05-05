@@ -1,6 +1,8 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 
 public class Tank_Offline : MonoBehaviour
 {
@@ -44,6 +46,9 @@ public class Tank_Offline : MonoBehaviour
     /// <summary> The gun current angle in radians </summary>
     protected float gunRotation = 0;
 
+    public InputActionReference move;
+    Vector3 MoveDir;
+
 
     protected virtual void Start()
     {
@@ -56,30 +61,60 @@ public class Tank_Offline : MonoBehaviour
     /// <summary>
     /// Automatically called by unity every frame after the physic engine
     /// </summary>
-    protected void Update() {
+    protected void Update()
+    {
 
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
         // if left click recorded, try to shoot
-        if (Input.GetMouseButtonDown(LEFT_CLICK)) {
-            if (this.CanShoot()) {
+        // if (Input.GetMouseButtonDown(LEFT_CLICK))
+        // {
+        //     if (this.CanShoot())
+        //     {
+        //         this.Shoot();
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Prevent self-shoot. TODO : animation");
+        //     }
+        // }
+    }
+
+    public void onMove(InputAction.CallbackContext ctxt)
+    {
+        Vector3 NewMoveDir = ctxt.ReadValue<Vector2>();
+        MoveDir.x = NewMoveDir.x;
+        MoveDir.y = NewMoveDir.y;
+    }
+    public void onShoot(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.performed)
+        {
+            if (this.CanShoot())
+            {
                 this.Shoot();
-            } else {
+            }
+            else
+            {
                 Debug.Log("Prevent self-shoot. TODO : animation");
             }
         }
+
     }
 
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
-    protected void FixedUpdate() {
+    protected void FixedUpdate()
+    {
 
         // process rotation input
-        float y = Input.GetAxis("Vertical");
-        float x = Input.GetAxis("Horizontal");
+        float y = MoveDir.y;
+        float x = MoveDir.x;
+        // float y = Input.GetAxis("Vertical");
+        // float x = Input.GetAxis("Horizontal");
         movementToMake = this.FaceDirection(x, y);
 
         // process movement input
