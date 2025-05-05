@@ -43,10 +43,6 @@ public class RoomUIManager : NetworkBehaviour
 
         StartCoroutine(EnsureRoomManagerAndClientReady());
         UpdateSelectionTexts();
-
-        CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
-        JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
-        codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
         Debug.Log("[RoomUI] Room UI initialized.");
 
         Debug.Log($"ClientStarted: {InstanceFinder.IsClientStarted}");
@@ -59,17 +55,12 @@ public class RoomUIManager : NetworkBehaviour
     private IEnumerator EnsureRoomManagerAndClientReady()
     {
         Debug.Log("[RoomUI] Coroutine started");
-
-        // Debug.Log($"ClientStarted: {InstanceFinder.IsClientStarted}");
-        // Debug.Log($"ClientManager exists: {InstanceFinder.ClientManager != null}");
-        // Debug.Log($"Connection exists: {InstanceFinder.ClientManager.Connection != null}");
-        // Debug.Log($"Connection is valid: {InstanceFinder.ClientManager.Connection?.IsValid}");
-        // // // Wait for network client to be ready
-        // yield return new WaitUntil(() =>
-        //     InstanceFinder.IsClientStarted &&
-        //     InstanceFinder.ClientManager.Connection != null &&
-        //     InstanceFinder.ClientManager.Connection.IsValid
-        // );
+        // Wait for network client to be ready
+        yield return new WaitUntil(() =>
+            InstanceFinder.IsClientStarted &&
+            InstanceFinder.ClientManager.Connection != null &&
+            InstanceFinder.ClientManager.Connection.IsValid
+        );
 
         // Wait until the manager is properly spawned
         yield return new WaitUntil(() =>
@@ -77,6 +68,10 @@ public class RoomUIManager : NetworkBehaviour
         );
 
         spawnedRoomManager = RoomManager.Instance;
+
+        CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
+        JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
+        codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
 
         Debug.Log("[RoomUI] RoomManager is ready.");
     }
