@@ -26,6 +26,7 @@ public class RoomUIManager : MonoBehaviour
     public List<Button> modeButtons; // public/private
 
     [Header("Room Manager")]
+    [SerializeField] private RoomManager roomManagerPrefab;
     private RoomManager spawnedRoomManager;
 
     private int selectedNumber = 2;

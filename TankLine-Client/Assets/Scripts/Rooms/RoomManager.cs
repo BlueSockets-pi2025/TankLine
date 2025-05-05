@@ -56,7 +56,8 @@ public class RoomManager : NetworkBehaviour
 
     room.AddPlayer(conn);
     playerRooms[conn] = roomId;
-    LoadWaitingRoomScene(roomId, conn);
+    TargetConfirmRoomJoin(conn, roomId);
+
   }
 
   /// <summary>
