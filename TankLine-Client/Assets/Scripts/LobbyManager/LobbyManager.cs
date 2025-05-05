@@ -59,11 +59,6 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
-    void OnDestroy()
-    {
-        Debug.Log("Destroying LobbyManager");       
-    }
-
 
 
 
@@ -106,7 +101,7 @@ public class LobbyManager : NetworkBehaviour
     [ServerRpc(RequireOwnership=false)]
     private void NewPlayerReady() {
         nbPlayerReady++;
-        Debug.Log($"[In-Game] Waiting to start game : {nbPlayerReady}/{serverPlayerList.Count}");
+        Debug.Log($"[In-Game] Waiting players : {nbPlayerReady}/{serverPlayerList.Count}");
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
@@ -124,7 +119,6 @@ public class LobbyManager : NetworkBehaviour
         NewPlayerReady();
     }
 
-    [ServerRpc(RequireOwnership=false)]
     public void OnPlayerSpawned() {
         SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
@@ -318,6 +312,8 @@ public class LobbyManager : NetworkBehaviour
 
     [Range(1,5)]
     public int maxPlayerLives = 3;
+    [Range(.5f, 5f)]
+    public float respawnCooldown = 3f;
     public List<Material> skins = new();
     private readonly List<int> availableSkins = new();
     
@@ -325,8 +321,8 @@ public class LobbyManager : NetworkBehaviour
     [ObserversRpc]
     private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins) {
 
+        // in game players
         if (CurrentSceneName() == "LoadScene") {
-            // in game players
             Tank_Player[] playersInGame = FindObjectsByType<Tank_Player>(FindObjectsSortMode.None);
             foreach (Tank_Player player in playersInGame)
             {
@@ -345,6 +341,33 @@ public class LobbyManager : NetworkBehaviour
 
             go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
         }
+    }
+
+    public void OnPlayerHit(NetworkConnection connection) {
+        try {
+            Debug.Log($"Lose life : {serverPlayerList[connection].name}");
+            serverPlayerList[connection].livesLeft--; // lose a life
+
+            // despawn player
+            playerSpawner.DespawnPlayer(serverPlayerList[connection].name);
+
+            // if life left, respawn after a short duration
+            if (serverPlayerList[connection].livesLeft > 0)
+                StartCoroutine(RespawnCoroutine(connection, serverPlayerList[connection]));
+
+        } catch {
+            Debug.Log($"[ERROR] No player found for connection {connection}");
+        }
+    }
+
+    private IEnumerator RespawnCoroutine(NetworkConnection playerConnection, PlayerData playerData) {
+        
+        // wait `respawnCooldown` seconds
+        yield return new WaitForSeconds(respawnCooldown);
+
+        // respawn player
+        playerSpawner.SpawnPlayer(playerConnection, playerData.name);
+        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
 }
 

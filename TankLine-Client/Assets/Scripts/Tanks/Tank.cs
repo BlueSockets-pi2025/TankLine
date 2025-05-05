@@ -115,21 +115,6 @@ public class Tank : NetworkBehaviour {
     */
 
     /// <summary>
-    /// Make this tank lose a life. <br/>  
-    /// If no life left, this tank is destroyed.
-    /// </summary>
-    public void LoseSingleLife() {
-        nbLifeLeft--;
-
-        // if no life left, destroy
-        if (nbLifeLeft <= 0) {
-            if (base.IsServerInitialized)
-                Despawn(gameObject);
-            return;
-        }
-    }
-
-    /// <summary>
     /// Make this tank lose multiple life. <br/>
     /// If not enough life is left, this tank is destroyed.
     /// </summary>

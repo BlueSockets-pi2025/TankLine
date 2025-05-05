@@ -296,7 +296,7 @@ public class Tank_Player : Tank
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
 
-            Spawn(newBulletObject);
+            Spawn(newBulletObject, null);
         }
     }
 
