@@ -136,12 +136,10 @@ public class Bullet : NetworkBehaviour {
             ############################## PLAYER COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == PLAYER_LAYER) {
-            Debug.Log("Hit player");
             
             Tank_Player hitTank = collision.gameObject.GetComponent<Tank_Player>();
 
             FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner);
-            Debug.Log($"Bullet : {collision.gameObject.name}");
 
             Despawn(thisBullet);
 

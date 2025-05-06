@@ -32,11 +32,17 @@ public class LobbyManager : NetworkBehaviour
         }
 
         // on client connexion change
-        networkManager.ServerManager.OnRemoteConnectionState += (connexion, state) => {
+        networkManager.ServerManager.OnRemoteConnectionState += (connection, state) => {
             // if client is disconnecting
             if (state.ConnectionState == FishNet.Transporting.RemoteConnectionState.Stopped) {
                 // remove from list
-                RemovePlayerFromList_ServerSide(connexion);
+                RemovePlayerFromList_ServerSide(connection);
+            }
+
+            // if client is connecting while game is running, refuse the connection
+            if (state.ConnectionState == FishNet.Transporting.RemoteConnectionState.Started && CurrentSceneName() == "LoadScene") {
+                DisconnectClient(connection);
+                RemovePlayerFromList_ServerSide(connection);
             }
         };
     }
@@ -105,7 +111,8 @@ public class LobbyManager : NetworkBehaviour
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
-            OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList())); // send names to update UI
+            alivePlayers = serverPlayerList.Values.ToList();
+            OnPlayerListChange(alivePlayers); // send names to update UI
             Debug.Log("[In-Game] Starting game... Spawning player");
 
             foreach (KeyValuePair<NetworkConnection, PlayerData> entry in serverPlayerList) {
@@ -196,7 +203,7 @@ public class LobbyManager : NetworkBehaviour
     */
 
     private readonly Dictionary<NetworkConnection, PlayerData> serverPlayerList = new();
-    private List<string> clientPlayerList = new();
+    private List<PlayerData> clientPlayerList = new();
 
 
     private IEnumerator SendPlayerName() {
@@ -223,7 +230,7 @@ public class LobbyManager : NetworkBehaviour
 
         // add player to list
         serverPlayerList.Add(connection, new(name, maxPlayerLives, availableSkins[0]));
-        OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList()));
+        OnPlayerListChange(serverPlayerList.Values.ToList());
 
         // spawn player object
         playerSpawner.SpawnPlayer(connection, name);
@@ -262,7 +269,7 @@ public class LobbyManager : NetworkBehaviour
 
         // remove player from list
         serverPlayerList.Remove(connection);
-        OnPlayerListChange(PlayerData.GetNameList(serverPlayerList.Values.ToList()));
+        OnPlayerListChange(serverPlayerList.Values.ToList());
     }
 
     /// <summary>
@@ -270,7 +277,7 @@ public class LobbyManager : NetworkBehaviour
     /// </summary>
     /// <param name="newNames">The new player list sent by the server</param>
     [ObserversRpc]
-    private void OnPlayerListChange(List<string> newNames) {
+    private void OnPlayerListChange(List<PlayerData> newNames) {
         clientPlayerList = newNames;
 
         uiManager.UpdateUI(clientPlayerList, playerEntryPrefab, minimumPlayerToStart);
@@ -295,6 +302,21 @@ public class LobbyManager : NetworkBehaviour
     private InGameUiManager uiManager;
     private AuthController authController;
 
+    [TargetRpc]
+    private void StartRespawnCountdown(NetworkConnection conn) {
+        StartCoroutine(uiManager.RespawnCountdownCoroutine(respawnCooldown));
+    }
+
+    [TargetRpc]
+    private void ShowDefeatPanel(NetworkConnection conn) {
+        uiManager.ShowDefeatPanel();
+    }
+
+    [ObserversRpc]
+    private void ShowEndGamePanel(string winnerName) {
+        uiManager.ShowEndGamePanel(winnerName, winnerName == authController.CurrentUser.username.ToString());
+    }
+
 
 
 
@@ -312,11 +334,11 @@ public class LobbyManager : NetworkBehaviour
 
     [Range(1,5)]
     public int maxPlayerLives = 3;
-    [Range(.5f, 5f)]
-    public float respawnCooldown = 3f;
+    [Range(1, 5)]
+    public int respawnCooldown = 3;
     public List<Material> skins = new();
     private readonly List<int> availableSkins = new();
-    
+    private List<PlayerData> alivePlayers = new();
 
     [ObserversRpc]
     private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins) {
@@ -345,15 +367,34 @@ public class LobbyManager : NetworkBehaviour
 
     public void OnPlayerHit(NetworkConnection connection) {
         try {
-            Debug.Log($"Lose life : {serverPlayerList[connection].name}");
             serverPlayerList[connection].livesLeft--; // lose a life
 
             // despawn player
             playerSpawner.DespawnPlayer(serverPlayerList[connection].name);
 
             // if life left, respawn after a short duration
-            if (serverPlayerList[connection].livesLeft > 0)
+            if (serverPlayerList[connection].livesLeft > 0) {
+                Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. {serverPlayerList[connection].livesLeft} lives left, respawning in {respawnCooldown} secondes");
+
+                StartRespawnCountdown(connection); // send the message to the player to update their UI
+
                 StartCoroutine(RespawnCoroutine(connection, serverPlayerList[connection]));
+            } 
+
+            // if no life left, remove from the list alivePlayer
+            else {
+                Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. No life left, game over");
+                alivePlayers.Remove(serverPlayerList[connection]);
+                OnPlayerListChange(alivePlayers); // update the list for every players
+
+                // if only one player is alive, end game
+                if (alivePlayers.Count() == 1) {
+                    Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
+                    ShowEndGamePanel(alivePlayers[0].name);
+                } else {
+                    ShowDefeatPanel(connection);
+                }
+            }
 
         } catch {
             Debug.Log($"[ERROR] No player found for connection {connection}");
@@ -368,14 +409,22 @@ public class LobbyManager : NetworkBehaviour
         // respawn player
         playerSpawner.SpawnPlayer(playerConnection, playerData.name);
         SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
+        Debug.Log($"Respawning player {playerData.name}");
     }
 }
 
+[Serializable]
 public class PlayerData
 {
     public string name { get; set; }
     public int livesLeft { get; set; }
     public int skinColor { get; set; }
+
+    public PlayerData() {
+        name = "";
+        livesLeft = -1;
+        skinColor = -1;
+    }
 
     public PlayerData(string _name, int _livesLeft, int _skinColor)
     {
