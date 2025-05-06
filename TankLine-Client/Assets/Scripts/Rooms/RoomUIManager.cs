@@ -15,6 +15,7 @@ public class RoomUIManager : MonoBehaviour
     [Header("Buttons")]
     public Button CreateRoomBtn;
     public Button JoinRoomBtn;
+    public Button MatchmakingBtn;
 
     [Header("Input Fields")]
     public TMP_InputField codeInput;
@@ -49,7 +50,7 @@ public class RoomUIManager : MonoBehaviour
     {
         StartCoroutine(EnsureRoomManagerAndClientReady());
         UpdateSelectionTexts();
-        Debug.Log("[RoomUI] Room UI initialized.");       
+        Debug.Log("[RoomUI] Room UI initialized.");
     }
 
     private IEnumerator EnsureRoomManagerAndClientReady()
@@ -72,6 +73,7 @@ public class RoomUIManager : MonoBehaviour
 
         CreateRoomBtn.onClick.AddListener(HandleCreateRoom);
         JoinRoomBtn.onClick.AddListener(HandleJoinRoom);
+        MatchmakingBtn.onClick.AddListener(HandleMatchmaking);
         codeInput.onEndEdit.AddListener(HandlePrivateCodeEntered);
 
         Debug.Log($"[RoomUI] ClientStarted: {InstanceFinder.IsClientStarted}");
@@ -134,40 +136,34 @@ public class RoomUIManager : MonoBehaviour
 
     // === ROOM JOINING ===
 
-    private void HandleJoinRoom()
+    private void HandleMatchmaking()
     {
-        bool isPublic = selectedMode == "Public";
-        Debug.Log("JOINING");
+        if (isDedicatedServer == "true") return;
 
-        // if the room is public then:
-        if (isPublic)
+        int? roomId = spawnedRoomManager.GetFirstAvaliablePublicRoom();
+        if (roomId.HasValue)
         {
-            int? roomId = spawnedRoomManager.GetFirstAvaliablePublicRoom();
-
-            if (roomId.HasValue)
-            {
-                Debug.Log($"[RoomUI] Joining public room {roomId.Value}");
-                spawnedRoomManager.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
-            }
-            else
-            {
-                Debug.Log("[RoomUI] No public rooms available.");
-                HandleCreateRoom();
-            }
+            Debug.Log($"[RoomUI] Joining public room {roomId.Value}");
+            spawnedRoomManager.RequestJoinRoom(roomId.Value, InstanceFinder.ClientManager.Connection);
         }
-
-        // if the room is private then:
         else
         {
-            if (IsValidRoomCode(codeInput.text, out int roomId))
-            {
-                Debug.Log($"[RoomUI] Joining private room {roomId}");
-                spawnedRoomManager.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
-            }
-            else
-            {
-                Debug.LogWarning("[RoomUI] Invalid room code.");
-            }
+            Debug.Log("[RoomUI] No public rooms available.");
+            HandleCreateRoom();
+        }
+    }
+
+    private void HandleJoinRoom()
+    {
+        if (isDedicatedServer == "true") return;
+        if (IsValidRoomCode(codeInput.text, out int roomId))
+        {
+            Debug.Log($"[RoomUI] Joining private room {roomId}");
+            spawnedRoomManager.RequestJoinRoom(roomId, InstanceFinder.ClientManager.Connection);
+        }
+        else
+        {
+            Debug.LogWarning("[RoomUI] Invalid room code.");
         }
     }
 

@@ -23845,6 +23845,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CreateRoomBtn: {fileID: 352712798}
   JoinRoomBtn: {fileID: 1521003941}
+  MatchmakingBtn: {fileID: 1732405640}
   codeInput: {fileID: 850711434}
   selectedNumberText: {fileID: 0}
   selectedModeText: {fileID: 0}
