@@ -49293,13 +49293,14 @@ GameObject:
   - component: {fileID: 1347227805}
   - component: {fileID: 1347227807}
   - component: {fileID: 1347227806}
+  - component: {fileID: 1347227808}
   m_Layer: 5
   m_Name: SignUpStep2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1347227805
 RectTransform:
   m_ObjectHideFlags: 0
@@ -49375,6 +49376,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1347227804}
   m_CullTransparentMesh: 1
+--- !u!114 &1347227808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347227804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da2103c9e69af4e4db791395d7b9481b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputFields:
+  - {fileID: 976697166}
+  - {fileID: 280986090}
+  - {fileID: 1658912590}
+  - {fileID: 396143893}
+  - {fileID: 834201064}
+  - {fileID: 698065075}
 --- !u!1 &1347398500
 GameObject:
   m_ObjectHideFlags: 0
@@ -76091,6 +76111,7 @@ GameObject:
   - component: {fileID: 2020324185}
   - component: {fileID: 2020324184}
   - component: {fileID: 2020324186}
+  - component: {fileID: 2020324187}
   m_Layer: 5
   m_Name: PagePrincipale
   m_TagString: Untagged
@@ -76183,6 +76204,21 @@ MonoBehaviour:
   eyeImage: {fileID: 710454791}
   eyeOpenTexture: {fileID: 2800000, guid: 6222172aa3efe8a429232bed6ed5a72e, type: 3}
   eyeClosedTexture: {fileID: 2800000, guid: ae48c06670a8122498db5ce6f089c777, type: 3}
+--- !u!114 &2020324187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020324182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da2103c9e69af4e4db791395d7b9481b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputFields:
+  - {fileID: 979700262}
+  - {fileID: 1842367838}
 --- !u!1 &2020327190
 GameObject:
   m_ObjectHideFlags: 0
