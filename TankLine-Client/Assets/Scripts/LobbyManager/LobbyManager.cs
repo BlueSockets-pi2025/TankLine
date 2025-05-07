@@ -38,12 +38,6 @@ public class LobbyManager : NetworkBehaviour
                 // remove from list
                 RemovePlayerFromList_ServerSide(connection);
             }
-
-            // if client is connecting while game is running, refuse the connection
-            if (state.ConnectionState == FishNet.Transporting.RemoteConnectionState.Started && CurrentSceneName() == "LoadScene") {
-                DisconnectClient(connection);
-                RemovePlayerFromList_ServerSide(connection);
-            }
         };
     }
 
@@ -84,6 +78,7 @@ public class LobbyManager : NetworkBehaviour
     [Space(5)]
     public GameObject WaitingRoomTankPrefab;
     public GameObject InGameTankPrefab;
+    private IEnumerator loadingTimeoutCoroutine;
 
     public void ChangeSpawnPrefab(string sceneName) {
         if (playerSpawner == null) {
@@ -111,20 +106,9 @@ public class LobbyManager : NetworkBehaviour
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
-            alivePlayers = serverPlayerList.Values.ToList();
-            OnPlayerListChange(alivePlayers); // send names to update UI
-            Debug.Log("[In-Game] Starting game... Spawning player");
-
-            foreach (KeyValuePair<NetworkConnection, PlayerData> entry in serverPlayerList) {
-                playerSpawner.SpawnPlayer(entry.Key, entry.Value.name);
-            }
+            StopCoroutine(loadingTimeoutCoroutine);
+            StartGame();
         }
-    }
-
-    [ServerRpc(RequireOwnership=false)]
-    public void JoinedWR(NetworkConnection conn = null) {
-        if (conn != null)
-            playerSpawner.SpawnPlayer(conn, serverPlayerList[conn].name);
     }
 
     public void IsReady() {
@@ -135,6 +119,40 @@ public class LobbyManager : NetworkBehaviour
     public void OnPlayerSpawned() {
         SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
+
+    public void StartGame() {
+        alivePlayers = serverPlayerList.Values.ToList();
+        OnPlayerListChange(alivePlayers); // send names to update UI
+        Debug.Log("[In-Game] Starting game... Spawning player");
+
+        foreach (KeyValuePair<NetworkConnection, PlayerData> entry in serverPlayerList)
+        {
+            playerSpawner.SpawnPlayer(entry.Key, entry.Value.name);
+        }
+    }
+
+    private IEnumerator StartLoadingTimeoutCoroutine(int nbSeconds) {
+        yield return new WaitForSeconds(nbSeconds);
+
+        StartGame();
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void JoinedWaitingRoom(NetworkConnection connection = null) {
+        PlayerData player = serverPlayerList[connection];
+
+        if (player == null) {
+            Debug.Log("[ERROR] Player joining waiting room from previous game is null");
+            return;
+        }
+
+        Debug.Log($"[Waiting room] Player {player.name} joining from previous game. Spawning character...");
+        playerSpawner.SpawnPlayer(connection, player.name);
+        
+        OnPlayerListChange(serverPlayerList.Values.ToList());
+    }
+
+
 
 
 
@@ -188,64 +206,59 @@ public class LobbyManager : NetworkBehaviour
 
         // init new ui manager
         uiManager = new(GameObject.Find("Canvas"), scene.name == "LoadScene");
+        Debug.Log($"new ui manager : {scene.name == "LoadScene"}");
+        hasAutoReplayStarted = false;
 
+        // if in game
         if (scene.name == "LoadScene") {
-            // if on server, reset the number of player ready when reloading a new game
-            if (base.IsServerInitialized) {
-                nbPlayerReady = 0;
-            }
-        } else if (scene.name == "WaitingRoom") {
-            JoinedWR();
+            // reset the number of player ready when reloading a new game
+            nbPlayerReady = 0;
 
+            // set a timeout to launch game even if a player can't make it in game
             if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") {
+                loadingTimeoutCoroutine = StartLoadingTimeoutCoroutine(5);
+                StartCoroutine(loadingTimeoutCoroutine);
+            }
+        } else 
+        
+        // if in waiting room
+        if (scene.name == "WaitingRoom") {
+
+            // if is running on server
+            if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") {
+
+                // send player list to update ui
                 OnPlayerListChange(serverPlayerList.Values.ToList());
+
+                ReplayClient();
+            } 
+
+            // if on the client
+            else {
+                JoinedWaitingRoom(base.ClientManager.Connection);
             }
         }
     }
 
     [ObserversRpc]
-    private void ClearBeforeReplay() {
-        
-        Destroy(GameObject.Find("map"));
-        Destroy(GameObject.Find("Main Camera"));
-        Destroy(GameObject.Find("Canvas"));
-        Destroy(GameObject.Find("PlayerSpawns"));
-
-        ClearCompletedForReplay();
+    private void ReplayClient() {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    private void ClearCompletedForReplay() {
+    private void ClearAndReplayServer() {
         nbPlayerReady++;
 
-        if (nbPlayerReady != serverPlayerList.Count)
-            return;
+        // reset number of lives
+        foreach (PlayerData player in serverPlayerList.Values.ToList()) {
+            player.livesLeft = maxPlayerLives;
+        }
 
-        Destroy(GameObject.Find("map"));
-        Destroy(GameObject.Find("Main Camera"));
-        Destroy(GameObject.Find("Canvas"));
-        Destroy(GameObject.Find("PlayerSpawns"));
-
-        // clear all breakableWalls object
-        BreakableObject[] walls = FindObjectsByType<BreakableObject>(FindObjectsSortMode.None);
-        foreach (BreakableObject wall in walls)
-            Despawn(wall.gameObject);
-
-        // load waitingRoom scene
-        SceneLoadData newScene = new("waitingRoom");
-        newScene.ReplaceScenes = ReplaceOption.All; // destroy every other object
-        newScene.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() }; // keep this object in the next scene
-
-
-        // change scene
-        Debug.Log($"[Lobby #number] Replay - Switch back to waiting room");
-        InstanceFinder.SceneManager.LoadGlobalScenes(newScene);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
     private IEnumerator AutoReplayCoroutine(int nbSeconds) {
         yield return new WaitForSeconds(nbSeconds);
-        nbPlayerReady=0;
-        ClearBeforeReplay();
+        ClearAndReplayServer();
     }
 
 
@@ -289,8 +302,9 @@ public class LobbyManager : NetworkBehaviour
         serverPlayerList.Add(connection, new(name, maxPlayerLives, availableSkins[0]));
         OnPlayerListChange(serverPlayerList.Values.ToList());
 
-        // spawn player object
-        playerSpawner.SpawnPlayer(connection, name);
+        // spawn player object if in waiting room
+        if (CurrentSceneName() == "WaitingRoom")
+            playerSpawner.SpawnPlayer(connection, name);
 
         // Remove the skin given to new player from availables ones
         availableSkins.RemoveAt(0);
@@ -327,14 +341,11 @@ public class LobbyManager : NetworkBehaviour
         if (alivePlayers.Exists(player => player.name == serverPlayerList[connection].name))
             alivePlayers.Remove(serverPlayerList[connection]);
 
-        // if autoreplay has started, remove the player from the ReadyForReplay & update clients ui
+        // if autoreplay has started, remove the player from the ReadyForReplay
         if (hasAutoReplayStarted) {
-            // if in ReadyForReplay, delete player
             if (playerReadyForReplay.Exists(player => player.name == serverPlayerList[connection].name)) {
                 playerReadyForReplay.Remove(serverPlayerList[connection]);
             }
-
-            UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
         }
 
         // remove player from list
@@ -344,6 +355,16 @@ public class LobbyManager : NetworkBehaviour
             OnPlayerListChange(alivePlayers);
         } else {
             OnPlayerListChange(serverPlayerList.Values.ToList());
+        }
+
+        if (hasAutoReplayStarted) {
+            // update the ui
+            UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
+
+            // check if every remaining players are ready
+            if (playerReadyForReplay.Count == serverPlayerList.Count) {
+                ClearAndReplayServer();
+            }
         }
     }
 
@@ -395,6 +416,9 @@ public class LobbyManager : NetworkBehaviour
 
     [ObserversRpc]
     private void UpdateReadyForReplay(int nbPlayer, int nbReady) {
+
+        if (CurrentSceneName() == "WaitingRoom") return;
+
         if (!hasAutoReplayStarted) {
             hasAutoReplayStarted = true;
             StartCoroutine(uiManager.StartAutoReplayCountdown(autoReplayCountdown));
@@ -518,9 +542,13 @@ public class LobbyManager : NetworkBehaviour
         if (conn != null && !playerReadyForReplay.Exists(player => player.name == serverPlayerList[conn].name)) {
 
             playerReadyForReplay.Add(serverPlayerList[conn]);
-            Debug.Log("[Lobby #number] New player ready for replay");
+            Debug.Log($"[Lobby #number] New player ready for replay. {playerReadyForReplay.Count}/{serverPlayerList.Count}");
 
+            // if everyone is ready, restart the game
             UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
+            if (playerReadyForReplay.Count == serverPlayerList.Count) {
+                ClearAndReplayServer();
+            }
         }
     }
 }

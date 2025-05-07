@@ -24,6 +24,7 @@ public class PlayerSpawner : NetworkBehaviour
 
         // clear old spawnpoints
         spawnPoints = new();
+        currentSpawnIndex = 0;
 
         foreach (Transform child in spawnPointsParent.transform) {
             spawnPoints.Add(child.gameObject);
