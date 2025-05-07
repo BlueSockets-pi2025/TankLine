@@ -121,6 +121,12 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
+    [ServerRpc(RequireOwnership=false)]
+    public void JoinedWR(NetworkConnection conn = null) {
+        if (conn != null)
+            playerSpawner.SpawnPlayer(conn, serverPlayerList[conn].name);
+    }
+
     public void IsReady() {
         playerSpawner.InitSpawnPoint();
         NewPlayerReady();
@@ -153,7 +159,7 @@ public class LobbyManager : NetworkBehaviour
         newScene.ReplaceScenes = ReplaceOption.All; // destroy every other object
         newScene.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() }; // keep this object in the next scene
 
-        Debug.Log($"[SERVER] Launching game");
+        Debug.Log($"[Lobby #number] Launching game");
 
         // change scene
         InstanceFinder.SceneManager.LoadGlobalScenes(newScene);
@@ -188,7 +194,58 @@ public class LobbyManager : NetworkBehaviour
             if (base.IsServerInitialized) {
                 nbPlayerReady = 0;
             }
+        } else if (scene.name == "WaitingRoom") {
+            JoinedWR();
+
+            if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") {
+                OnPlayerListChange(serverPlayerList.Values.ToList());
+            }
         }
+    }
+
+    [ObserversRpc]
+    private void ClearBeforeReplay() {
+        
+        Destroy(GameObject.Find("map"));
+        Destroy(GameObject.Find("Main Camera"));
+        Destroy(GameObject.Find("Canvas"));
+        Destroy(GameObject.Find("PlayerSpawns"));
+
+        ClearCompletedForReplay();
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void ClearCompletedForReplay() {
+        nbPlayerReady++;
+
+        if (nbPlayerReady != serverPlayerList.Count)
+            return;
+
+        Destroy(GameObject.Find("map"));
+        Destroy(GameObject.Find("Main Camera"));
+        Destroy(GameObject.Find("Canvas"));
+        Destroy(GameObject.Find("PlayerSpawns"));
+
+        // clear all breakableWalls object
+        BreakableObject[] walls = FindObjectsByType<BreakableObject>(FindObjectsSortMode.None);
+        foreach (BreakableObject wall in walls)
+            Despawn(wall.gameObject);
+
+        // load waitingRoom scene
+        SceneLoadData newScene = new("waitingRoom");
+        newScene.ReplaceScenes = ReplaceOption.All; // destroy every other object
+        newScene.MovedNetworkObjects = new NetworkObject[] { this.GetComponent<NetworkObject>() }; // keep this object in the next scene
+
+
+        // change scene
+        Debug.Log($"[Lobby #number] Replay - Switch back to waiting room");
+        InstanceFinder.SceneManager.LoadGlobalScenes(newScene);
+    }
+
+    private IEnumerator AutoReplayCoroutine(int nbSeconds) {
+        yield return new WaitForSeconds(nbSeconds);
+        nbPlayerReady=0;
+        ClearBeforeReplay();
     }
 
 
@@ -267,9 +324,27 @@ public class LobbyManager : NetworkBehaviour
         // Add leaving player skins to available ones
         availableSkins.Add(leavingPlayer.skinColor);
 
+        if (alivePlayers.Exists(player => player.name == serverPlayerList[connection].name))
+            alivePlayers.Remove(serverPlayerList[connection]);
+
+        // if autoreplay has started, remove the player from the ReadyForReplay & update clients ui
+        if (hasAutoReplayStarted) {
+            // if in ReadyForReplay, delete player
+            if (playerReadyForReplay.Exists(player => player.name == serverPlayerList[connection].name)) {
+                playerReadyForReplay.Remove(serverPlayerList[connection]);
+            }
+
+            UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
+        }
+
         // remove player from list
         serverPlayerList.Remove(connection);
-        OnPlayerListChange(serverPlayerList.Values.ToList());
+
+        if (CurrentSceneName() == "LoadScene") {
+            OnPlayerListChange(alivePlayers);
+        } else {
+            OnPlayerListChange(serverPlayerList.Values.ToList());
+        }
     }
 
     /// <summary>
@@ -301,6 +376,7 @@ public class LobbyManager : NetworkBehaviour
     public int minimumPlayerToStart = 2;
     private InGameUiManager uiManager;
     private AuthController authController;
+    bool hasAutoReplayStarted = false;
 
     [TargetRpc]
     private void StartRespawnCountdown(NetworkConnection conn) {
@@ -315,6 +391,20 @@ public class LobbyManager : NetworkBehaviour
     [ObserversRpc]
     private void ShowEndGamePanel(string winnerName) {
         uiManager.ShowEndGamePanel(winnerName, winnerName == authController.CurrentUser.username.ToString());
+    }
+
+    [ObserversRpc]
+    private void UpdateReadyForReplay(int nbPlayer, int nbReady) {
+        if (!hasAutoReplayStarted) {
+            hasAutoReplayStarted = true;
+            StartCoroutine(uiManager.StartAutoReplayCountdown(autoReplayCountdown));
+        }
+
+        uiManager.UpdateReadyForReplay(nbPlayer, nbReady);
+    }
+
+    public void SendReadyForReplay() {
+        ReadyForReplay();
     }
 
 
@@ -336,9 +426,12 @@ public class LobbyManager : NetworkBehaviour
     public int maxPlayerLives = 3;
     [Range(1, 5)]
     public int respawnCooldown = 3;
+    [Range(5, 30)]
+    public int autoReplayCountdown = 15;
     public List<Material> skins = new();
     private readonly List<int> availableSkins = new();
     private List<PlayerData> alivePlayers = new();
+    private List<PlayerData> playerReadyForReplay = new();
 
     [ObserversRpc]
     private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins) {
@@ -410,6 +503,25 @@ public class LobbyManager : NetworkBehaviour
         playerSpawner.SpawnPlayer(playerConnection, playerData.name);
         SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
         Debug.Log($"Respawning player {playerData.name}");
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void ReadyForReplay(NetworkConnection conn = null) {
+        // if first to hit replay, start autoReplay countdown
+        if (!hasAutoReplayStarted) {
+            Debug.Log($"[Lobby #number] Starting auto-replay in {autoReplayCountdown} seconds");
+            hasAutoReplayStarted = true;
+            StartCoroutine(AutoReplayCoroutine(autoReplayCountdown));
+        }
+
+        // check if player already ready
+        if (conn != null && !playerReadyForReplay.Exists(player => player.name == serverPlayerList[conn].name)) {
+
+            playerReadyForReplay.Add(serverPlayerList[conn]);
+            Debug.Log("[Lobby #number] New player ready for replay");
+
+            UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
+        }
     }
 }
 

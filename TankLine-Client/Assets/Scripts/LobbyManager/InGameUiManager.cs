@@ -54,6 +54,7 @@ public class InGameUiManager
             // bind onclick
             gameOverPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
             gameOverPanel.transform.Find("SpectateGameBtn").GetComponent<Button>().onClick.AddListener(() => { gameOverPanel.SetActive(false); });
+            gameOverPanel.transform.Find("ReplayBtn").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindAnyObjectByType<LobbyManager>().SendReadyForReplay);
 
             gameOverPanel.SetActive(false); // hide panel
         }
@@ -153,6 +154,23 @@ public class InGameUiManager
         }
 
         gameOverPanel.transform.Find("ReplayBtn").gameObject.SetActive(true);
+    }
+
+    public void UpdateReadyForReplay(int nbPlayer, int nbReady) {
+        GameObject ready = gameOverPanel.transform.Find("playerReady").gameObject;
+        
+        ready.SetActive(true);
+        ready.GetComponent<TMP_Text>().text = $"{nbReady}/{nbPlayer}";
+    }
+
+    public System.Collections.IEnumerator StartAutoReplayCountdown(int nbSeconds) {
+        gameOverPanel.transform.Find("autoReplay").gameObject.SetActive(true);
+        TMP_Text countdown = gameOverPanel.transform.Find("autoReplay").GetComponent<TMP_Text>();
+
+        for (int i=nbSeconds; i>0; i--) {
+            countdown.text = $"auto-replay in {i} seconds";
+            yield return new WaitForSeconds(1);
+        }
     }
 
     private void ResetGameOverPanel() {
