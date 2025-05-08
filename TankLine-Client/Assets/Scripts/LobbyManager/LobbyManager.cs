@@ -106,7 +106,7 @@ public class LobbyManager : NetworkBehaviour
 
         // if everyone ready, spawn everyone
         if (nbPlayerReady >= serverPlayerList.Count) {
-            StopCoroutine(loadingTimeoutCoroutine);
+            hasAutoReplayStarted = false;
             StartGame();
         }
     }
@@ -258,7 +258,8 @@ public class LobbyManager : NetworkBehaviour
 
     private IEnumerator AutoReplayCoroutine(int nbSeconds) {
         yield return new WaitForSeconds(nbSeconds);
-        ClearAndReplayServer();
+        if (hasAutoReplayStarted)
+            ClearAndReplayServer();
     }
 
 
