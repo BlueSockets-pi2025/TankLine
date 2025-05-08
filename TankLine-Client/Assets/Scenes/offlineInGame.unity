@@ -2325,6 +2325,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  map: {fileID: 0}
+  victories: {fileID: 0}
+  username: {fileID: 0}
+  ratio: {fileID: 0}
+  tanks_destroyed: {fileID: 0}
+  nb_games_played: {fileID: 0}
+  victory_or_defeat: {fileID: 0}
+  rank: {fileID: 0}
+  date: {fileID: 0}
 --- !u!114 &709505823
 MonoBehaviour:
   m_ObjectHideFlags: 0
