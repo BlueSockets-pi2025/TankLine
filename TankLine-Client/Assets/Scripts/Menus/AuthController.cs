@@ -9,17 +9,24 @@ using System.Collections.Generic;
 using System;
 using System.Timers;
 
-using Heartbeat ; 
+using Heartbeat;
 
 
-
+public class Bypass : CertificateHandler
+{
+    protected override bool ValidateCertificate(byte[] certificateData)
+    {
+        // Always return true to bypass certificate validation
+        return true;
+    }
+}
 public class AuthController : MonoBehaviour
 {
     [Header("UI Elements")]
 
     private const string registerUrl = "https://185.155.93.105:17008/api/auth/register";
     private const string loginUrl = "https://185.155.93.105:17008/api/auth/login";
-    private const string logoutUrl = "https://185.155.93.105:17008/api/auth/logout"; 
+    private const string logoutUrl = "https://185.155.93.105:17008/api/auth/logout";
     private const string verifyUrl = "https://185.155.93.105:17008/api/auth/verify";
     private const string resendVerificationUrl = "https://185.155.93.105:17008/api/auth/resend-verification-code";
     private const string resetPasswordRequestUrl = "https://185.155.93.105:17008/api/auth/request-password-reset";
@@ -30,15 +37,15 @@ public class AuthController : MonoBehaviour
 
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
-    private string playedGameUrl = "https://185.155.93.105:17008/api/PlayedGames/summary"; 
+    private string playedGameUrl = "https://185.155.93.105:17008/api/PlayedGames/summary";
 
-    private string heartbeatUrl = "https://185.155.93.105:17008/api/auth/heartbeat" ; 
+    private string heartbeatUrl = "https://185.155.93.105:17008/api/auth/heartbeat";
 
 
     private static AuthController instance;
 
 
-    private static X509Certificate2 trustedCertificate;  
+    private static X509Certificate2 trustedCertificate;
 
     public bool IsRequestSuccessful { get; private set; }
     public string ErrorResponse { get; private set; }
@@ -52,7 +59,7 @@ public class AuthController : MonoBehaviour
     // Heartbeat (ping) to update is_logged_in 
     private float timeSinceLastHeartbeat = 0f;
     private float heartbeatInterval = 30f;
-    private bool isLoggedIn = false;  
+    private bool isLoggedIn = false;
 
     private bool preventAutoLogin = false;
 
@@ -68,18 +75,18 @@ public class AuthController : MonoBehaviour
     public TMP_Text rank;
     public TMP_Text date;
 
-    
+
     private static X509Certificate2 staticTrustedCertificate;
 
 
 
     private void OnApplicationQuit()
     {
-        
+
         StartCoroutine(LogoutUser());
     }
 
-    
+
 
 
 
@@ -89,7 +96,7 @@ public class AuthController : MonoBehaviour
         LoadCertificate();
 
     }
-    
+
 
     private void LoadCertificate()
     {
@@ -98,7 +105,7 @@ public class AuthController : MonoBehaviour
         {
             byte[] certificateBytes = File.ReadAllBytes(certificatePath);
             trustedCertificate = new X509Certificate2(certificateBytes);
-            staticTrustedCertificate = trustedCertificate ; 
+            staticTrustedCertificate = trustedCertificate;
             Debug.Log("Certificate successfully loaded.");
         }
         else
@@ -137,7 +144,9 @@ public class AuthController : MonoBehaviour
             }
         }
 
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
+
 
         yield return request.SendWebRequest();
 
@@ -148,7 +157,9 @@ public class AuthController : MonoBehaviour
             UnityWebRequest refreshRequest = new UnityWebRequest(refreshTokenUrl, "POST");
             refreshRequest.downloadHandler = new DownloadHandlerBuffer();
             refreshRequest.SetRequestHeader("Content-Type", "application/json");
-            refreshRequest.certificateHandler = new CustomCertificateHandler();
+            // refreshRequest.certificateHandler = new CustomCertificateHandler();
+            refreshRequest.certificateHandler = new Bypass();
+
 
             yield return refreshRequest.SendWebRequest();
 
@@ -173,7 +184,8 @@ public class AuthController : MonoBehaviour
                     }
                 }
 
-                retryRequest.certificateHandler = new CustomCertificateHandler();
+                // retryRequest.certificateHandler = new CustomCertificateHandler();
+                retryRequest.certificateHandler = new Bypass();
 
                 yield return retryRequest.SendWebRequest();
 
@@ -260,7 +272,7 @@ public class AuthController : MonoBehaviour
     {
         // Attend la fin de la coroutine GetGamePlayedStats
         yield return StartCoroutine(GetGamePlayedStats());
-        
+
         Debug.Log("GAME PLAYED !");
     }
 
@@ -271,7 +283,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.LogError("Passwords do not match.");
             IsRequestSuccessful = false;
-            yield break; 
+            yield break;
         }
 
         string birthDate = FormatDateForApi(day, month, year);
@@ -281,9 +293,9 @@ public class AuthController : MonoBehaviour
             Username = username,
             Email = email,
             passwordHash = password,
-            ConfirmPassword = confirmPassword, 
-            FirstName = firstName,           
-            LastName = lastName,              
+            ConfirmPassword = confirmPassword,
+            FirstName = firstName,
+            LastName = lastName,
             BirthDate = birthDate
         };
 
@@ -295,7 +307,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -308,7 +321,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Registration failed: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -342,8 +355,9 @@ public class AuthController : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        
-        request.certificateHandler = new CustomCertificateHandler();
+
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -356,7 +370,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Verification failed: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -376,7 +390,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -389,7 +404,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Error resending code: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -410,7 +425,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -424,9 +440,9 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Login error: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
-        
+
         }
     }
 
@@ -471,7 +487,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -483,9 +500,9 @@ public class AuthController : MonoBehaviour
         else
         {
             Debug.Log("Password reset failed: " + request.error);
-            Debug.Log("Details: " + request.downloadHandler.text); 
+            Debug.Log("Details: " + request.downloadHandler.text);
             // Updates ErrorResponse with the error message:
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -502,7 +519,7 @@ public class AuthController : MonoBehaviour
         var resetRequest = new ResetPasswordRequest
         {
             Email = email,
-            Code = code ,
+            Code = code,
             ConfirmPassword = confirmNewPassword,
             NewPassword = newPassword
         };
@@ -515,7 +532,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -528,7 +546,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Password reset error: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -538,7 +556,8 @@ public class AuthController : MonoBehaviour
         UnityWebRequest request = new UnityWebRequest(userDataUrl, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return SendRequestWithAutoRefresh(
             userDataUrl,
@@ -566,7 +585,7 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Failed to retrieve user data: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
-                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
                 IsRequestSuccessful = false;
             }
         );
@@ -577,7 +596,8 @@ public class AuthController : MonoBehaviour
         UnityWebRequest request = new UnityWebRequest(userStatisticsUrl, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
         yield return SendRequestWithAutoRefresh(
             userStatisticsUrl,
@@ -605,184 +625,185 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Failed to retrieve user statistics: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
-                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
                 IsRequestSuccessful = false;
             }
         );
     }
-    
-private IEnumerator GetGamePlayedStats()
-{
-    UnityWebRequest request = new UnityWebRequest(playedGameUrl, "GET");
 
-    request.downloadHandler = new DownloadHandlerBuffer();
-    request.SetRequestHeader("Content-Type", "application/json");
-    request.certificateHandler = new CustomCertificateHandler();
+    private IEnumerator GetGamePlayedStats()
+    {
+        UnityWebRequest request = new UnityWebRequest(playedGameUrl, "GET");
 
-    yield return SendRequestWithAutoRefresh(
-        playedGameUrl,
-        "GET",
-        new Dictionary<string, string> { { "Content-Type", "application/json" } },
-        null, // No body for GET
-        onSuccess: (response) =>
-        {
-            string json = response.downloadHandler?.text; 
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+        // request.certificateHandler = new CustomCertificateHandler();
+        request.certificateHandler = new Bypass();
 
-            if (json == null)
+        yield return SendRequestWithAutoRefresh(
+            playedGameUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // No body for GET
+            onSuccess: (response) =>
             {
-                Debug.LogError("DownloadHandler text is null.");
-                IsRequestSuccessful = false;
-                return;
-            }
+                string json = response.downloadHandler?.text;
 
-            Debug.Log("Game Played Statistics (Raw JSON): " + json);
-
-            try
-            {
-                if (string.IsNullOrWhiteSpace(json) || json.Trim() == "null")
+                if (json == null)
                 {
-                    Debug.LogWarning("No game stats returned or content is 'null'.");
+                    Debug.LogError("DownloadHandler text is null.");
                     IsRequestSuccessful = false;
                     return;
                 }
 
-                var stats = JsonUtility.FromJson<PlayedGameStats>(json);
-
-                if (stats == null)
-                {
-                    Debug.LogWarning("Deserialization failed: 'stats' is null.");
-                    IsRequestSuccessful = false;
-                    return;
-                }
-
-                if (stats.totalGames == 0 || stats.totalVictories < 0 || stats.tanksDestroyed < 0 || string.IsNullOrEmpty(stats.mapPlayed))
-                {
-                    Debug.LogWarning("Some critical game stats are missing or invalid.");
-                    IsRequestSuccessful = false;
-                    return;
-                }
-
-                CurrentPlayedGameStats = stats;
-                IsRequestSuccessful = true;
-
-                float victoryRatio = stats.totalGames > 0
-                    ? (float)stats.totalVictories / stats.totalGames
-                    : 0f;
-
-                Debug.LogWarning("Updating UI with game stats.");
-                
-                if (username != null ) 
-                {
-                    username.text = stats.username.ToString();
-
-
-                }
-                if (nb_games_played != null)
-                {
-                    nb_games_played.text = stats.totalGames.ToString();
-                    Debug.LogWarning("Updated nb_games_played.");
-                }
-
-                if (victories != null)
-                {
-                    victories.text = stats.totalVictories.ToString();
-                    Debug.LogWarning("Updated victories.");
-                }
-
-                if (ratio != null)
-                {
-                    ratio.text = victoryRatio.ToString("P1");
-                    Debug.LogWarning("Updated ratio.");
-                }
-
-                if (tanks_destroyed != null)
-                {
-                    tanks_destroyed.text = stats.tanksDestroyed.ToString();
-                    Debug.LogWarning("Updated tanks_destroyed.");
-                }
-
-                if (map != null)
-                {
-                    map.text = stats.mapPlayed;
-                    Debug.LogWarning("Updated map.");
-                }
-
-                if (rank != null)
-                {
-                    rank.text = stats.playerRank.ToString();
-                    Debug.LogWarning("Updated rank.");
-                }
-
-                if (victory_or_defeat != null)
-                {
-                    victory_or_defeat.text = stats.gameWon ? "Victory" : "Defeat";
-                    Debug.LogWarning("Updated victory_or_defeat.");
-                }
+                Debug.Log("Game Played Statistics (Raw JSON): " + json);
 
                 try
                 {
-                    DateTime parsedGameDate = DateTime.Parse(stats.gameDate);
-                    if (date != null)
+                    if (string.IsNullOrWhiteSpace(json) || json.Trim() == "null")
                     {
-                        date.text = parsedGameDate.ToString("dd/MM/yyyy HH:mm");
-                        Debug.LogWarning("Updated date.");
+                        Debug.LogWarning("No game stats returned or content is 'null'.");
+                        IsRequestSuccessful = false;
+                        return;
                     }
+
+                    var stats = JsonUtility.FromJson<PlayedGameStats>(json);
+
+                    if (stats == null)
+                    {
+                        Debug.LogWarning("Deserialization failed: 'stats' is null.");
+                        IsRequestSuccessful = false;
+                        return;
+                    }
+
+                    if (stats.totalGames == 0 || stats.totalVictories < 0 || stats.tanksDestroyed < 0 || string.IsNullOrEmpty(stats.mapPlayed))
+                    {
+                        Debug.LogWarning("Some critical game stats are missing or invalid.");
+                        IsRequestSuccessful = false;
+                        return;
+                    }
+
+                    CurrentPlayedGameStats = stats;
+                    IsRequestSuccessful = true;
+
+                    float victoryRatio = stats.totalGames > 0
+                        ? (float)stats.totalVictories / stats.totalGames
+                        : 0f;
+
+                    Debug.LogWarning("Updating UI with game stats.");
+
+                    if (username != null)
+                    {
+                        username.text = stats.username.ToString();
+
+
+                    }
+                    if (nb_games_played != null)
+                    {
+                        nb_games_played.text = stats.totalGames.ToString();
+                        Debug.LogWarning("Updated nb_games_played.");
+                    }
+
+                    if (victories != null)
+                    {
+                        victories.text = stats.totalVictories.ToString();
+                        Debug.LogWarning("Updated victories.");
+                    }
+
+                    if (ratio != null)
+                    {
+                        ratio.text = victoryRatio.ToString("P1");
+                        Debug.LogWarning("Updated ratio.");
+                    }
+
+                    if (tanks_destroyed != null)
+                    {
+                        tanks_destroyed.text = stats.tanksDestroyed.ToString();
+                        Debug.LogWarning("Updated tanks_destroyed.");
+                    }
+
+                    if (map != null)
+                    {
+                        map.text = stats.mapPlayed;
+                        Debug.LogWarning("Updated map.");
+                    }
+
+                    if (rank != null)
+                    {
+                        rank.text = stats.playerRank.ToString();
+                        Debug.LogWarning("Updated rank.");
+                    }
+
+                    if (victory_or_defeat != null)
+                    {
+                        victory_or_defeat.text = stats.gameWon ? "Victory" : "Defeat";
+                        Debug.LogWarning("Updated victory_or_defeat.");
+                    }
+
+                    try
+                    {
+                        DateTime parsedGameDate = DateTime.Parse(stats.gameDate);
+                        if (date != null)
+                        {
+                            date.text = parsedGameDate.ToString("dd/MM/yyyy HH:mm");
+                            Debug.LogWarning("Updated date.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError("Failed to parse gameDate: " + ex.Message);
+                    }
+
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError("Failed to parse gameDate: " + ex.Message);
+                    Debug.LogError($"Exception while parsing or using game stats: {ex.Message}");
+                    IsRequestSuccessful = false;
+                }
+            },
+            onError: (response) =>
+            {
+                long responseCode = response.responseCode;
+                string responseText = response.downloadHandler != null ? response.downloadHandler.text : "";
+
+                if (responseCode == 404)
+                {
+                    Debug.LogWarning("No games found for the current user (404).");
+                }
+                else
+                {
+                    Debug.LogError($"Failed to retrieve game statistics. HTTP {responseCode}: {response.error}");
+                    Debug.LogError("Details: " + responseText);
                 }
 
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Exception while parsing or using game stats: {ex.Message}");
+                ErrorResponse = !string.IsNullOrEmpty(responseText)
+                    ? responseText
+                    : "An unknown error occurred.";
                 IsRequestSuccessful = false;
             }
-        },
-        onError: (response) =>
-        {
-            long responseCode = response.responseCode;
-            string responseText = response.downloadHandler != null ? response.downloadHandler.text : "";
-
-            if (responseCode == 404)
-            {
-                Debug.LogWarning("No games found for the current user (404).");
-            }
-            else
-            {
-                Debug.LogError($"Failed to retrieve game statistics. HTTP {responseCode}: {response.error}");
-                Debug.LogError("Details: " + responseText);
-            }
-
-            ErrorResponse = !string.IsNullOrEmpty(responseText)
-                ? responseText
-                : "An unknown error occurred.";
-            IsRequestSuccessful = false;
-        }
-    );
-}
+        );
+    }
 
     private IEnumerator SendHeartbeat()
     {
         Debug.Log("Is Logged In: " + isLoggedIn);
 
-        if (!isLoggedIn) 
+        if (!isLoggedIn)
         {
             Debug.LogWarning("User is not logged in. Heartbeat request not sent.");
-            yield break;  
+            yield break;
         }
-        else 
+        else
         {
-             Debug.LogWarning("USER IS LOGGED IN");
+            Debug.LogWarning("USER IS LOGGED IN");
         }
 
         Debug.LogWarning("SEND HEARTBEAT");
         yield return SendRequestWithAutoRefresh(
-            heartbeatUrl,  
-            "POST",  
+            heartbeatUrl,
+            "POST",
             new Dictionary<string, string> { { "Content-Type", "application/json" } },
-            null,  
+            null,
             onSuccess: (response) =>
             {
                 Debug.LogWarning("Heartbeat SUCCESS");
@@ -793,7 +814,7 @@ private IEnumerator GetGamePlayedStats()
             }
         );
 
-     }
+    }
 
 
 }
@@ -822,7 +843,7 @@ public class RegisterRequest
 {
     public string Username;
     public string Email;
-    public string passwordHash; 
+    public string passwordHash;
     public string ConfirmPassword;
     public string FirstName;
     public string LastName;
@@ -895,5 +916,5 @@ public class PlayedGameStats
     public string mapPlayed;
     public int playerRank;
     public bool gameWon;
-    public string gameDate;  
+    public string gameDate;
 }
