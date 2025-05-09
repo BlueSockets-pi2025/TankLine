@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 using Unity.VisualScripting;
+using System;
 
 public class Bullet : NetworkBehaviour {
 
@@ -76,13 +77,8 @@ public class Bullet : NetworkBehaviour {
             }
         }
 
-        // move the bullet
-        if (Input.GetKeyDown(KeyCode.E)) {
-            thisBullet.transform.position = new Vector3(0,0,0);
-        } else {
-            thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.Value);
-            virtualServerPosition += bulletSpeed * Time.deltaTime * direction.Value;
-        }
+        thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction.Value);
+        virtualServerPosition += bulletSpeed * Time.deltaTime * direction.Value;
     }
 
     /// <summary>
@@ -90,6 +86,7 @@ public class Bullet : NetworkBehaviour {
     /// </summary>
 
     void OnCollisionEnter(Collision collision) {
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
 
         /* 
             ############################## WALL COLLISIONS ############################## 
@@ -101,8 +98,7 @@ public class Bullet : NetworkBehaviour {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
                 wall.TakeDamage();
-                if (base.IsServerInitialized)
-                    Despawn(thisBullet);
+                Despawn(thisBullet);
             } 
             
             // if static wall
@@ -110,8 +106,7 @@ public class Bullet : NetworkBehaviour {
 
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0) {
-                    if (base.IsServerInitialized)
-                        Despawn(thisBullet);
+                    Despawn(thisBullet);
                     return;
                 }
 
@@ -141,14 +136,12 @@ public class Bullet : NetworkBehaviour {
             ############################## PLAYER COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == PLAYER_LAYER) {
-            Tank hitTank = collision.gameObject.GetComponent<Tank>();
             
-            if (hitTank != null) {
-                hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
-            }
+            Tank_Player hitTank = collision.gameObject.GetComponent<Tank_Player>();
 
-            if (base.IsServerInitialized)
-                Despawn(thisBullet);
+            FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner);
+
+            Despawn(thisBullet);
 
             return;
         }
@@ -157,10 +150,8 @@ public class Bullet : NetworkBehaviour {
             ############################## SHELL COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == SHELL_LAYER) {
-            if (base.IsServerInitialized) {
-                Despawn(collision.gameObject);
-                Despawn(thisBullet);
-            }
+            Despawn(collision.gameObject);
+            Despawn(thisBullet);
             return;
         }
     }
