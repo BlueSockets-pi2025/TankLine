@@ -1,0 +1,746 @@
+{
+  "name": "sceneTest.json",
+  "mainCamera": {
+    "position": {
+      "x": 0.0,
+      "y": 20.0,
+      "z": -8.4
+    },
+    "rotation": {
+      "x": 70.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "fieldOfView": 54.0,
+    "nearClipPlane": 0.3,
+    "farClipPlane": 1000.0,
+    "hasAudioListener": true,
+    "isAdditionalCamera": false
+  },
+  "objects": [
+    {
+      "prefabName": "Global Volume",
+      "isNetworked": false,
+      "position": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "DayLight",
+      "isNetworked": false,
+      "position": {
+        "x": 0.0,
+        "y": 3.0,
+        "z": 0.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "WaterWall",
+      "isNetworked": false,
+      "position": {
+        "x": 10.0,
+        "y": 0.05,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "WaterWall",
+      "isNetworked": false,
+      "position": {
+        "x": 11.0,
+        "y": 0.05,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "WaterWall",
+      "isNetworked": false,
+      "position": {
+        "x": 12.0,
+        "y": 0.05,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "WaterWall",
+      "isNetworked": false,
+      "position": {
+        "x": 13.0,
+        "y": 0.05,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 4.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 5.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 6.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 7.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 8.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 9.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BushGroup",
+      "isNetworked": false,
+      "position": {
+        "x": 5.0,
+        "y": 2.0,
+        "z": 1.0
+      },
+      "children": [
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 5.0,
+            "y": 0.5,
+            "z": 1.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 6.0,
+            "y": 0.5,
+            "z": 1.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 7.0,
+            "y": 0.5,
+            "z": 1.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 8.0,
+            "y": 0.5,
+            "z": 1.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 5.0,
+            "y": 0.5,
+            "z": 0.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 5.0,
+            "y": 0.5,
+            "z": -1.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 6.0,
+            "y": 0.5,
+            "z": -1.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 6.0,
+            "y": 0.5,
+            "z": 0.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 7.0,
+            "y": 0.5,
+            "z": 0.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": 8.0,
+            "y": 0.5,
+            "z": 0.0
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "prefabName": "BushGroup",
+      "isNetworked": false,
+      "position": {
+        "x": -3.0,
+        "y": 2.0,
+        "z": 3.0
+      },
+      "children": [
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 3.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 4.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 5.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 6.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 7.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 8.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -3.0,
+            "y": 0.5,
+            "z": 9.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -4.0,
+            "y": 0.5,
+            "z": 3.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -4.0,
+            "y": 0.5,
+            "z": 4.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -5.0,
+            "y": 0.5,
+            "z": 9.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -4.0,
+            "y": 0.5,
+            "z": 8.0
+          },
+          "children": []
+        },
+        {
+          "prefabName": "BushWall",
+          "isNetworked": false,
+          "position": {
+            "x": -4.0,
+            "y": 0.5,
+            "z": 9.0
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 5.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 6.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 7.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 8.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 9.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 5.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 6.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 7.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 8.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 9.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 4.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 3.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -4.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -3.0,
+        "y": 1.0,
+        "z": 2.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -4.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -3.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -4.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -3.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": 3.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -4.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "StaticWall",
+      "isNetworked": false,
+      "position": {
+        "x": -3.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 2.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": -2.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": -1.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    },
+    {
+      "prefabName": "BreakableWall",
+      "isNetworked": true,
+      "position": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": -1.0
+      },
+      "children": []
+    }
+  ],
+  "spawnPoints": [
+    {
+      "x": 10.0,
+      "y": 0.5,
+      "z": 7.0
+    },
+    {
+      "x": -10.0,
+      "y": 0.5,
+      "z": 7.0
+    },
+    {
+      "x": -10.0,
+      "y": 0.5,
+      "z": -7.0
+    },
+    {
+      "x": 10.0,
+      "y": 0.5,
+      "z": -7.0
+    },
+    {
+      "x": 0.0,
+      "y": 0.5,
+      "z": 1.0
+    }
+  ]
+}
