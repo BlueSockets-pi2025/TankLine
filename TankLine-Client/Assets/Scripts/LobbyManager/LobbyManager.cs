@@ -79,6 +79,7 @@ public class LobbyManager : NetworkBehaviour
     public GameObject WaitingRoomTankPrefab;
     public GameObject InGameTankPrefab;
     private IEnumerator loadingTimeoutCoroutine;
+    private bool hasGameStarted = false;
 
     public void ChangeSpawnPrefab(string sceneName) {
         if (playerSpawner == null) {
@@ -124,6 +125,7 @@ public class LobbyManager : NetworkBehaviour
         alivePlayers = serverPlayerList.Values.ToList();
         OnPlayerListChange(alivePlayers); // send names to update UI
         Debug.Log("[In-Game] Starting game... Spawning player");
+        hasGameStarted = true;
 
         foreach (KeyValuePair<NetworkConnection, PlayerData> entry in serverPlayerList)
         {
@@ -134,7 +136,8 @@ public class LobbyManager : NetworkBehaviour
     private IEnumerator StartLoadingTimeoutCoroutine(int nbSeconds) {
         yield return new WaitForSeconds(nbSeconds);
 
-        StartGame();
+        if (!hasGameStarted)
+            StartGame();
     }
 
     [ServerRpc(RequireOwnership=false)]
@@ -208,6 +211,8 @@ public class LobbyManager : NetworkBehaviour
         uiManager = new(GameObject.Find("Canvas"), scene.name == "LoadScene");
         Debug.Log($"new ui manager : {scene.name == "LoadScene"}");
         hasAutoReplayStarted = false;
+        hasGameStarted = false;
+        playerReadyForReplay = new();
 
         // if in game
         if (scene.name == "LoadScene") {
