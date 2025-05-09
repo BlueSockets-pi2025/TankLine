@@ -42,10 +42,12 @@ public class LobbyManager : NetworkBehaviour
     }
 
     void Start() {
+        // initialize everything
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
         uiManager = new(GameObject.Find("Canvas"), CurrentSceneName() == "LoadScene");
         ChangeSpawnPrefab(CurrentSceneName());
         playerSpawner.InitSpawnPoint();
+        uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
 
         // load skins
         for (int i=0; i<skins.Count; i++) {
@@ -399,6 +401,7 @@ public class LobbyManager : NetworkBehaviour
     [Header("UI References")]
     [Space(5)]
     public GameObject playerEntryPrefab;
+    public GameObject skinEntryPrefab;
     [Range(1, 6)]
     public int minimumPlayerToStart = 2;
     private InGameUiManager uiManager;
@@ -478,13 +481,18 @@ public class LobbyManager : NetworkBehaviour
             }
         }
 
-        // Lobby players
-        Tank_Lobby[] playersLobby = FindObjectsByType<Tank_Lobby>(FindObjectsSortMode.None);
-        foreach (Tank_Lobby player in playersLobby) {
-            GameObject go = player.GameObject();
-            Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
+        else {
+            // Lobby players
+            Tank_Lobby[] playersLobby = FindObjectsByType<Tank_Lobby>(FindObjectsSortMode.None);
+            foreach (Tank_Lobby player in playersLobby) {
+                GameObject go = player.GameObject();
+                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
-            go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+            }
+
+            // update ui
+            uiManager.UpdateSkinsPanel(availableSkins);
         }
     }
 

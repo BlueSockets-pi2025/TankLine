@@ -13,6 +13,7 @@ public class InGameUiManager
     private readonly GameObject respawnCountDown;
     private readonly GameObject playerListDiv;
     private readonly GameObject gameOverPanel;
+    private readonly GameObject skinGrid;
     private bool isSettingsPanelOpen = false;
     private bool isInGame;
 
@@ -37,7 +38,9 @@ public class InGameUiManager
         if (!isInGame) {
             startButton = canvas.transform.Find("StartButton").gameObject;
             playerCount = canvas.transform.Find("PlayerCount").gameObject;
-            
+            skinGrid = canvas.transform.Find("SkinPanel").Find("SkinGrid").gameObject;
+
+
             canvas.transform.Find("StartButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindFirstObjectByType<LobbyManager>().ClickedStartGame);
 
             // disable start button at the beggining
@@ -181,5 +184,30 @@ public class InGameUiManager
         gameOverPanel.transform.Find("ReplayBtn").gameObject.SetActive(false);
         gameOverPanel.transform.Find("playerReady").gameObject.SetActive(false);
         gameOverPanel.transform.Find("autoReplay").gameObject.SetActive(false);
+    }
+
+    public void CreateSkinsPanel(List<Material> skins, GameObject skinEntryPrefab) {
+        
+        // clear the skin picker just in case
+        foreach (Transform child in skinGrid.transform) {
+            MonoBehaviour.Destroy(child.gameObject);
+        }
+
+        // create a entry for every skin
+        foreach (Material skin in skins) {
+            GameObject newEntry = MonoBehaviour.Instantiate(skinEntryPrefab, skinGrid.transform);
+            newEntry.GetComponent<RawImage>().color = skin.color;
+        }
+    }
+
+    public void UpdateSkinsPanel(List<int> availableSkins) {
+        
+        // update which skin is clickable or not
+        for (int i=0; i<skinGrid.transform.childCount; i++) {
+            GameObject skinEntry = skinGrid.transform.GetChild(i).gameObject;
+
+            // check if skin is available
+            skinEntry.GetComponent<Button>().interactable = availableSkins.Exists((x) => {return x==i;}); 
+        }
     }
 }
