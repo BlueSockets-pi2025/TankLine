@@ -6084,21 +6084,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <IsNested>k__BackingField: 0
-  <ComponentIndex>k__BackingField: 0
-  <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
-  InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects: []
-  RuntimeParentNetworkBehaviour: {fileID: 0}
-  RuntimeChildNetworkBehaviours: []
-  _isNetworked: 1
-  _isSpawnable: 1
-  _isGlobal: 0
-  _initializeOrder: 0
-  _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -6122,6 +6107,21 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0, w: 0}
     Scale: {x: 0, y: 0, z: 0}
     IsValid: 0
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
 --- !u!114 &452973940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13266,7 +13266,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3e6408a891e754f8341882b6bd2383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sfxSource: {fileID: 458100771}
+  musicSource: {fileID: 0}
+  sfxSource: {fileID: 0}
   menuMusic: {fileID: 8300000, guid: caf2d87a35c14c74ab66e33eda6d558a, type: 3}
   inGameMusic: {fileID: 8300000, guid: 7869194553a329247bc1b8811c8bead2, type: 3}
   btnClicSfx: {fileID: 8300000, guid: aeb5ad6e5b7dc45498a677af5021abc5, type: 3}
@@ -16723,7 +16724,6 @@ GameObject:
   - component: {fileID: 1127350813}
   - component: {fileID: 1127350812}
   - component: {fileID: 1127350811}
-  - component: {fileID: 1127350810}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -16743,11 +16743,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bee932eaee668a94d97a22a4310bbbe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 1127350812}
-  _networkObjectCache: {fileID: 0}
-  playerEntryPrefab: {fileID: 0}
-  minimumPlayerToStart: 2
 --- !u!4 &1127350809
 Transform:
   m_ObjectHideFlags: 0
@@ -16766,22 +16761,6 @@ Transform:
   - {fileID: 734800539}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1127350810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1127350807}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeac000193ca73c35ac2e6f14019e6d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 1127350812}
-  _networkObjectCache: {fileID: 0}
-  playerObjectPrefab: {fileID: 0}
 --- !u!114 &1127350811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16859,6 +16838,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  map: {fileID: 0}
+  victories: {fileID: 0}
+  username: {fileID: 0}
+  ratio: {fileID: 0}
+  tanks_destroyed: {fileID: 0}
+  nb_games_played: {fileID: 0}
+  victory_or_defeat: {fileID: 0}
+  rank: {fileID: 0}
+  date: {fileID: 0}
 --- !u!1 &1130574339
 GameObject:
   m_ObjectHideFlags: 0
@@ -31867,3 +31855,4 @@ SceneRoots:
   - {fileID: 560609072}
   - {fileID: 1585880272}
   - {fileID: 452973941}
+  - {fileID: 886281975}
