@@ -299,13 +299,16 @@ public class Tank_Player : Tank
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
 
-            // Activate VFX of shooting
-            effectPullPrefab.SetActive(true);
-            effectPullPrefab.GetComponent<explosionPull>().play();
-            // --------------
+            PlayAnimationOnClient();
 
             Spawn(newBulletObject, null);
         }
+    }
+
+    [ObserverRpc]
+    private void PlayAnimationOnClient() {
+        effectPullPrefab.SetActive(true);
+        effectPullPrefab.GetComponent<explosionPull>().play();
     }
 
     public void DecreaseNbBulletShot() {
