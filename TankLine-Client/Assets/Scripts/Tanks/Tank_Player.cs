@@ -305,7 +305,7 @@ public class Tank_Player : Tank
         }
     }
 
-    [ObserverRpc]
+    [ObserversRpc]
     private void PlayAnimationOnClient() {
         effectPullPrefab.SetActive(true);
         effectPullPrefab.GetComponent<explosionPull>().play();
