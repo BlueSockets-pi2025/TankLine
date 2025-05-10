@@ -15,6 +15,7 @@ public class InGameUiManager
     private readonly GameObject gameOverPanel;
     private readonly GameObject skinGrid;
     private bool isSettingsPanelOpen = false;
+    private bool isSkinPanelOpen = false;
     private bool isInGame;
 
     public InGameUiManager(GameObject _canvas, bool _isInGame)
@@ -31,7 +32,7 @@ public class InGameUiManager
         playerListDiv = canvas.transform.Find("PlayersCanvas").gameObject;
 
         // add onclick function to buttons
-        canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickPanel);
+        canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickSettingsPanel);
         canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
 
         // waiting room ui
@@ -39,9 +40,11 @@ public class InGameUiManager
             startButton = canvas.transform.Find("StartButton").gameObject;
             playerCount = canvas.transform.Find("PlayerCount").gameObject;
             skinGrid = canvas.transform.Find("SkinPanel").Find("SkinGrid").gameObject;
-
+            canvas.transform.Find("SkinPanel").gameObject.SetActive(isSkinPanelOpen);
 
             canvas.transform.Find("StartButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindFirstObjectByType<LobbyManager>().ClickedStartGame);
+            canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindAnyObjectByType<LobbyManager>().GetAvailableSkins);
+            canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
 
             // disable start button at the beggining
             DisableStartButton();
@@ -64,10 +67,16 @@ public class InGameUiManager
     }
 
 
-    public void ClickPanel()
+    public void ClickSettingsPanel()
     {
         isSettingsPanelOpen = !isSettingsPanelOpen;
         canvas.transform.Find("SettingsPanel").gameObject.SetActive(isSettingsPanelOpen);
+    }
+
+    public void ClickSkinsPanel()
+    {
+        isSkinPanelOpen = !isSkinPanelOpen;
+        canvas.transform.Find("SkinPanel").gameObject.SetActive(isSkinPanelOpen);
     }
 
     public void ExitToMenu()
@@ -193,10 +202,14 @@ public class InGameUiManager
             MonoBehaviour.Destroy(child.gameObject);
         }
 
+        int i = 0;
         // create a entry for every skin
         foreach (Material skin in skins) {
             GameObject newEntry = MonoBehaviour.Instantiate(skinEntryPrefab, skinGrid.transform);
             newEntry.GetComponent<RawImage>().color = skin.color;
+            newEntry.GetComponent<Button>().onClick.AddListener(() => {MonoBehaviour.FindAnyObjectByType<LobbyManager>().PickSkin(skins.IndexOf(skin));});
+
+            i++;
         }
     }
 
@@ -207,7 +220,7 @@ public class InGameUiManager
             GameObject skinEntry = skinGrid.transform.GetChild(i).gameObject;
 
             // check if skin is available
-            skinEntry.GetComponent<Button>().interactable = availableSkins.Exists((x) => {return x==i;}); 
+            skinEntry.GetComponent<Button>().interactable = availableSkins.Contains(i); 
         }
     }
 }

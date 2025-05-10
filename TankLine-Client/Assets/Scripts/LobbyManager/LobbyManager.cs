@@ -462,7 +462,7 @@ public class LobbyManager : NetworkBehaviour
     [Range(5, 30)]
     public int autoReplayCountdown = 15;
     public List<Material> skins = new();
-    private readonly List<int> availableSkins = new();
+    private List<int> availableSkins = new();
     private List<PlayerData> alivePlayers = new();
     private List<PlayerData> playerReadyForReplay = new();
 
@@ -490,10 +490,36 @@ public class LobbyManager : NetworkBehaviour
 
                 go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
             }
-
-            // update ui
-            uiManager.UpdateSkinsPanel(availableSkins);
         }
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void UpdateAvailableSkins(NetworkConnection conn = null) {
+        ClientUpdateAvailableSkins(conn, availableSkins);
+    }
+
+    [ObserversRpc][TargetRpc]
+    private void ClientUpdateAvailableSkins(NetworkConnection target, List<int> serverAvailableSkins) {
+        availableSkins = serverAvailableSkins;
+        uiManager.UpdateSkinsPanel(availableSkins);
+    }
+
+    public void GetAvailableSkins() {
+        UpdateAvailableSkins(base.ClientManager.Connection);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void ChangeSkin(int newSkin, NetworkConnection conn = null) {
+        availableSkins.Add(serverPlayerList[conn].skinColor);
+        serverPlayerList[conn].skinColor = newSkin;
+        availableSkins.Remove(newSkin);
+        ClientUpdateAvailableSkins(null, availableSkins);
+        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
+    }
+
+    public void PickSkin(int skinIndex) {
+        ChangeSkin(skinIndex, base.ClientManager.Connection);
+        Debug.Log(skinIndex);
     }
 
     public void OnPlayerHit(NetworkConnection connection) {

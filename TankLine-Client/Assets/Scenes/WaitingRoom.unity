@@ -7540,7 +7540,7 @@ GameObject:
   - component: {fileID: 1769833507}
   - component: {fileID: 1769833506}
   m_Layer: 5
-  m_Name: SkinPicker
+  m_Name: SkinPickerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
