@@ -22,9 +22,6 @@ public class Tank_Player : Tank
 
     protected float movementToMake = 0;
 
-    /// <summary> gameObject in hierarchy which represent the shooting's VFX  </summary>
-    protected GameObject effectPullPrefab;
-
     /// <summary> VFX of explosion </summary>
     public GameObject deathVFXPrefab;
 
@@ -34,9 +31,6 @@ public class Tank_Player : Tank
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
-
-        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true")
-            effectPullPrefab = thisTank.transform.Find("tankGun").Find("effect_pull").gameObject;
     }
 
     /// <summary>
@@ -304,19 +298,9 @@ public class Tank_Player : Tank
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
 
-            PlayAnimationOnClient();
-
             Spawn(newBulletObject, null);
         }
     }
-
-    [ObserversRpc]
-    private void PlayAnimationOnClient() {
-        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
-        effectPullPrefab.SetActive(true);
-        effectPullPrefab.GetComponent<explosionPull>().play();
-    }
-
     public void DecreaseNbBulletShot() {
         nbBulletShot--;
     }
