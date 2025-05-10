@@ -99,7 +99,6 @@ public class Bullet : NetworkBehaviour {
             if (collision.gameObject.CompareTag(BREAKABLE_TAG)) {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
-                PlayAnimationOnClient();
                 wall.TakeDamage();
                 Despawn(thisBullet);
             } 
