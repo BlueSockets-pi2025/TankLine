@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Heartbeat;
 using UnityEngine.InputSystem;
-
+using UnityEngine.UI;
 
 public class MenuSwapper : MonoBehaviour
 {
@@ -24,6 +24,8 @@ public class MenuSwapper : MonoBehaviour
 
     public GameObject PasswordErrorTextReset;
     public GameObject ConfirmationErrorTextReset;
+
+    public Toggle RememberMeToggle; // reference to the “Remember Me” checkbox
 
     // Testing : 
     public TMP_Text gamesPlayedInputField;
@@ -67,6 +69,13 @@ public class MenuSwapper : MonoBehaviour
         if (currentScene == "ConnectionMenu")
         {
             OpenPage("PagePrincipale");
+
+            if (RememberMeToggle != null)
+            {
+                // Set the checkbox to true by default:
+                RememberMeToggle.isOn = true;
+            }
+            // If the game is launched (connection page) for the first time, auto-login:
             if (isFirstLaunch)
             {
                 AutoLogin();
@@ -79,7 +88,7 @@ public class MenuSwapper : MonoBehaviour
         else if (currentScene == "MainMenu")
         {
             OpenPage("MainMenu");
-            AutoLogin();
+            //AutoLogin();
         }
     }
 
@@ -89,29 +98,57 @@ public class MenuSwapper : MonoBehaviour
     }
 
     /// <summary>
-    /// Coroutine function to log in
+    /// Coroutine function for auto login 
     /// </summary>
     private IEnumerator AutoLoginCoroutine()
     {
         Debug.Log("Attempting auto-login...");
 
-        // Request requiring an access token to check if the user is already logged in and set the current user 
-        yield return authController.User();
+        // Restore refresh token in HTTP-ONLY cookies (from local persistent file between sessions):
+        yield return authController.RestoreRefreshCookie();
 
+
+        if (!authController.IsRequestSuccessful) // If remember me hasn't been activated, for example, or if you're connecting for the first time 
+        {
+            Debug.Log("Failed to restore refresh token. Redirecting to login page.");
+            OpenPage("PagePrincipale");
+            yield break;
+        }
+
+        // Attempt auto-login using the refresh token:
+        yield return authController.AutoLogin();
 
         if (authController.IsRequestSuccessful)
         {
             Debug.Log("Auto-login successful. Skipping login page.");
-            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            if (currentScene == "ConnectionMenu")
+
+            // Check if the refresh token is still valid for 1 day and rotate it if necessary (must re-login the next time it is used as the file will not be updated): 
+            StartCoroutine(CheckAndRotateRefreshTokenCoroutine());
+
+            // Set User informations:
+            yield return authController.User();
+
+            if (authController.IsRequestSuccessful)
             {
-                HeartbeatManager.Instance.SetLoggedIn(true);
-                MainMenuScene();
+                Debug.Log("User data retrieved successfully.");
+
+                string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+                if (currentScene == "ConnectionMenu")
+                {
+                    // Load the main menu scene:
+                    MainMenuScene();
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed to retrieve user data: {authController.ErrorResponse}");
+                OpenErr($"Failed to retrieve user data: {authController.ErrorResponse}");
             }
         }
         else
         {
             Debug.Log("Auto-login failed. Redirecting to login page.");
+            OpenErr($"Auto-login failed: {authController.ErrorResponse}");
             OpenPage("PagePrincipale"); // Connection page 
         }
     }
@@ -153,8 +190,11 @@ public class MenuSwapper : MonoBehaviour
         if (pageName == "MainMenu")
         {
             GameManager.Instance?.UpdateGameState(GameState.Menu);
+            // StartCoroutine(CheckAndRotateRefreshTokenCoroutine());
         }
     }
+
+    // Popup display and close function: 
 
     public void OpenErr(string message)
     {
@@ -165,7 +205,6 @@ public class MenuSwapper : MonoBehaviour
     {
         ErrorPopup.SetActive(false);
     }
-
     public void OpenMessage(string message)
     {
         MessagePopup.SetActive(true);
@@ -189,6 +228,9 @@ public class MenuSwapper : MonoBehaviour
         ExitGamePopup.SetActive(false);
     }
 
+    /// <summary>
+    /// Login the user with the username and password in the input fields </br>
+    /// </summary>
     public void LoginUser()
     {
         if (authController == null)
@@ -214,21 +256,25 @@ public class MenuSwapper : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Coroutine function for login the user </br>
+    /// </summary>
+    /// <param name="PagePrincipale">The page where the username and password are</param>
     private IEnumerator LoginUserCoroutine(Transform PagePrincipale)
     {
 
-        // Find username and password input field
+        // Find username and password input field:
         yield return authController.Login(PagePrincipale.Find("LogUsername").GetComponent<TMP_InputField>().text,
                                         PagePrincipale.Find("LogPassword").GetComponent<TMP_InputField>().text);
 
         if (authController.IsRequestSuccessful)
         {
+            // Load the user data:
             yield return authController.User();
-
 
             if (authController.IsRequestSuccessful)
             {
-                Debug.Log("DEBUGGGGGG");
+                Debug.Log("DEBUG");
                 Debug.Log(authController.CurrentUser.username);
                 yield return authController.UserStatistics();
 
@@ -252,6 +298,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Set email to reset user password </br>
+    /// </summary>
     public void ResetPassword()
     {
         if (authController == null)
@@ -275,13 +324,16 @@ public class MenuSwapper : MonoBehaviour
             StartCoroutine(ResetPasswordCoroutine(Canvas.Find("ResetPasswordStep1").transform));
     }
 
+    /// <summary>
+    /// Coroutine function to send the reset code by email </br>
+    /// </summary>
+    /// <param name="ResetPasswordPage">The page where the email is</param>
     private IEnumerator ResetPasswordCoroutine(Transform ResetPasswordPage)
     {
         yield return authController.RequestPasswordReset(ResetPasswordPage.Find("MailInputField").GetComponent<TMP_InputField>().text);
 
         if (authController.IsRequestSuccessful)
         {
-
             OpenPage("ResetPasswordStep2");
             OpenMessage("Password reset code sent to your email.");
         }
@@ -291,6 +343,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Reset the password with the code sent by email (check fields) </br>
+    /// </summary>
     public void ResetPassword2()
     {
         if (authController == null)
@@ -323,6 +378,10 @@ public class MenuSwapper : MonoBehaviour
         StartCoroutine(ResetPassword2Coroutine(CurrentPage.transform));
     }
 
+    /// <summary>
+    /// Coroutine function to reset the password with the code sent by email </br>
+    /// </summary>
+    /// <param name="ResetPasswordPage2">The page where the code and new password are</param>
     private IEnumerator ResetPassword2Coroutine(Transform ResetPasswordPage2)
     {
         yield return authController.ResetPassword(Canvas.Find("ResetPasswordStep1").Find("MailInputField").GetComponent<TMP_InputField>().text,
@@ -340,6 +399,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Set the date of birth of the user who wants to register </br>
+    /// </summary>
     public void SignUpUser1()
     {
         if (CurrentPage.name != "SignUpStep1")
@@ -384,6 +446,9 @@ public class MenuSwapper : MonoBehaviour
         OpenPage("SignUpStep2");
     }
 
+    /// <summary>
+    /// Register the user with the username, email and password in the input fields (check fields) </br>
+    /// </summary>
     public void SignUpUser2()
     {
         if (CurrentPage.name != "SignUpStep2")
@@ -449,6 +514,13 @@ public class MenuSwapper : MonoBehaviour
         StartCoroutine(SignUpUser2Coroutine(FirstName, LastName, UserName, Email, Password, ConfirmPassword, day, month, year));
     }
 
+    /// <summary>
+    /// Coroutine function to register the user with the username, email and password in the input fields </br>
+    /// </summary>
+    /// <param name="FirstName">The first name of the user</param>, <param name="LastName">The last name of the user</param>,
+    /// <param name="UserName">The username of the user</param>, <param name="Email">The email of the user</param>,
+    /// <param name="Password">The password of the user</param>, <param name="ConfirmPassword">The confirmation password of the user</param>,
+    /// <param name="day">The day of birth of the user</param>, <param name="month">The month of birth of the user</param>, <param name="year">The year of birth of the user</param>
     private IEnumerator SignUpUser2Coroutine(TMP_InputField FirstName, TMP_InputField LastName, TMP_InputField UserName,
                                             TMP_InputField Email, TMP_InputField Password, TMP_InputField ConfirmPassword,
                                             string day, string month, string year)
@@ -466,6 +538,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Verify the account with the code sent by email (check fields) </br>
+    /// </summary>
     public void SignUpUser3()
     {
         // Check if on correct page
@@ -488,6 +563,10 @@ public class MenuSwapper : MonoBehaviour
         StartCoroutine(SignUpUser3Coroutine(CheckCode, Canvas.Find("SignUpStep2").Find("EmailInputField").GetComponent<TMP_InputField>()));
     }
 
+    /// <summary>
+    /// Coroutine function to verify the account with the code sent by email </br>
+    /// </summary>
+    /// <param name="CheckCode">The code sent by email</param>, <param name="Email">The email of the user</param>
     private IEnumerator SignUpUser3Coroutine(TMP_InputField CheckCode, TMP_InputField Email)
     {
         yield return authController.VerifyAccountButton(Email.text, CheckCode.text);
@@ -502,6 +581,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Resend the verification code to the email of the user </br>
+    /// </summary>
     public void ResendVerificationCode()
     {
         if (authController == null)
@@ -512,6 +594,10 @@ public class MenuSwapper : MonoBehaviour
         StartCoroutine(ResendVerificationCodeCoroutine(Canvas.Find("SignUpStep2").Find("EmailInputField").GetComponent<TMP_InputField>()));
     }
 
+    /// <summary>
+    /// Coroutine function to resend the verification code to the email of the user </br>
+    /// </summary>
+    /// <param name="Email">The email of the user</param>
     private IEnumerator ResendVerificationCodeCoroutine(TMP_InputField Email)
     {
         yield return authController.ResendVerificationCode(Email.text);
@@ -525,6 +611,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Call the logout coroutine </br>
+    /// </summary>
     public void LogoutUser()
     {
         if (authController == null)
@@ -536,6 +625,9 @@ public class MenuSwapper : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Coroutine function to logout the user </br>
+    /// </summary>
     private IEnumerator LogoutCoroutine()
     {
         Debug.Log("Logging out...");
@@ -545,10 +637,10 @@ public class MenuSwapper : MonoBehaviour
         {
             OpenMessage("You have been logged out successfully.");
 
-            // Wait for popup to close
+            // Wait for popup to close:
             yield return new WaitUntil(() => !MessagePopup.activeSelf);
 
-            // Load scene after closing popup
+            // Load scene after closing popup:
             UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
         }
         else
@@ -557,12 +649,44 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Session expiry management: return to login page </br>
+    /// </summary>
     public void HandleSessionExpired()
     {
         Debug.Log("Redirecting to login page...");
         OpenPage("PagePrincipale"); // Redirects to login page
     }
 
+    /// <summary>
+    /// Coroutine for calling the token expiration check function </br>
+    /// </summary>
+    private IEnumerator CheckAndRotateRefreshTokenCoroutine()
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            yield break;
+        }
+
+        // Check if the refresh token is still valid for 1 day and rotate it if necessary (must re-login the next time it is used as the file will not be updated):
+        yield return authController.CheckAndRotateRefreshToken();
+
+        if (authController.IsRequestSuccessful)
+        {
+            Debug.Log("Refresh token rotated or maintained successfully.");
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to rotate or maintained refresh token: {authController.ErrorResponse}");
+            OpenErr($"Failed to rotate refresh token: {authController.ErrorResponse}");
+        }
+    }
+
+    /// <summary>
+    /// Update the user statistics (games played, highest score, rank) </br>
+    /// </summary>
+    /// <param name="badge">The badge to update</param>
     private IEnumerator UpdateStatisticsCoroutine(Transform badge)
     {
 
@@ -597,50 +721,9 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
-
-    // public void SetPlayerStatistics(int gamesPlayed, int highestScore)
-    // {
-    //     if (authController == null)
-    //     {
-    //         Debug.LogError("AuthController is not initialized.");
-    //         return;
-    //     }
-
-    //     StartCoroutine(authController.UpdateUserStatistics(
-    //         gamesPlayed,
-    //         highestScore,
-    //         onSuccess: () =>
-    //         {
-    //             Debug.Log("Player statistics updated successfully.");
-    //             OpenMessage("Statistics updated successfully.");
-    //         },
-    //         onError: (errorMessage) =>
-    //         {
-    //             Debug.LogError($"Failed to update player statistics: {errorMessage}");
-    //             OpenErr($"Failed to update statistics: {errorMessage}");
-    //         }
-    //     ));
-    // }
-
-    // public void OnUpdateStatisticsButtonClick()
-    // {
-    //     int gamesPlayed;
-    //     int highestScore;
-
-    //     if (!int.TryParse(gamesPlayedInputField.text, out gamesPlayed))
-    //     {
-    //         Debug.LogError("Invalid input for Games Played.");
-    //         return;
-    //     }
-
-    //     if (!int.TryParse(highestScoreInputField.text, out highestScore))
-    //     {
-    //         Debug.LogError("Invalid input for Highest Score.");
-    //         return;
-    //     }
-    //     SetPlayerStatistics(gamesPlayed, highestScore);
-    // }
-
+    /// <summary>
+    /// Password field verification function on registration 
+    /// </summary>
     public void ValidatePasswordRegistration()
     {
         Transform signUpStep2Page = Canvas.Find("SignUpStep2");
@@ -658,6 +741,9 @@ public class MenuSwapper : MonoBehaviour
         FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorText);
     }
 
+    /// <summary>
+    /// Password field verification function on reset password
+    /// </summary>
     public void ValidatePasswordReset()
     {
         Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
@@ -675,6 +761,9 @@ public class MenuSwapper : MonoBehaviour
         FieldsValidation.ValidatePasswordField(passwordField, PasswordErrorTextReset);
     }
 
+    /// <summary>
+    /// Confirm password field verification function on registration
+    /// </summary>
     public void ValidateConfirmPasswordRegistration()
     {
         Transform signUpStep2Page = Canvas.Find("SignUpStep2");
@@ -693,6 +782,9 @@ public class MenuSwapper : MonoBehaviour
         FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorText);
     }
 
+    /// <summary>
+    /// Confirm password field verification function on reset password
+    /// </summary>
     public void ValidateConfirmPasswordReset()
     {
         Transform resetPasswordStep2Page = Canvas.Find("ResetPasswordStep2");
@@ -711,6 +803,9 @@ public class MenuSwapper : MonoBehaviour
         FieldsValidation.ValidateConfirmPasswordField(passwordField, confirmPasswordField, ConfirmationErrorTextReset);
     }
 
+    /// <summary>
+    /// Email field verification function on registration
+    /// </summary>
     public void ValidateEmailField(TMP_InputField emailField)
     {
         var outline = emailField.GetComponent<UnityEngine.UI.Outline>();
@@ -734,86 +829,42 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
-
-    // public void UpdateLeaderboard()
-    // {
-    //     if (authController == null)
-    //     {
-    //         Debug.LogError("AuthController is not initialized.");
-    //         return;
-    //     }
-
-    //     StartCoroutine(authController.GetLeaderboard(
-    //         onSuccess: (leaderboardEntries) =>
-    //         {
-    //             Debug.Log("Leaderboard data fetched successfully.");
-    //             UpdateLeaderboardUI(leaderboardEntries);
-    //         },
-    //         onError: (errorMessage) =>
-    //         {
-    //             Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
-    //             OpenErr($"Failed to fetch leaderboard: {errorMessage}");
-    //         }
-    //     ));
-    // }
-
-    // private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
-    // {
-    //     // Update GameObjects for the first 4
-    //     UpdateLeaderboardEntry(top1, leaderboardEntries.Count > 0 ? leaderboardEntries[0] : null);
-    //     UpdateLeaderboardEntry(top2, leaderboardEntries.Count > 1 ? leaderboardEntries[1] : null);
-    //     UpdateLeaderboardEntry(top3, leaderboardEntries.Count > 2 ? leaderboardEntries[2] : null);
-    //     UpdateLeaderboardEntry(top4, leaderboardEntries.Count > 3 ? leaderboardEntries[3] : null);
-    // }
-
-
-    // private void UpdateLeaderboardEntry(GameObject entryObject, LeaderboardEntry entry)
-    // {
-    //     if (entryObject == null) return;
-
-    //     // Retrieve sub-GameObjects for Rank, Name and Score
-    //     TMP_Text rankText = entryObject.transform.Find("Rank")?.GetComponent<TMP_Text>();
-    //     TMP_Text nameText = entryObject.transform.Find("Name")?.GetComponent<TMP_Text>();
-    //     TMP_Text scoreText = entryObject.transform.Find("Score")?.GetComponent<TMP_Text>();
-
-    //     if (entry != null)
-    //     {
-    //         // Update text fields
-    //         if (rankText != null) rankText.text = $"{entry.ranking}";
-    //         if (nameText != null) nameText.text = entry.username;
-    //         if (scoreText != null) scoreText.text = $"{entry.highestScore}";
-
-    //         entryObject.SetActive(true); // Display entry
-    //     }
-    //     else
-    //     {
-    //         // Hide fields if no data available
-    //         if (rankText != null) rankText.text = "";
-    //         if (nameText != null) nameText.text = "";
-    //         if (scoreText != null) scoreText.text = "";
-
-    //         entryObject.SetActive(false); // Hide entry
-    //     }
-    // }
-
-    public void ConnectToRandomWaitingRoom() {
-        ConnectToWaitingRoom();
-    }
-
-    public void ConnectToWaitingRoom() {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
-    }
-
+    /// <summary>
+    /// Load the connection scene </br>
+    /// </summary>
     public void ConnectionScene()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
     }
+
+    /// <summary>
+    /// Load the main menu scene </br>
+    /// </summary>
     public void MainMenuScene()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 
-    // Recursive search for a GameObject by name
+    /// <summary>
+    /// Load a random waiting room scene </br>
+    /// </summary>
+    public void ConnectToRandomWaitingRoom()
+    {
+        ConnectToWaitingRoom();
+    }
+
+    /// <summary>
+    /// Load the waiting room scene </br>
+    /// </summary>
+    public void ConnectToWaitingRoom()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
+    }
+
+    /// <summary>
+    /// Rcursive search for a GameObject in the hierarchy by name </br>
+    /// </summary>
+    /// <param name="parent">The parent transform to search in</param>, <param name="childName">The name of the child to find</param>
     private Transform FindDeepChild(Transform parent, string childName)
     {
         foreach (Transform child in parent)
@@ -828,6 +879,10 @@ public class MenuSwapper : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Show the tooltip for field validation </br>
+    /// </summary>
+    /// <param name="tooltip">The tooltip GameObject to show or hide</param>
     public static void ShowTooltip(GameObject tooltip)
     {
         if (tooltip != null)
@@ -840,6 +895,10 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Hide the tooltip for field validation </br>
+    /// </summary>
+    /// <param name="tooltip">The tooltip GameObject to show or hide</param>
     public static void HideTooltip(GameObject tooltip)
     {
         if (tooltip != null)
@@ -852,12 +911,17 @@ public class MenuSwapper : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Call the coroutine to get the games played statistics </br>
+    /// </summary>
     public void GamesPlayed()
     {
         StartCoroutine(GamesPlayedAndNavigate());
     }
 
+    /// <summary>
+    /// Coroutine function to get the games played statistics </br>
+    /// </summary>
     private IEnumerator GamesPlayedAndNavigate()
     {
         yield return authController.GamesPlayedStatistics();
