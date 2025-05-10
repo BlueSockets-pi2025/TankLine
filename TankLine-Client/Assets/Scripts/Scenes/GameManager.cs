@@ -10,8 +10,6 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public GameState CurrentStat { get; private set; }
 
-    // public bool HostPlayer { get; set; }
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
