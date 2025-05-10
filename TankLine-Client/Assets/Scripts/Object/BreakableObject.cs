@@ -22,10 +22,11 @@ public class BreakableObject : NetworkBehaviour
 
     private void Awake()
     {
-        alembicPlayer = GetComponent<AlembicStreamPlayer>();
-        alembicPlayer.CurrentTime = 0;
-        alembicPlayer.enabled = false;
-
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") {
+            alembicPlayer = GetComponent<AlembicStreamPlayer>();
+            alembicPlayer.CurrentTime = 0;
+            alembicPlayer.enabled = false;
+        }
 
         health.Value = nbStartingLife;
         health.OnChange += OnHealthChange;
@@ -65,44 +66,50 @@ public class BreakableObject : NetworkBehaviour
 
     private IEnumerator PerformAnimationPart1()
     {
-        alembicPlayer.enabled = true;
-        while(alembicPlayer.CurrentTime < (damage_time_1 / speed))
-        {
-            if (alembicPlayer != null)
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") {
+            alembicPlayer.enabled = true;
+            while(alembicPlayer.CurrentTime < (damage_time_1 / speed))
             {
-                alembicPlayer.CurrentTime += Time.deltaTime*speed;
+                if (alembicPlayer != null)
+                {
+                    alembicPlayer.CurrentTime += Time.deltaTime*speed;
+                }
+                yield return null;
             }
-            yield return null;
+            alembicPlayer.enabled = false;
         }
-        alembicPlayer.enabled = false;
     }
 
     private IEnumerator PerformAnimationPart2()
     {
-        alembicPlayer.enabled = true;
-        while(alembicPlayer.CurrentTime < (damage_time_2 / speed))
-        {
-            if (alembicPlayer != null)
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") {
+            alembicPlayer.enabled = true;
+            while(alembicPlayer.CurrentTime < (damage_time_2 / speed))
             {
-                alembicPlayer.CurrentTime += Time.deltaTime*speed;
+                if (alembicPlayer != null)
+                {
+                    alembicPlayer.CurrentTime += Time.deltaTime*speed;
+                }
+                yield return null;
             }
-            yield return null;
+            alembicPlayer.enabled = false;
         }
-        alembicPlayer.enabled = false;
     }
 
     private IEnumerator PerformAnimationPart3()
     {
-        alembicPlayer.enabled = true;
-        while(alembicPlayer.CurrentTime < (alembicPlayer.Duration / speed))
-        {
-            if (alembicPlayer != null)
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") {
+            alembicPlayer.enabled = true;
+            while(alembicPlayer.CurrentTime < (alembicPlayer.Duration / speed))
             {
-                alembicPlayer.CurrentTime += Time.deltaTime*speed;
+                if (alembicPlayer != null)
+                {
+                    alembicPlayer.CurrentTime += Time.deltaTime*speed;
+                }
+                yield return null;
             }
-            yield return null;
+            alembicPlayer.enabled = false;
         }
-        alembicPlayer.enabled = false;
         if (base.IsServerInitialized)
             Despawn(gameObject);
     }
