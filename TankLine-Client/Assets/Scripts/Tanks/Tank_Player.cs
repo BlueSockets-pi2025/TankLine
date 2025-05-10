@@ -1,3 +1,4 @@
+using System;
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
@@ -31,7 +32,8 @@ public class Tank_Player : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
 
-        effectPullPrefab = thisTank.transform.Find("tankGun").Find("effect_pull").gameObject;
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true")
+            effectPullPrefab = thisTank.transform.Find("tankGun").Find("effect_pull").gameObject;
     }
 
     /// <summary>
@@ -307,6 +309,7 @@ public class Tank_Player : Tank
 
     [ObserversRpc]
     private void PlayAnimationOnClient() {
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
         effectPullPrefab.SetActive(true);
         effectPullPrefab.GetComponent<explosionPull>().play();
     }
