@@ -290,7 +290,7 @@ public class Tank_Player : Tank
             Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
 
             // spawn object
-            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f*dir, Quaternion.identity);
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 1.1f*dir, Quaternion.identity);
 
             // change direction and tankOwner (for bullet count)
             Bullet newBullet = newBulletObject.GetComponent<Bullet>();

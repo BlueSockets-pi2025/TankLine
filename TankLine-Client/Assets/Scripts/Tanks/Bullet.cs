@@ -2,7 +2,6 @@ using FishNet.Object;
 using Unity.Mathematics;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
-using Unity.VisualScripting;
 using System;
 
 public class Bullet : NetworkBehaviour {
@@ -34,15 +33,13 @@ public class Bullet : NetworkBehaviour {
     public GameObject tankOwner = null;
 
     /// <summary> The smoothness of the correction applied to the bullet position to match with the server 
-    // (0 means no smoothness, almost teleport to right location, and 1 means high smoothness, almost no correction)</summary>
+    /// (0 means no smoothness, almost teleport to right location, and 1 means high smoothness, almost no correction)
+    /// </summary>
     [Range(0f, 1f)]
     public float correctionSmoothness = 0.8f;
 
     /// <summary> VFX of explosion </summary>
     public GameObject bulletVFXPrefab;
-    /// <summary> VFX of bullet being shoot </summary>
-    public GameObject shootVFXPrefab;
-
 
     /// <summary> This bullet GameObject </summary>
     protected GameObject thisBullet;
@@ -62,9 +59,6 @@ public class Bullet : NetworkBehaviour {
         // functions called when the var is changed by another game instance
         direction.OnChange += OnDirectionChange;
         serverPosition.OnChange += OnServerPositionChange;
-
-        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true")
-            Instantiate(shootVFXPrefab, transform.position, transform.rotation);
     }
 
     /// <summary>
