@@ -40,6 +40,8 @@ public class Bullet : NetworkBehaviour {
 
     /// <summary> VFX of explosion </summary>
     public GameObject bulletVFXPrefab;
+    /// <summary> VFX of bullet being shoot </summary>
+    public GameObject shootVFXPrefab;
 
 
     /// <summary> This bullet GameObject </summary>
@@ -60,6 +62,9 @@ public class Bullet : NetworkBehaviour {
         // functions called when the var is changed by another game instance
         direction.OnChange += OnDirectionChange;
         serverPosition.OnChange += OnServerPositionChange;
+
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true")
+            Instantiate(shootVFXPrefab, transform.position, transform.rotation);
     }
 
     /// <summary>
