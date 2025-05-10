@@ -1,15 +1,10 @@
-using FishNet.Object;
-using Unity.Mathematics;
-using FishNet.Object.Synchronizing;
 using UnityEngine;
-using Unity.VisualScripting;
-using System;
 using System.Collections.Generic;
 using System.Collections; 
 using UnityEngine.Formats.Alembic.Importer;
 
 
-public class bulletExplosion : NetworkBehaviour
+public class bulletExplosion : MonoBehaviour
 {
     private List<Material> allMaterials = new List<Material>();
     private AlembicStreamPlayer alembicPlayer;
@@ -78,7 +73,7 @@ public class bulletExplosion : NetworkBehaviour
                     mat.SetFloat("Fade", 1f);
                 }
             }
-            Despawn(gameObject,null);
+            Destroy(gameObject);
         }
     }
 
