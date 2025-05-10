@@ -17,20 +17,14 @@ public class BreakableObject : NetworkBehaviour
     public float damage_time_1 = 0f;
     public float damage_time_2 = 0f;
 
-    private Renderer objRenderer;
     private Rigidbody rb;
 
     private void Awake()
     {
-        objRenderer = GetComponent<Renderer>();
         alembicPlayer = GetComponent<AlembicStreamPlayer>();
         alembicPlayer.CurrentTime = 0;
         alembicPlayer.enabled = false;
 
-        if (objRenderer == null)
-        {
-            Debug.LogError("Renderer not found on " + gameObject.name);
-        }
 
         health.Value = nbStartingLife;
         health.OnChange += OnHealthChange;
