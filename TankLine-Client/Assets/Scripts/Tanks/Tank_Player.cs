@@ -21,6 +21,9 @@ public class Tank_Player : Tank
 
     protected float movementToMake = 0;
 
+    /// <summary> gameObject in hierarchy which represent the shooting's VFX  </summary>
+    protected GameObject effectPullPrefab;
+
     protected override void Start()
     {
         // set thisTank to the GameObject this script is attached to
@@ -28,7 +31,7 @@ public class Tank_Player : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
 
-
+        effectPullPrefab = thisTank.transform.Find("tankGun").Find("effect_pull").gameObject;
     }
 
     /// <summary>
@@ -295,6 +298,11 @@ public class Tank_Player : Tank
             newBullet.direction.Value = dir;
             newBullet.tankOwner = gameObject;
             nbBulletShot++;
+
+            // Activate VFX of shooting
+            effectPullPrefab.SetActive(true);
+            effectPullPrefab.GetComponent<explosionPull>().play();
+            // --------------
 
             Spawn(newBulletObject, null);
         }

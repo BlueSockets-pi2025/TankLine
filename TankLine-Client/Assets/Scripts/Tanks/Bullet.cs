@@ -38,6 +38,9 @@ public class Bullet : NetworkBehaviour {
     [Range(0f, 1f)]
     public float correctionSmoothness = 0.8f;
 
+    /// <summary> VFX of explosion </summary>
+    public GameObject bulletVFXPrefab;
+
 
     /// <summary> This bullet GameObject </summary>
     protected GameObject thisBullet;
@@ -97,6 +100,8 @@ public class Bullet : NetworkBehaviour {
             if (collision.gameObject.CompareTag(BREAKABLE_TAG)) {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
+                GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
+                Spawn(newbulletVFX, null);
                 wall.TakeDamage();
                 Despawn(thisBullet);
             } 
@@ -106,6 +111,8 @@ public class Bullet : NetworkBehaviour {
 
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0) {
+                    GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
+                    Spawn(newbulletVFX, null);
                     Despawn(thisBullet);
                     return;
                 }
@@ -141,6 +148,8 @@ public class Bullet : NetworkBehaviour {
 
             FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner);
 
+            GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
+            Spawn(newbulletVFX, null);
             Despawn(thisBullet);
 
             return;
@@ -150,6 +159,8 @@ public class Bullet : NetworkBehaviour {
             ############################## SHELL COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == SHELL_LAYER) {
+            GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
+            Spawn(newbulletVFX, null);
             Despawn(collision.gameObject);
             Despawn(thisBullet);
             return;

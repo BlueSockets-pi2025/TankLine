@@ -1,10 +1,15 @@
+using FishNet.Object;
+using Unity.Mathematics;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
+using Unity.VisualScripting;
+using System;
 using System.Collections.Generic;
 using System.Collections; 
 using UnityEngine.Formats.Alembic.Importer;
 
 
-public class bulletExplosion : MonoBehaviour
+public class bulletExplosion : NetworkBehaviour
 {
     private List<Material> allMaterials = new List<Material>();
     private AlembicStreamPlayer alembicPlayer;
@@ -13,7 +18,7 @@ public class bulletExplosion : MonoBehaviour
     private Renderer rend;
     private bool finished;
 
-    void Start()
+    void Awake()
     {
         // Récupère tous les renderers (MeshRenderer + SkinnedMeshRenderer)
         var renderers = GetComponentsInChildren<Renderer>();
@@ -73,7 +78,7 @@ public class bulletExplosion : MonoBehaviour
                     mat.SetFloat("Fade", 1f);
                 }
             }
-            Destroy(gameObject);
+            Despawn(gameObject,null);
         }
     }
 
