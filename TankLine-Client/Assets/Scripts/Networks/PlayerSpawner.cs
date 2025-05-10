@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
@@ -5,32 +6,42 @@ using UnityEngine;
 
 public class PlayerSpawner : NetworkBehaviour
 {
-    [Header("Spawner objects references")]
+    [Header("Prefabs references")]
     [Space(10)]
-    public NetworkObject playerObjectPrefab = null;
-    public List<GameObject> spawnPoints = new();
+    public GameObject playerObjectPrefab = null;
+    private List<GameObject> spawnPoints = new();
 
     private int currentSpawnIndex = 0;
 
-    void Awake()
+    public void InitSpawnPoint()
     {
-        if (playerObjectPrefab == null) {
-            Debug.LogError("[ERROR] Player object prefab not referenced");
-            this.enabled = false;
-        } else if (spawnPoints.Count == 0) {
-            Debug.LogError("[ERROR] No spawn point referenced");
-            this.enabled = false;
+        // find new spawnpoint transform
+        GameObject spawnPointsParent = GameObject.Find("PlayerSpawns");
+        if (spawnPointsParent == null) {
+            Debug.Log("[ERROR] spawnpoint parent not found");
+            return;
         }
+
+        // clear old spawnpoints
+        spawnPoints = new();
+        currentSpawnIndex = 0;
+
+        foreach (Transform child in spawnPointsParent.transform) {
+            spawnPoints.Add(child.gameObject);
+        }
+
+        Debug.Log($"{spawnPoints.Count} new spawn point initialized");
     }
 
     /// <summary>
     /// Spawn a player on one of the spawnPoint
     /// </summary>
     /// <param name="ownerConnection">The connection of the player who will own the object</param>
+    /// <param name="ownerName">The owner nickname</param>
     public void SpawnPlayer(NetworkConnection ownerConnection, string ownerName) {
 
         // instantiate the new player at the current spawnpoint position
-        GameObject newPlayer = Instantiate(playerObjectPrefab.gameObject);
+        GameObject newPlayer = Instantiate(playerObjectPrefab);
         newPlayer.transform.position = spawnPoints[currentSpawnIndex].transform.position;
 
         // spawn the player
@@ -40,6 +51,8 @@ public class PlayerSpawner : NetworkBehaviour
         // increment current spawn point
         currentSpawnIndex++;
         if (currentSpawnIndex >= spawnPoints.Count) currentSpawnIndex -= spawnPoints.Count;
+
+        FindAnyObjectByType<LobbyManager>().OnPlayerSpawned();
     }
 
     /// <summary>
@@ -57,5 +70,15 @@ public class PlayerSpawner : NetworkBehaviour
     public void DespawnPlayer(string playerName) {
         GameObject playerObject = GameObject.Find("Player:"+playerName);
         Despawn(playerObject);
+    }
+
+    /// <summary>
+    /// Despawn every player
+    /// </summary>
+    public void DespawnEveryone(List<string> playersName) {
+        foreach (string player in playersName) {
+            GameObject playerObject = GameObject.Find("Player:"+player);
+            Despawn(playerObject);
+        }
     }
 }

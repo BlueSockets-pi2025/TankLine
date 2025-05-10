@@ -3,10 +3,10 @@ using FishNet.Managing;
 using FishNet.Transporting.Tugboat;
 using System;
 using System.IO;
-using System.Collections.Generic;
 
 public class ConnectionManager : MonoBehaviour
 {
+    private static ConnectionManager instance = null;
     private NetworkManager networkManager;
     private Tugboat tugboat;
     public const string PathToEnvFile = "/.env";
@@ -14,6 +14,13 @@ public class ConnectionManager : MonoBehaviour
 
 
     private void Awake() {
+
+        if (instance != null) {
+            gameObject.GetComponent<ConnectionManager>().enabled = false;
+            return;
+        }
+        instance = this;
+
         // initialize variables
         networkManager = FindFirstObjectByType<NetworkManager>();
         tugboat = networkManager.GetComponent<Tugboat>();

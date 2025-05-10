@@ -6,6 +6,12 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System;
 using System.Collections.Generic;
+using System;
+using System.Timers;
+
+using Heartbeat ; 
+
+
 
 public class AuthController : MonoBehaviour
 {
@@ -24,6 +30,14 @@ public class AuthController : MonoBehaviour
 
     private const string refreshTokenUrl = "https://185.155.93.105:17008/api/auth/refresh-token";
 
+    private string playedGameUrl = "https://185.155.93.105:17008/api/PlayedGames/summary"; 
+
+    private string heartbeatUrl = "https://185.155.93.105:17008/api/auth/heartbeat" ; 
+
+
+    private static AuthController instance;
+
+
     private static X509Certificate2 trustedCertificate;  
 
     public bool IsRequestSuccessful { get; private set; }
@@ -31,10 +45,51 @@ public class AuthController : MonoBehaviour
     public UserData CurrentUser { get; private set; }
     public UserStatistics CurrentUserStatistics { get; private set; }
 
+    public PlayedGameStats CurrentPlayedGameStats { get; private set; }
+
+
+
+    // Heartbeat (ping) to update is_logged_in 
+    private float timeSinceLastHeartbeat = 0f;
+    private float heartbeatInterval = 30f;
+    private bool isLoggedIn = false;  
+
+    private bool preventAutoLogin = false;
+
+
+    // UI Elements (Leaderboard)
+    public TMP_Text map;
+    public TMP_Text victories;
+    public TMP_Text username;
+    public TMP_Text ratio;
+    public TMP_Text tanks_destroyed;
+    public TMP_Text nb_games_played;
+    public TMP_Text victory_or_defeat;
+    public TMP_Text rank;
+    public TMP_Text date;
+
+    
+    private static X509Certificate2 staticTrustedCertificate;
+
+
+
+    private void OnApplicationQuit()
+    {
+        
+        StartCoroutine(LogoutUser());
+    }
+
+    
+
+
+
+
     private void Awake()
     {
         LoadCertificate();
+
     }
+    
 
     private void LoadCertificate()
     {
@@ -43,6 +98,7 @@ public class AuthController : MonoBehaviour
         {
             byte[] certificateBytes = File.ReadAllBytes(certificatePath);
             trustedCertificate = new X509Certificate2(certificateBytes);
+            staticTrustedCertificate = trustedCertificate ; 
             Debug.Log("Certificate successfully loaded.");
         }
         else
@@ -199,6 +255,16 @@ public class AuthController : MonoBehaviour
         yield return StartCoroutine(ResetPasswordCoroutine(email, code, newPassword, confirmNewPassword));
     }
 
+
+    public IEnumerator GamesPlayedStatistics()
+    {
+        // Attend la fin de la coroutine GetGamePlayedStats
+        yield return StartCoroutine(GetGamePlayedStats());
+        
+        Debug.Log("GAME PLAYED !");
+    }
+
+
     private IEnumerator RegisterUser(string username, string email, string password, string confirmPassword, string firstName, string lastName, string day, string month, string year)
     {
         if (password != confirmPassword)
@@ -352,6 +418,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Login successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
+            HeartbeatManager.Instance.SetLoggedIn(true);
         }
         else
         {
@@ -359,32 +426,35 @@ public class AuthController : MonoBehaviour
             Debug.Log("Details: " + request.downloadHandler.text);
             ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
             IsRequestSuccessful = false;
+        
         }
     }
+
 
     private IEnumerator LogoutUser()
     {
-        UnityWebRequest request = new UnityWebRequest(logoutUrl, "POST");
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
 
-        request.certificateHandler = new CustomCertificateHandler();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Logout successful: " + request.downloadHandler.text);
-            IsRequestSuccessful = true;
-        }
-        else
-        {
-            Debug.Log("Logout error: " + request.error);
-            Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
-            IsRequestSuccessful = false;
-        }
+        yield return SendRequestWithAutoRefresh(
+            logoutUrl,
+            "POST",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // no body for logout
+            onSuccess: (response) =>
+            {
+                Debug.Log("Logout successful: " + response.downloadHandler.text);
+                IsRequestSuccessful = true;
+                HeartbeatManager.Instance.SetLoggedIn(false);
+            },
+            onError: (response) =>
+            {
+                Debug.LogError("Logout error: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(response.downloadHandler.text) ? response.downloadHandler.text : "An unknown error occurred.";
+                IsRequestSuccessful = false;
+            }
+        );
     }
+
 
     private IEnumerator RequestPasswordResetCoroutine(string email)
     {
@@ -540,7 +610,196 @@ public class AuthController : MonoBehaviour
             }
         );
     }
+    
+private IEnumerator GetGamePlayedStats()
+{
+    UnityWebRequest request = new UnityWebRequest(playedGameUrl, "GET");
+
+    request.downloadHandler = new DownloadHandlerBuffer();
+    request.SetRequestHeader("Content-Type", "application/json");
+    request.certificateHandler = new CustomCertificateHandler();
+
+    yield return SendRequestWithAutoRefresh(
+        playedGameUrl,
+        "GET",
+        new Dictionary<string, string> { { "Content-Type", "application/json" } },
+        null, // No body for GET
+        onSuccess: (response) =>
+        {
+            string json = response.downloadHandler?.text; 
+
+            if (json == null)
+            {
+                Debug.LogError("DownloadHandler text is null.");
+                IsRequestSuccessful = false;
+                return;
+            }
+
+            Debug.Log("Game Played Statistics (Raw JSON): " + json);
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(json) || json.Trim() == "null")
+                {
+                    Debug.LogWarning("No game stats returned or content is 'null'.");
+                    IsRequestSuccessful = false;
+                    return;
+                }
+
+                var stats = JsonUtility.FromJson<PlayedGameStats>(json);
+
+                if (stats == null)
+                {
+                    Debug.LogWarning("Deserialization failed: 'stats' is null.");
+                    IsRequestSuccessful = false;
+                    return;
+                }
+
+                if (stats.totalGames == 0 || stats.totalVictories < 0 || stats.tanksDestroyed < 0 || string.IsNullOrEmpty(stats.mapPlayed))
+                {
+                    Debug.LogWarning("Some critical game stats are missing or invalid.");
+                    IsRequestSuccessful = false;
+                    return;
+                }
+
+                CurrentPlayedGameStats = stats;
+                IsRequestSuccessful = true;
+
+                float victoryRatio = stats.totalGames > 0
+                    ? (float)stats.totalVictories / stats.totalGames
+                    : 0f;
+
+                Debug.LogWarning("Updating UI with game stats.");
+                
+                if (username != null ) 
+                {
+                    username.text = stats.username.ToString();
+
+
+                }
+                if (nb_games_played != null)
+                {
+                    nb_games_played.text = stats.totalGames.ToString();
+                    Debug.LogWarning("Updated nb_games_played.");
+                }
+
+                if (victories != null)
+                {
+                    victories.text = stats.totalVictories.ToString();
+                    Debug.LogWarning("Updated victories.");
+                }
+
+                if (ratio != null)
+                {
+                    ratio.text = victoryRatio.ToString("P1");
+                    Debug.LogWarning("Updated ratio.");
+                }
+
+                if (tanks_destroyed != null)
+                {
+                    tanks_destroyed.text = stats.tanksDestroyed.ToString();
+                    Debug.LogWarning("Updated tanks_destroyed.");
+                }
+
+                if (map != null)
+                {
+                    map.text = stats.mapPlayed;
+                    Debug.LogWarning("Updated map.");
+                }
+
+                if (rank != null)
+                {
+                    rank.text = stats.playerRank.ToString();
+                    Debug.LogWarning("Updated rank.");
+                }
+
+                if (victory_or_defeat != null)
+                {
+                    victory_or_defeat.text = stats.gameWon ? "Victory" : "Defeat";
+                    Debug.LogWarning("Updated victory_or_defeat.");
+                }
+
+                try
+                {
+                    DateTime parsedGameDate = DateTime.Parse(stats.gameDate);
+                    if (date != null)
+                    {
+                        date.text = parsedGameDate.ToString("dd/MM/yyyy HH:mm");
+                        Debug.LogWarning("Updated date.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError("Failed to parse gameDate: " + ex.Message);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception while parsing or using game stats: {ex.Message}");
+                IsRequestSuccessful = false;
+            }
+        },
+        onError: (response) =>
+        {
+            long responseCode = response.responseCode;
+            string responseText = response.downloadHandler != null ? response.downloadHandler.text : "";
+
+            if (responseCode == 404)
+            {
+                Debug.LogWarning("No games found for the current user (404).");
+            }
+            else
+            {
+                Debug.LogError($"Failed to retrieve game statistics. HTTP {responseCode}: {response.error}");
+                Debug.LogError("Details: " + responseText);
+            }
+
+            ErrorResponse = !string.IsNullOrEmpty(responseText)
+                ? responseText
+                : "An unknown error occurred.";
+            IsRequestSuccessful = false;
+        }
+    );
 }
+
+    private IEnumerator SendHeartbeat()
+    {
+        Debug.Log("Is Logged In: " + isLoggedIn);
+
+        if (!isLoggedIn) 
+        {
+            Debug.LogWarning("User is not logged in. Heartbeat request not sent.");
+            yield break;  
+        }
+        else 
+        {
+             Debug.LogWarning("USER IS LOGGED IN");
+        }
+
+        Debug.LogWarning("SEND HEARTBEAT");
+        yield return SendRequestWithAutoRefresh(
+            heartbeatUrl,  
+            "POST",  
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null,  
+            onSuccess: (response) =>
+            {
+                Debug.LogWarning("Heartbeat SUCCESS");
+            },
+            onError: (response) =>
+            {
+                Debug.LogWarning("Heartbeat failed: " + response.error);
+            }
+        );
+
+     }
+
+
+}
+
+
+
 
 public class CustomCertificateHandler : CertificateHandler
 {
@@ -619,7 +878,22 @@ public class UserData
 [System.Serializable]
 public class UserStatistics
 {
+    public string username;
     public int gamesPlayed;
     public int highestScore;
     public int ranking;
+}
+
+
+[System.Serializable]
+public class PlayedGameStats
+{
+    public string username;
+    public int totalGames;
+    public int totalVictories;
+    public int tanksDestroyed;
+    public string mapPlayed;
+    public int playerRank;
+    public bool gameWon;
+    public string gameDate;  
 }
