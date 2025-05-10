@@ -115,7 +115,7 @@ public class Bullet_Offline : MonoBehaviour
         */
         else if (collision.gameObject.layer == PLAYER_LAYER)
         {
-            Tank hitTank = collision.gameObject.GetComponent<Tank>();
+            Tank_Offline hitTank = collision.gameObject.GetComponent<Tank_Offline>();
 
             if (hitTank != null)
             {

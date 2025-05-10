@@ -796,6 +796,14 @@ public class MenuSwapper : MonoBehaviour
     //     }
     // }
 
+    public void ConnectToRandomWaitingRoom() {
+        ConnectToWaitingRoom();
+    }
+
+    public void ConnectToWaitingRoom() {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
+    }
+
     public void ConnectionScene()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
