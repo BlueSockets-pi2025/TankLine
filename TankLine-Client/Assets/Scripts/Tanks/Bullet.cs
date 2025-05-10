@@ -100,8 +100,7 @@ public class Bullet : NetworkBehaviour {
             if (collision.gameObject.CompareTag(BREAKABLE_TAG)) {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
-                GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
-                Spawn(newbulletVFX, null);
+                PlayAnimationOnClient();
                 wall.TakeDamage();
                 Despawn(thisBullet);
             } 
@@ -111,8 +110,7 @@ public class Bullet : NetworkBehaviour {
 
                 // if all bounces have been made, delete
                 if (nbRebounds <= 0) {
-                    GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
-                    Spawn(newbulletVFX, null);
+                    PlayAnimationOnClient();
                     Despawn(thisBullet);
                     return;
                 }
@@ -148,8 +146,7 @@ public class Bullet : NetworkBehaviour {
 
             FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner);
 
-            GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
-            Spawn(newbulletVFX, null);
+            PlayAnimationOnClient();
             Despawn(thisBullet);
 
             return;
@@ -159,8 +156,7 @@ public class Bullet : NetworkBehaviour {
             ############################## SHELL COLLISIONS ############################## 
         */
         else if (collision.gameObject.layer == SHELL_LAYER) {
-            GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
-            Spawn(newbulletVFX, null);
+            PlayAnimationOnClient();
             Despawn(collision.gameObject);
             Despawn(thisBullet);
             return;
@@ -177,6 +173,11 @@ public class Bullet : NetworkBehaviour {
             Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
             playerOwner.DecreaseNbBulletShot();
         }
+    }
+
+    [ObserversRpc]
+    private void PlayAnimationOnClient() {
+        GameObject newbulletVFX = Instantiate(bulletVFXPrefab, transform.position, Quaternion.identity);
     }
 
     public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer) {

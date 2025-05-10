@@ -25,6 +25,9 @@ public class Tank_Player : Tank
     /// <summary> gameObject in hierarchy which represent the shooting's VFX  </summary>
     protected GameObject effectPullPrefab;
 
+    /// <summary> VFX of explosion </summary>
+    public GameObject deathVFXPrefab;
+
     protected override void Start()
     {
         // set thisTank to the GameObject this script is attached to
@@ -316,5 +319,10 @@ public class Tank_Player : Tank
 
     public void DecreaseNbBulletShot() {
         nbBulletShot--;
+    }
+
+    public void OnDestroy() {
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
+        GameObject newbulletVFX = Instantiate(deathVFXPrefab, transform.position, Quaternion.identity);
     }
 }
