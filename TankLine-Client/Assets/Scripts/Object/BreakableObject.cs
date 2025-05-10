@@ -3,6 +3,7 @@ using FishNet.Object.Synchronizing;
 using UnityEngine;
 using UnityEngine.Formats.Alembic.Importer;
 using System.Collections;
+using System;
 
 //Object that breaks after a certain number of lives, and changes texture/material with each life
 public class BreakableObject : NetworkBehaviour
