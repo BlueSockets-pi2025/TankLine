@@ -21,11 +21,11 @@ MonoBehaviour:
   m_OverrideGlobalSceneList: 1
   m_Scenes:
   - m_enabled: 1
-    m_path: Assets/Scenes/WaitingRoom.unity
-  - m_enabled: 1
     m_path: Assets/Scenes/ConnectionMenu.unity
   - m_enabled: 1
     m_path: Assets/Scenes/MainMenu.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/WaitingRoom.unity
   - m_enabled: 1
     m_path: Assets/Scenes/LoadScene.unity
   - m_enabled: 1
