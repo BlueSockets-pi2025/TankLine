@@ -20406,7 +20406,7 @@ MonoBehaviour:
   ErrorPopup: {fileID: 2102403008}
   MessagePopup: {fileID: 1976018103}
   ExitGamePopup: {fileID: 0}
-  actions: {fileID: 0}
+  actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
   CurrentPage: {fileID: 2020324182}
   EmailErrorText: {fileID: 956111884}
   PasswordErrorText: {fileID: 677064402}

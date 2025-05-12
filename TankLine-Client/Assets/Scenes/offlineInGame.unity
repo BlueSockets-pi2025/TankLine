@@ -1769,7 +1769,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 709505827}
+      - m_Target: {fileID: 709505829}
         m_TargetAssemblyTypeName: MenuSwapper2, Assembly-CSharp
         m_MethodName: CloseErr
         m_Mode: 1
@@ -2291,8 +2291,8 @@ GameObject:
   - component: {fileID: 709505823}
   - component: {fileID: 709505821}
   - component: {fileID: 709505820}
-  - component: {fileID: 709505827}
   - component: {fileID: 709505828}
+  - component: {fileID: 709505829}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2325,6 +2325,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  endpointsConfig:
+    GAME_SERVER_IP: 
+    GAME_SERVER_PORT: 
+    ENCRYPTION_PASSWORD: 
+    ENCRYPTION_SALT: 
+    DATABASE_SERVER_IP: 
+    DATABASE_SERVER_PORT: 
   map: {fileID: 0}
   victories: {fileID: 0}
   username: {fileID: 0}
@@ -2418,21 +2425,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &709505827
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 709505818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3b485d1ec74e0438158b4bb7c688f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _canvas: {fileID: 709505818}
-  ErrorPopup: {fileID: 1536944226}
-  actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!114 &709505828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2445,6 +2437,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 662161198e3e2b047a0e6b5c5acde2c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
+--- !u!114 &709505829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709505818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad943a2e2e4b04a49a38c0110f8aec86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvas: {fileID: 709505818}
+  ErrorPopup: {fileID: 1536944226}
   actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!1001 &732309412
 PrefabInstance:
@@ -4951,7 +4958,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 709505827}
+      - m_Target: {fileID: 709505829}
         m_TargetAssemblyTypeName: MenuSwapper2, Assembly-CSharp
         m_MethodName: OpenErr
         m_Mode: 1
@@ -6200,6 +6207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ba92fdb300b8143963ffb691f6d96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
   MoveRef: {fileID: -8431542246685893986, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
   ShootRef: {fileID: 5727265709788935379, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!114 &1536944231
