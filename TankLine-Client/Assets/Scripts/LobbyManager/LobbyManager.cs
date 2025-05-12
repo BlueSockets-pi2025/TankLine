@@ -42,10 +42,12 @@ public class LobbyManager : NetworkBehaviour
     }
 
     void Start() {
+        // initialize everything
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
         uiManager = new(GameObject.Find("Canvas"), CurrentSceneName() == "LoadScene");
         ChangeSpawnPrefab(CurrentSceneName());
         playerSpawner.InitSpawnPoint();
+        uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
 
         // load skins
         for (int i=0; i<skins.Count; i++) {
@@ -241,6 +243,8 @@ public class LobbyManager : NetworkBehaviour
             // if on the client
             else {
                 JoinedWaitingRoom(base.ClientManager.Connection);
+                uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
+                GetAvailableSkins();
             }
         }
     }
@@ -354,6 +358,12 @@ public class LobbyManager : NetworkBehaviour
             }
         }
 
+        // if only one player is alive, end game
+        if (alivePlayers.Count() == 1) {
+            Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
+            ShowEndGamePanel(alivePlayers[0].name);
+        }
+
         // remove player from list
         serverPlayerList.Remove(connection);
 
@@ -399,6 +409,7 @@ public class LobbyManager : NetworkBehaviour
     [Header("UI References")]
     [Space(5)]
     public GameObject playerEntryPrefab;
+    public GameObject skinEntryPrefab;
     [Range(1, 6)]
     public int minimumPlayerToStart = 2;
     private InGameUiManager uiManager;
@@ -459,7 +470,7 @@ public class LobbyManager : NetworkBehaviour
     [Range(5, 30)]
     public int autoReplayCountdown = 15;
     public List<Material> skins = new();
-    private readonly List<int> availableSkins = new();
+    private List<int> availableSkins = new();
     private List<PlayerData> alivePlayers = new();
     private List<PlayerData> playerReadyForReplay = new();
 
@@ -478,14 +489,47 @@ public class LobbyManager : NetworkBehaviour
             }
         }
 
-        // Lobby players
-        Tank_Lobby[] playersLobby = FindObjectsByType<Tank_Lobby>(FindObjectsSortMode.None);
-        foreach (Tank_Lobby player in playersLobby) {
-            GameObject go = player.GameObject();
-            Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
+        else {
+            // Lobby players
+            Tank_Lobby[] playersLobby = FindObjectsByType<Tank_Lobby>(FindObjectsSortMode.None);
+            foreach (Tank_Lobby player in playersLobby) {
+                GameObject go = player.GameObject();
+                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
-            go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+            }
         }
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void UpdateAvailableSkins(NetworkConnection conn = null) {
+        ClientUpdateAvailableSkins(conn, availableSkins);
+    }
+
+    [ObserversRpc][TargetRpc]
+    private void ClientUpdateAvailableSkins(NetworkConnection target, List<int> serverAvailableSkins) {
+        availableSkins = serverAvailableSkins;
+        uiManager.UpdateSkinsPanel(availableSkins);
+    }
+
+    public void GetAvailableSkins() {
+        UpdateAvailableSkins(base.ClientManager.Connection);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void ChangeSkin(int newSkin, NetworkConnection conn = null) {
+        if (!availableSkins.Contains(newSkin)) return;
+
+        availableSkins.Add(serverPlayerList[conn].skinColor);
+        serverPlayerList[conn].skinColor = newSkin;
+        availableSkins.Remove(newSkin);
+        ClientUpdateAvailableSkins(null, availableSkins);
+        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
+    }
+
+    public void PickSkin(int skinIndex) {
+        ChangeSkin(skinIndex, base.ClientManager.Connection);
+        GetAvailableSkins();
     }
 
     public void OnPlayerHit(NetworkConnection connection) {
