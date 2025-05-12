@@ -48,6 +48,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  map: {fileID: 0}
+  victories: {fileID: 0}
+  username: {fileID: 0}
+  ratio: {fileID: 0}
+  tanks_destroyed: {fileID: 0}
+  nb_games_played: {fileID: 0}
+  victory_or_defeat: {fileID: 0}
+  rank: {fileID: 0}
+  date: {fileID: 0}
 --- !u!114 &785085764030342164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,9 +158,11 @@ MonoBehaviour:
   WaitingRoomTankPrefab: {fileID: 2936260714432119890, guid: b13e84cec43517b98998b8ab8096499c, type: 3}
   InGameTankPrefab: {fileID: 5713213973998924859, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
   playerEntryPrefab: {fileID: 3750445552347481031, guid: 3ee84746511846d1d8941743bc0fea7c, type: 3}
+  skinEntryPrefab: {fileID: 4418473825720239372, guid: 3a3c43f8a33802d32b5610d31524e354, type: 3}
   minimumPlayerToStart: 1
   maxPlayerLives: 3
   respawnCooldown: 3
+  autoReplayCountdown: 15
   skins:
   - {fileID: 2100000, guid: 982f385553afb916593611edf6b725e4, type: 2}
   - {fileID: 2100000, guid: f96f74a6ca86feb6db55ab1aa62a2d5a, type: 2}
