@@ -223,8 +223,8 @@ public class AuthController : MonoBehaviour
             }
         }
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new Bypass();
 
 
         yield return request.SendWebRequest();
@@ -238,8 +238,8 @@ public class AuthController : MonoBehaviour
             UnityWebRequest refreshRequest = new UnityWebRequest(refreshTokenUrl, "POST");
             refreshRequest.downloadHandler = new DownloadHandlerBuffer();
             refreshRequest.SetRequestHeader("Content-Type", "application/json");
-            // refreshRequest.certificateHandler = new CustomCertificateHandler();
-            refreshRequest.certificateHandler = new Bypass();
+            refreshRequest.certificateHandler = new CustomCertificateHandler();
+            // refreshRequest.certificateHandler = new Bypass();
 
 
             yield return refreshRequest.SendWebRequest();
@@ -267,8 +267,8 @@ public class AuthController : MonoBehaviour
                     }
                 }
 
-                // retryRequest.certificateHandler = new CustomCertificateHandler();
-                retryRequest.certificateHandler = new Bypass();
+                retryRequest.certificateHandler = new CustomCertificateHandler();
+                // retryRequest.certificateHandler = new Bypass();
 
                 yield return retryRequest.SendWebRequest();
 
@@ -458,8 +458,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        //request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -519,8 +519,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        //request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -557,8 +557,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        //request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -596,8 +596,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -745,8 +745,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -795,8 +795,8 @@ public class AuthController : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        //request.certificateHandler = new Bypass();
 
         yield return request.SendWebRequest();
 
@@ -822,8 +822,8 @@ public class AuthController : MonoBehaviour
         UnityWebRequest request = new UnityWebRequest(userDataUrl, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new Bypass();
 
         yield return SendRequestWithAutoRefresh(
             userDataUrl,
@@ -865,8 +865,8 @@ public class AuthController : MonoBehaviour
         UnityWebRequest request = new UnityWebRequest(userStatisticsUrl, "GET");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        // request.certificateHandler = new CustomCertificateHandler();
-        request.certificateHandler = new Bypass();
+        request.certificateHandler = new CustomCertificateHandler();
+        // request.certificateHandler = new Bypass();
 
         yield return SendRequestWithAutoRefresh(
             userStatisticsUrl,
