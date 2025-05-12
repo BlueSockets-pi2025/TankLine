@@ -193,7 +193,7 @@ public class AuthController : MonoBehaviour
         #else 
             string jsonEnv = File.ReadAllText(envFilePath);
             endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
-        #elsif
+        #endif
     }
 
     private IEnumerator LoadEndpointsConfigForAndroid(string envFilePath)
