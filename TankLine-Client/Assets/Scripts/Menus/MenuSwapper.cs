@@ -27,6 +27,9 @@ public class MenuSwapper : MonoBehaviour
 
     public Toggle RememberMeToggle; // reference to the “Remember Me” checkbox
 
+    public GameObject leaderboardContent; 
+    public GameObject leaderboardEntryPrefab; 
+
     // Testing : 
     public TMP_Text gamesPlayedInputField;
     public TMP_Text highestScoreInputField;
@@ -175,14 +178,14 @@ public class MenuSwapper : MonoBehaviour
 
         CurrentPage.SetActive(true);
 
-        // if (pageName == "Score")
-        // {
-        //     Debug.Log("Opening Score page. Updating leaderboard...");
-        //     UpdateLeaderboard();
-        // }
+        if (pageName == "Score")
+        {
+            Debug.Log("Opening Score page. Updating leaderboard...");
+            UpdateLeaderboard();
+        }
 
         // if switch to mainMenu or play, load stats & name
-        if (pageName == "MainMenu" || pageName == "Play")
+        if (pageName == "MainMenu" || pageName == "Play" || pageName == "Score")
         {
             StartCoroutine(UpdateStatisticsCoroutine(CurrentPage.transform.Find("Badge")));
         }
@@ -720,6 +723,63 @@ public class MenuSwapper : MonoBehaviour
             OpenErr($"Failed to retrieve user statistics: \n {authController.ErrorResponse}");
         }
     }
+
+    /// <summary>
+    /// Update the leaderboard with the current user statistics </br>
+    /// </summary>
+    public void UpdateLeaderboard()
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(authController.GetLeaderboard(
+            onSuccess: (leaderboardEntries) =>
+            {
+                Debug.Log("Leaderboard data fetched successfully.");
+                UpdateLeaderboardUI(leaderboardEntries);
+            },
+            onError: (errorMessage) =>
+            {
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                OpenErr($"Failed to fetch leaderboard: {errorMessage}");
+            }
+        ));
+    }
+
+    /// <summary>
+    /// Update the leaderboard UI with the fetched data </br>
+    /// </summary>
+    /// <param name="leaderboardEntries">The list of leaderboard entries</param>
+    private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
+    {
+        // Delete old entries:
+        foreach (Transform child in leaderboardContent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Add new entries:
+        foreach (var entry in leaderboardEntries)
+        {
+            GameObject newEntry = Instantiate(leaderboardEntryPrefab, leaderboardContent.transform);
+
+            newEntry.SetActive(true); // Ensure the new entry is active
+            
+            // Retrieve text fields from prefab:
+            TMP_Text rankText = newEntry.transform.Find("Rank")?.GetComponent<TMP_Text>();
+            TMP_Text nameText = newEntry.transform.Find("Name")?.GetComponent<TMP_Text>();
+            TMP_Text scoreText = newEntry.transform.Find("Score")?.GetComponent<TMP_Text>();
+
+            // Update text fields:
+            if (rankText != null) rankText.text = $"{entry.ranking}";
+            if (nameText != null) nameText.text = entry.username;
+            if (scoreText != null) scoreText.text = $"{entry.highestScore}";
+        }
+    }
+
 
     /// <summary>
     /// Password field verification function on registration 
