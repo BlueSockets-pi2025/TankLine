@@ -33,6 +33,7 @@ public class AuthController : MonoBehaviour
     private string disconnectUrl;
     private string refreshExpirationUrl;
     private string refreshRefreshTokenUrl;
+    private string leaderboardUrl;
 
     private int minExpirationRefreshToken = 24; // Minimum expiration time for refresh token in hours when checking in launch
 
@@ -109,6 +110,7 @@ public class AuthController : MonoBehaviour
         disconnectUrl = $"{baseUrl}/auth/disconnect";
         refreshExpirationUrl = $"{baseUrl}/auth/refresh-expiration";
         refreshRefreshTokenUrl = $"{baseUrl}/auth/refresh-refresh-token";
+        leaderboardUrl = $"{baseUrl}/leaderboard";
     }   
 
     /// <summary>
@@ -1032,6 +1034,43 @@ public class AuthController : MonoBehaviour
     }
 
     /// <summary>
+    /// Coroutine to send the request for leaderboard data.
+    /// </summary>
+    /// <param name="onSuccess">Callback for successful response.</param>, <param name="onError">Callback for error response.</param>
+    public IEnumerator GetLeaderboard(Action<List<LeaderboardEntry>> onSuccess, Action<string> onError)
+    {
+        yield return SendRequestWithAutoRefresh(
+            leaderboardUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // No body for a GET request
+            onSuccess: (response) =>
+            {   
+                // Get and parse the leaderboard data:
+                try 
+                {
+                    string jsonResponse = response.downloadHandler.text;
+                    List<LeaderboardEntry> leaderboardEntries = JsonUtility.FromJson<LeaderboardList>($"{{\"entries\":{jsonResponse}}}").entries;
+                    onSuccess?.Invoke(leaderboardEntries);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error parsing leaderboard data: {ex.Message}");
+                    onError?.Invoke("Failed to parse leaderboard data.");
+                }
+            },
+            onError: (response) =>
+            {
+                string errorMessage = !string.IsNullOrEmpty(response.downloadHandler.text)
+                    ? response.downloadHandler.text
+                    : "An unknown error occurred.";
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                onError?.Invoke(errorMessage);
+            }
+        );
+    }
+
+    /// <summary>
     /// Coroutine to get the statistics of the played games.
     /// </summary>  
     private IEnumerator GetGamePlayedStats()
@@ -1050,16 +1089,13 @@ public class AuthController : MonoBehaviour
             onSuccess: (response) =>
             {
                 string json = response.downloadHandler?.text; 
-
                 if (json == null)
                 {
                     Debug.LogError("DownloadHandler text is null.");
                     IsRequestSuccessful = false;
                     return;
                 }
-
                 Debug.Log("Game Played Statistics (Raw JSON): " + json);
-
                 try
                 {
                     if (string.IsNullOrWhiteSpace(json) || json.Trim() == "null")
@@ -1068,26 +1104,21 @@ public class AuthController : MonoBehaviour
                         IsRequestSuccessful = false;
                         return;
                     }
-
                     var stats = JsonUtility.FromJson<PlayedGameStats>(json);
-
                     if (stats == null)
                     {
                         Debug.LogWarning("Deserialization failed: 'stats' is null.");
                         IsRequestSuccessful = false;
                         return;
                     }
-
                     if (stats.totalGames == 0 || stats.totalVictories < 0 || stats.tanksDestroyed < 0 || string.IsNullOrEmpty(stats.mapPlayed))
                     {
                         Debug.LogWarning("Some critical game stats are missing or invalid.");
                         IsRequestSuccessful = false;
                         return;
                     }
-
                     CurrentPlayedGameStats = stats;
                     IsRequestSuccessful = true;
-
                     float victoryRatio = stats.totalGames > 0
                         ? (float)stats.totalVictories / stats.totalGames
                         : 0f;
@@ -1309,4 +1340,19 @@ public class SaveTokenResponse
 public class RefreshTokenExpirationResponse
 {
     public string expiresAt;
+}
+
+[System.Serializable]
+public class LeaderboardEntry
+{
+    public string username;
+    public int highestScore;
+    public int ranking;
+    public int gamesPlayed;
+}
+
+[System.Serializable]
+public class LeaderboardList
+{
+    public List<LeaderboardEntry> entries;
 }
