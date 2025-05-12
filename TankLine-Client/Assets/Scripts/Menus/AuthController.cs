@@ -1218,24 +1218,44 @@ public class AuthController : MonoBehaviour
     }
 }
 
-/// <summary>
+
 /// Custom certificate handler class to validate the server's SSL certificate.
-/// </summary>
 public class CustomCertificateHandler : CertificateHandler
 {
+    // This method is called to validate the certificate received from the server
     protected override bool ValidateCertificate(byte[] certificateData)
     {
+        // Retrieve the trusted certificate that was preloaded into Unity's assets
         X509Certificate2 trustedCert = AuthController.GetTrustedCertificate();
+        
+        // If no trusted certificate is loaded, log an error and return false to reject the certificate
         if (trustedCert == null)
         {
             Debug.LogError("No trusted certificate loaded.");
-            return false;
+            return false;  // If no trusted certificate is found, the certificate validation fails
         }
 
+        // Create an X509Certificate2 object from the certificate data received from the server
         X509Certificate2 receivedCertificate = new X509Certificate2(certificateData);
-        return receivedCertificate.Equals(trustedCert);
+
+        // Compare the thumbprints (unique identifiers) of the two certificates
+        bool isMatch = string.Equals(
+            receivedCertificate.Thumbprint,    // Thumbprint of the certificate received from the server
+            trustedCert.Thumbprint,            // Thumbprint of the preloaded trusted certificate
+            StringComparison.OrdinalIgnoreCase  // Perform a case-insensitive comparison
+        );
+
+        // If the thumbprints do not match, log a warning
+        if (!isMatch)
+        {
+            Debug.LogWarning("Server certificate does not match trusted certificate.");
+        }
+
+        // Return whether the thumbprints match
+        return isMatch;
     }
 }
+
 
 [System.Serializable]
 public class RegisterRequest
