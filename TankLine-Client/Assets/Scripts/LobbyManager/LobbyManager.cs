@@ -236,8 +236,6 @@ public class LobbyManager : NetworkBehaviour
 
                 // send player list to update ui
                 OnPlayerListChange(serverPlayerList.Values.ToList());
-                uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
-                GetAvailableSkins();
 
                 ReplayClient();
             } 
@@ -245,6 +243,8 @@ public class LobbyManager : NetworkBehaviour
             // if on the client
             else {
                 JoinedWaitingRoom(base.ClientManager.Connection);
+                uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
+                GetAvailableSkins();
             }
         }
     }
