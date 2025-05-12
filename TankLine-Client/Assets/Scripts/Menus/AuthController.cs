@@ -78,6 +78,15 @@ public class AuthController : MonoBehaviour
 
     private void Awake()
     {
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            Debug.Log("Platform is Android.");
+        }
+        else
+        {
+            Debug.Log("Platform is not Android.");
+        }
         // Load the trusted certificate from the specified path:
         LoadCertificate();
 
@@ -125,13 +134,16 @@ public class AuthController : MonoBehaviour
     /// </summary>
     private void LoadCertificate()
     {
-        string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
+            string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
+
+            Debug.Log("Certificate path: " + certificatePath);
+            Debug.Log("Current platform: " + Application.platform);
 
         #if UNITY_ANDROID
-            // On Android, use UnityWebRequest to read the file:
+            Debug.Log("Running on Android. Attempting to load certificate using UnityWebRequest.");
             StartCoroutine(LoadCertificateForAndroid(certificatePath));
         #else
-            // On PC or other platforms, read the file directly:
+            Debug.Log("Running on a non-Android platform. Attempting to load certificate directly.");
             if (File.Exists(certificatePath))
             {
                 byte[] certificateBytes = File.ReadAllBytes(certificatePath);

@@ -44,7 +44,7 @@ public class BetterView : MonoBehaviour
     {
         if (!isShifted)
         {
-            addKey = shiftAmount + indexField * 150f;
+            addKey = shiftAmount + indexField * 95f;
             uiRoot.anchoredPosition += new Vector2(0, addKey);
             isShifted = true;
         }
