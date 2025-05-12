@@ -80,7 +80,10 @@ public class AuthController : MonoBehaviour
 
     private void Awake()
     {
+        StartCoroutine(Initialization());
+    }
 
+    private IEnumerator Initialization() {
         if (Application.platform == RuntimePlatform.Android)
         {
             Debug.Log("Platform is Android.");
@@ -90,13 +93,13 @@ public class AuthController : MonoBehaviour
             Debug.Log("Platform is not Android.");
         }
         // Load the trusted certificate from the specified path:
-        LoadCertificate();
-
-        // Load the encryption configuration (password and salt) from the `.env` file:
-        TokenCrypto.LoadEncryptionConfig();
+        yield return StartCoroutine(LoadCertificate());
 
         // Load the server configuration (database server endpoints) from the `.env` file:
-        LoadEndpointsConfig();
+        yield return StartCoroutine(LoadEndpointsConfig());
+
+        // Load the encryption configuration (password and salt) from the `.env` file:
+        yield return StartCoroutine(TokenCrypto.LoadEncryptionConfig(this)); // "this" for the monoBehaviour instance
 
         // Load environment variables for the database server:         
         string serverIp = endpointsConfig.DATABASE_SERVER_IP;
@@ -105,7 +108,7 @@ public class AuthController : MonoBehaviour
         if (string.IsNullOrEmpty(serverIp) || string.IsNullOrEmpty(serverPort))
         {
             Debug.LogError("Database server IP or port is not set in the environment variables.");
-            return;
+            yield break;
         }
 
         // Build URLs dynamically: 
@@ -134,16 +137,18 @@ public class AuthController : MonoBehaviour
     /// Loads the trusted certificate from the specified path. <br/>
     /// This method is called in the Awake method.
     /// </summary>
-    private void LoadCertificate()
+    private IEnumerator LoadCertificate()
     {
         string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
 
+        Debug.Log("Loading trusted certificate from: " + certificatePath);
+        
         //Debug.Log("Certificate path: " + certificatePath);
         Debug.Log("Current platform: " + Application.platform);
 
         #if UNITY_ANDROID
             Debug.Log("Running on Android. Attempting to load certificate using UnityWebRequest.");
-            StartCoroutine(LoadCertificateForAndroid(certificatePath));
+            yield return StartCoroutine(LoadCertificateForAndroid(certificatePath));
         #else
             Debug.Log("Running on a non-Android platform. Attempting to load certificate directly.");
             if (File.Exists(certificatePath))
@@ -157,6 +162,7 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Certificate file not found! Ensure it's in the correct directory.");
             }
+            yield return null; // Guarantee that the coroutine ends
         #endif
     }
 
@@ -185,16 +191,27 @@ public class AuthController : MonoBehaviour
     /// <summary>
     /// Load the server configuration (database server endpoints) from the `.env` file and store it in the variable `endpointsConfig`
     /// </summary>
-    private void LoadEndpointsConfig()
+    private IEnumerator LoadEndpointsConfig()
     {
-        string envFilePath = Application.streamingAssetsPath + PathToEnvFile;
+        string envFilePath;
 
         #if UNITY_ANDROID
             Debug.Log("Running on Android. Attempting to load .env file using UnityWebRequest.");
-            StartCoroutine(LoadEndpointsConfigForAndroid(envFilePath));
+            envFilePath = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
+            yield return StartCoroutine(LoadEndpointsConfigForAndroid(envFilePath));
         #else 
-            string jsonEnv = File.ReadAllText(envFilePath);
-            endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+            envFilePath = Application.streamingAssetsPath + "./env";
+            if (File.Exists(envFilePath))
+            {
+                string jsonEnv = File.ReadAllText(envFilePath);
+                endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+                Debug.Log("Endpoints configuration successfully loaded.");
+            }
+            else
+            {
+                Debug.LogError("Env file not found! Ensure it's in the correct directory.");
+            }
+            yield return null;
         #endif
     }
 
@@ -208,6 +225,9 @@ public class AuthController : MonoBehaviour
             endpointsConfig = JsonUtility.FromJson<EnvVariables>(envContent);
 
             Debug.Log("Endpoints configuration successfully loaded on Android.");
+            Debug.Log("Env return: " + envContent);
+            Debug.Log("EndpointsConfig: " + JsonUtility.ToJson(endpointsConfig));
+
         }
         else
         {
