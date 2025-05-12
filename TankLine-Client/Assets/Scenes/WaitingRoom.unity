@@ -18598,7 +18598,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Log out
+  m_text: Exit game
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e060a50dfb82f3c409b54cf9703a8190, type: 2}
   m_sharedMaterial: {fileID: 8112968372249616142, guid: e060a50dfb82f3c409b54cf9703a8190, type: 2}

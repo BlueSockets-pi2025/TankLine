@@ -367,6 +367,7 @@ MonoBehaviour:
   movementSpeed: 3
   rotationSpeed: 0.06544985
   nbLifeLeft: 3
+  move: {fileID: -8431542246685893986, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!114 &7205870284494420305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -486,25 +487,13 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Tank_Offline, Assembly-CSharp
-        m_MethodName: onShoot
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: b575c3ed-418e-4492-8c06-2e1e20acd877
     m_ActionName: 'Gameplay/Shoot[/Mouse/leftButton]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Tank_Offline, Assembly-CSharp
+      - m_Target: {fileID: 7751050197579624633}
+        m_TargetAssemblyTypeName: Tank_Lobby, Assembly-CSharp
         m_MethodName: onMove
         m_Mode: 0
         m_Arguments:
