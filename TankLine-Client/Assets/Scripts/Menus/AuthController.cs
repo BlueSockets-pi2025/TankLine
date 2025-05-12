@@ -68,6 +68,8 @@ public class AuthController : MonoBehaviour
     public TMP_Text rank;
     public TMP_Text date;
 
+    public const string PathToEnvFile = "/.env";
+
     private static X509Certificate2 staticTrustedCertificate;
 
     private void OnApplicationQuit()
@@ -276,7 +278,6 @@ public class AuthController : MonoBehaviour
             refreshRequest.SetRequestHeader("Content-Type", "application/json");
             refreshRequest.certificateHandler = new CustomCertificateHandler();
             // refreshRequest.certificateHandler = new Bypass();
-
 
             yield return refreshRequest.SendWebRequest();
 
