@@ -184,9 +184,4 @@ public class RoomUIManager : MonoBehaviour
         roomId = -1;
         return false;
     }
-
-    private void HandleReturn()
-    {
-        Debug.Log("[RoomUI] Return button clicked. Returning to main menu.");
-    }
 }

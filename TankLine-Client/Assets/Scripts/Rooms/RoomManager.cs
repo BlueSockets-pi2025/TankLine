@@ -153,9 +153,7 @@ public class RoomManager : NetworkBehaviour
     }
 
     Debug.Log("[RoomManager] You have joined room " + roomId);
-
-    RoomClientData.CurrentRoomId = roomId;
-
+    
     LoadWaitingRoomScene(roomId, conn);
   }
 
@@ -163,11 +161,6 @@ public class RoomManager : NetworkBehaviour
   private void TargetJoinFailed(NetworkConnection conn, string message)
   {
     Debug.LogWarning($"[RoomManager] Join failed: {message}");
-  }
-
-  public bool CanJoinRoom(int roomId)
-  {
-    return !rooms.ContainsKey(roomId) || rooms[roomId].IsFull == false;
   }
 
   public int? GetFirstAvaliablePublicRoom()
@@ -191,12 +184,6 @@ public class RoomManager : NetworkBehaviour
       roomId = UnityEngine.Random.Range(100000, 999999);
     } while (rooms.ContainsKey(roomId));
     return roomId;
-  }
-
-  public Room GetRoom(int roomId)
-  {
-    rooms.TryGetValue(roomId, out Room room);
-    return room;
   }
 
   [ServerRpc(RequireOwnership = false)]
