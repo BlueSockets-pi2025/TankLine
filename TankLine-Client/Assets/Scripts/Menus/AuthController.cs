@@ -134,10 +134,10 @@ public class AuthController : MonoBehaviour
     /// </summary>
     private void LoadCertificate()
     {
-            string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
+        string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
 
-            Debug.Log("Certificate path: " + certificatePath);
-            Debug.Log("Current platform: " + Application.platform);
+        //Debug.Log("Certificate path: " + certificatePath);
+        Debug.Log("Current platform: " + Application.platform);
 
         #if UNITY_ANDROID
             Debug.Log("Running on Android. Attempting to load certificate using UnityWebRequest.");
@@ -185,8 +185,32 @@ public class AuthController : MonoBehaviour
     /// </summary>
     private void LoadEndpointsConfig()
     {
-        string jsonEnv = File.ReadAllText(Application.streamingAssetsPath + PathToEnvFile);
-        endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+        string envFilePath = Application.streamingAssetsPath + PathToEnvFile;
+
+        #if UNITY_ANDROID
+            Debug.Log("Running on Android. Attempting to load .env file using UnityWebRequest.");
+            StartCoroutine(LoadEndpointsConfigForAndroid(envFilePath));
+        #else 
+            string jsonEnv = File.ReadAllText(envFilePath);
+            endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+        #elsif
+    }
+
+    private IEnumerator LoadEndpointsConfigForAndroid(string envFilePath)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(envFilePath);
+        yield return request.SendWebRequest();
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string envContent = request.downloadHandler.text;
+            endpointsConfig = JsonUtility.FromJson<EnvVariables>(envContent);
+
+            Debug.Log("Endpoints configuration successfully loaded on Android.");
+        }
+        else
+        {
+            Debug.LogError("Failed to load .env file on Android: " + request.error);
+        }
     }
 
     /// <summary>
