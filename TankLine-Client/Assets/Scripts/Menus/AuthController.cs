@@ -126,16 +126,45 @@ public class AuthController : MonoBehaviour
     private void LoadCertificate()
     {
         string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
-        if (File.Exists(certificatePath))
+
+        #if UNITY_ANDROID
+            // On Android, use UnityWebRequest to read the file:
+            StartCoroutine(LoadCertificateForAndroid(certificatePath));
+        #else
+            // On PC or other platforms, read the file directly:
+            if (File.Exists(certificatePath))
+            {
+                byte[] certificateBytes = File.ReadAllBytes(certificatePath);
+                trustedCertificate = new X509Certificate2(certificateBytes);
+                staticTrustedCertificate = trustedCertificate;
+                Debug.Log("Certificate successfully loaded.");
+            }
+            else
+            {
+                Debug.LogError("Certificate file not found! Ensure it's in the correct directory.");
+            }
+        #endif
+    }
+
+    /// <summary>
+    /// Loads the trusted certificate from the specified path for Android. <br/>
+    /// </summary>
+    /// <param name="certificatePath">The path to the certificate file.</param>
+    private IEnumerator LoadCertificateForAndroid(string certificatePath)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(certificatePath);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
         {
-            byte[] certificateBytes = File.ReadAllBytes(certificatePath);
+            byte[] certificateBytes = request.downloadHandler.data;
             trustedCertificate = new X509Certificate2(certificateBytes);
             staticTrustedCertificate = trustedCertificate;
-            Debug.Log("Certificate successfully loaded.");
+            Debug.Log("Certificate successfully loaded on Android.");
         }
         else
         {
-            Debug.LogError("Certificate file not found! Ensure it's in the correct directory.");
+            Debug.LogError("Failed to load certificate on Android: " + request.error);
         }
     }
 

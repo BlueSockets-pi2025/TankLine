@@ -216,8 +216,8 @@ public class MenuSwapper : MonoBehaviour
         }
 
         Transform page = CurrentPage.name == "PagePrincipale" ? CurrentPage.transform : Canvas.Find("PagePrincipale").transform;
-        string username = page.Find("LogUsername").GetComponent<TMP_InputField>().text;
-        string password = page.Find("LogPassword").GetComponent<TMP_InputField>().text;
+        string username = FindDeepChild(page, "LogUsername")?.GetComponent<TMP_InputField>().text;
+        string password = FindDeepChild(page, "LogPassword")?.GetComponent<TMP_InputField>().text;
 
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
@@ -240,8 +240,8 @@ public class MenuSwapper : MonoBehaviour
     {
 
         // Find username and password input field:
-        yield return authController.Login(PagePrincipale.Find("LogUsername").GetComponent<TMP_InputField>().text,
-                                        PagePrincipale.Find("LogPassword").GetComponent<TMP_InputField>().text);
+        yield return authController.Login(FindDeepChild(PagePrincipale, "LogUsername")?.GetComponent<TMP_InputField>().text,
+                                        FindDeepChild(PagePrincipale, "LogPassword")?.GetComponent<TMP_InputField>().text);
 
         if (authController.IsRequestSuccessful)
         {
