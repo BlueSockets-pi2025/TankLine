@@ -2,7 +2,8 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
-using Heartbeat; 
+using Heartbeat;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class MenuSwapper : MonoBehaviour
@@ -12,7 +13,8 @@ public class MenuSwapper : MonoBehaviour
 
     public GameObject _canvas;
     private Transform Canvas;
-    public GameObject ErrorPopup, MessagePopup;
+    public GameObject ErrorPopup, MessagePopup, ExitGamePopup;
+    public InputActionAsset actions;
 
     public GameObject CurrentPage;
 
@@ -34,7 +36,7 @@ public class MenuSwapper : MonoBehaviour
     public TMP_Text UserNameField;
     public TMP_Text UserRankField;
 
-    public static bool isFirstLaunch = true ; 
+    public static bool isFirstLaunch = true;
 
     void Awake()
     {
@@ -44,7 +46,7 @@ public class MenuSwapper : MonoBehaviour
         else
             Destroy(gameObject);
 
-        Canvas = _canvas.transform;       
+        Canvas = _canvas.transform;
     }
 
     private void Start()
@@ -56,13 +58,21 @@ public class MenuSwapper : MonoBehaviour
             return;
         }
 
-        // Load first page: 
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+        {
+            actions.LoadBindingOverridesFromJson(rebinds);
+            rebinds = actions.SaveBindingOverridesAsJson();
+        }
+
+        // Load first page
+        // OpenPage("PagePrincipale"); 
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         if (currentScene == "ConnectionMenu")
         {
             OpenPage("PagePrincipale");
-            
+
             if (RememberMeToggle != null)
             {
                 // Set the checkbox to true by default:
@@ -72,10 +82,10 @@ public class MenuSwapper : MonoBehaviour
             if (isFirstLaunch)
             {
                 AutoLogin();
-                isFirstLaunch = false; 
+                isFirstLaunch = false;
                 Debug.Log("FIRST LAUNCH");
             }
-            else Debug.Log ("NOT FIRST LAUNCH");
+            else Debug.Log("NOT FIRST LAUNCH");
         }
 
         else if (currentScene == "MainMenu")
@@ -100,6 +110,7 @@ public class MenuSwapper : MonoBehaviour
         // Restore refresh token in HTTP-ONLY cookies (from local persistent file between sessions):
         yield return authController.RestoreRefreshCookie();
 
+
         if (!authController.IsRequestSuccessful) // If remember me hasn't been activated, for example, or if you're connecting for the first time 
         {
             Debug.Log("Failed to restore refresh token. Redirecting to login page.");
@@ -109,7 +120,7 @@ public class MenuSwapper : MonoBehaviour
 
         // Attempt auto-login using the refresh token:
         yield return authController.AutoLogin();
-        
+
         if (authController.IsRequestSuccessful)
         {
             Debug.Log("Auto-login successful. Skipping login page.");
@@ -207,6 +218,19 @@ public class MenuSwapper : MonoBehaviour
         MessagePopup.SetActive(false);
     }
 
+    public void OpenExitGame()
+    {
+        ExitGamePopup.SetActive(true);
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+    public void CloseExitGame()
+    {
+        ExitGamePopup.SetActive(false);
+    }
+
     /// <summary>
     /// Login the user with the username and password in the input fields </br>
     /// </summary>
@@ -253,8 +277,8 @@ public class MenuSwapper : MonoBehaviour
 
             if (authController.IsRequestSuccessful)
             {
-                Debug.Log("DEBUG"); 
-                Debug.Log(authController.CurrentUser.username); 
+                Debug.Log("DEBUG");
+                Debug.Log(authController.CurrentUser.username);
                 yield return authController.UserStatistics();
 
                 if (authController.IsRequestSuccessful)
@@ -601,7 +625,7 @@ public class MenuSwapper : MonoBehaviour
             return;
         }
         StartCoroutine(LogoutCoroutine());
-        
+
     }
 
     /// <summary>
@@ -618,7 +642,7 @@ public class MenuSwapper : MonoBehaviour
 
             // Wait for popup to close:
             yield return new WaitUntil(() => !MessagePopup.activeSelf);
-            
+
             // Load scene after closing popup:
             UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
         }
@@ -669,7 +693,7 @@ public class MenuSwapper : MonoBehaviour
     private IEnumerator UpdateStatisticsCoroutine(Transform badge)
     {
 
-        string found_badge  ; 
+        string found_badge;
         if (authController == null)
         {
             Debug.LogError("AuthController is not initialized.");
@@ -685,8 +709,8 @@ public class MenuSwapper : MonoBehaviour
             {
                 badge.Find("GamePlayed").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.gamesPlayed.ToString();
                 badge.Find("HighScore").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.highestScore.ToString();
-                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();    
-                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.username ;
+                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();
+                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.username;
             }
 
             else
@@ -884,14 +908,16 @@ public class MenuSwapper : MonoBehaviour
     /// <summary>
     /// Load a random waiting room scene </br>
     /// </summary>
-    public void ConnectToRandomWaitingRoom() {
+    public void ConnectToRandomWaitingRoom()
+    {
         ConnectToWaitingRoom();
     }
 
     /// <summary>
     /// Load the waiting room scene </br>
     /// </summary>
-    public void ConnectToWaitingRoom() {
+    public void ConnectToWaitingRoom()
+    {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
@@ -951,18 +977,22 @@ public class MenuSwapper : MonoBehaviour
     public void GamesPlayed()
     {
         StartCoroutine(GamesPlayedAndNavigate());
-    }    
-    
+    }
+
     /// <summary>
     /// Coroutine function to get the games played statistics </br>
     /// </summary>
-    private IEnumerator GamesPlayedAndNavigate() {
+    private IEnumerator GamesPlayedAndNavigate()
+    {
         yield return authController.GamesPlayedStatistics();
 
-        if (authController.IsRequestSuccessful) {
-            OpenPage("ACHIEVEMENTS"); 
-        } else {
-            OpenMessage("You have not played a game yet. Start your epic journey now !"); 
+        if (authController.IsRequestSuccessful)
+        {
+            OpenPage("ACHIEVEMENTS");
+        }
+        else
+        {
+            OpenMessage("You have not played a game yet. Start your epic journey now !");
         }
     }
 }
