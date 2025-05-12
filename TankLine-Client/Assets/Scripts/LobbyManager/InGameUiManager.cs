@@ -45,6 +45,7 @@ public class InGameUiManager
             canvas.transform.Find("StartButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindFirstObjectByType<LobbyManager>().ClickedStartGame);
             canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindAnyObjectByType<LobbyManager>().GetAvailableSkins);
             canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
+            canvas.transform.Find("SkinPanel").Find("CloseBtn").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
 
             // disable start button at the beggining
             DisableStartButton();

@@ -236,6 +236,8 @@ public class LobbyManager : NetworkBehaviour
 
                 // send player list to update ui
                 OnPlayerListChange(serverPlayerList.Values.ToList());
+                uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
+                GetAvailableSkins();
 
                 ReplayClient();
             } 
@@ -354,6 +356,12 @@ public class LobbyManager : NetworkBehaviour
             if (playerReadyForReplay.Exists(player => player.name == serverPlayerList[connection].name)) {
                 playerReadyForReplay.Remove(serverPlayerList[connection]);
             }
+        }
+
+        // if only one player is alive, end game
+        if (alivePlayers.Count() == 1) {
+            Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
+            ShowEndGamePanel(alivePlayers[0].name);
         }
 
         // remove player from list
@@ -510,6 +518,8 @@ public class LobbyManager : NetworkBehaviour
 
     [ServerRpc(RequireOwnership=false)]
     private void ChangeSkin(int newSkin, NetworkConnection conn = null) {
+        if (!availableSkins.Contains(newSkin)) return;
+
         availableSkins.Add(serverPlayerList[conn].skinColor);
         serverPlayerList[conn].skinColor = newSkin;
         availableSkins.Remove(newSkin);
@@ -519,7 +529,7 @@ public class LobbyManager : NetworkBehaviour
 
     public void PickSkin(int skinIndex) {
         ChangeSkin(skinIndex, base.ClientManager.Connection);
-        Debug.Log(skinIndex);
+        GetAvailableSkins();
     }
 
     public void OnPlayerHit(NetworkConnection connection) {
