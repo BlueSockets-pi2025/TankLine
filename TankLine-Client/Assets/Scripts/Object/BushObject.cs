@@ -45,7 +45,7 @@ public class BushObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == PLAYER_LAYER )//&& other.gameObject.GetComponent<NetworkBehaviour>().IsOwner) 
+        if (other.gameObject.layer == PLAYER_LAYER && other.gameObject.GetComponent<NetworkBehaviour>().IsOwner) 
         {
             // Add this bush to the player's bush list
             if (!playerBushes.ContainsKey(other.gameObject))
@@ -65,7 +65,7 @@ public class BushObject : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.layer == PLAYER_LAYER )//&& other.gameObject.GetComponent<NetworkBehaviour>().IsOwner)
+        if (other.gameObject.layer == PLAYER_LAYER && other.gameObject.GetComponent<NetworkBehaviour>().IsOwner)
         {
             if (playerBushes.ContainsKey(other.gameObject))
             {
