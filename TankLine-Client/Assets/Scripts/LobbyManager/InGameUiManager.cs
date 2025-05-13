@@ -37,13 +37,13 @@ public class InGameUiManager
         canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickSettingsPanel);
         canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
         Debug.Log("toto");
-
+/* // Comment to compile 
 #if UNITY_ANDROID
         canvas.transform.Find("OptionKeyboard").gameObject.SetActive(false);
         canvas.transform.Find("OptionGeneral/Keyboard")?.gameObject.SetActive(false);
         canvas.transform.Find("OptionMouse/Keyboard")?.gameObject.SetActive(false);
 #endif
-
+*/
         // waiting room ui
         if (!isInGame)
         {

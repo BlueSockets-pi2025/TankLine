@@ -36,11 +36,20 @@ public class Tank_Player : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
 
-        GameObject canvas = GameObject.Find("canvas");
+        GameObject canvas = GameObject.Find("Canvas");
         GameObject controls = canvas.transform.Find("Controls")?.gameObject;
         joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
-        shootJoystick = controls.transform.Find("ButtonShot")?.GetComponent<ShootJoystick>();
+        if (joystick == null)
+        {
+            Debug.LogError("[Tank_Player] joystick is null in Start.");
+        }
 
+        shootJoystick = controls.transform.Find("ButtonShot")?.GetComponent<ShootJoystick>();
+        if (shootJoystick == null)
+        {
+            Debug.LogError("[Tank_Player] shootJoystick is null in Start.");
+        }
+        
 #if UNITY_STANDALONE
         controls.SetActive(false);
 #endif
@@ -63,8 +72,15 @@ public class Tank_Player : Tank
         this.ApplyRotation();
 #endif
 #if UNITY_ANDROID
-        this.GunTrackJoystick(shootJoystick.GetInput()); 
-        this.ApplyRotation();
+        if (shootJoystick != null)
+        {
+            this.GunTrackJoystick(shootJoystick.GetInput());
+            this.ApplyRotation();
+        }
+        else
+        {
+            Debug.LogError("[Tank_Player] shootJoystick is null in Update.");
+        }
 #endif
     }
 
@@ -107,9 +123,18 @@ public class Tank_Player : Tank
         movementToMake = this.FaceDirection(x, y);
 #endif
 #if UNITY_ANDROID
-        float x = joystick.GetHorizontal();
-        float y = joystick.GetVertical();
-        movementToMake = this.FaceDirection(x, y);
+
+        if (joystick != null)
+        {
+            float x = joystick.GetHorizontal();
+            float y = joystick.GetVertical();
+            movementToMake = this.FaceDirection(x, y);
+        }
+        else
+        {
+            Debug.LogError("[Tank_Player] joystick is null in FixedUpdate.");
+        }
+
 #endif
 
         // process movement input
