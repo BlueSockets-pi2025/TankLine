@@ -201,6 +201,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.LogError("Failed to load certificate on Android: " + request.error);
         }
+        yield return null; // Guarantee that the coroutine ends
     }
 
     
@@ -217,7 +218,7 @@ public class AuthController : MonoBehaviour
             envFilePath = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
             yield return StartCoroutine(LoadEndpointsConfigForAndroid(envFilePath));
 #else
-        envFilePath = Application.streamingAssetsPath + "./env";
+        envFilePath = Application.streamingAssetsPath + "/.env";
         if (File.Exists(envFilePath))
         {
             string jsonEnv = File.ReadAllText(envFilePath);

@@ -96,7 +96,7 @@ public class ConnectionManager : MonoBehaviour
             envFilePath = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
             yield return StartCoroutine(LoadServerConfigForAndroid(envFilePath));
         #else 
-            envFilePath = Application.streamingAssetsPath + "./env";
+            envFilePath = Application.streamingAssetsPath + "/.env";
             if (File.Exists(envFilePath))
             {
                 string jsonEnv = File.ReadAllText(envFilePath);
