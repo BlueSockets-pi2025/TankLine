@@ -287,6 +287,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b709a1ce5bf28864e83d6ff7a30471c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 954004659047073416}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b709a1ce5bf28864e83d6ff7a30471c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8303280405890828449}
   m_SourcePrefab: {fileID: 100100000, guid: b709a1ce5bf28864e83d6ff7a30471c9, type: 3}
 --- !u!4 &2590802598270934760 stripped
 Transform:
@@ -364,6 +367,7 @@ MonoBehaviour:
   movementSpeed: 3
   rotationSpeed: 0.06544985
   nbLifeLeft: 3
+  move: {fileID: -8431542246685893986, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!114 &7205870284494420305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,6 +380,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -399,21 +418,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0, w: 0}
     Scale: {x: 0, y: 0, z: 0}
     IsValid: 0
-  <IsNested>k__BackingField: 0
-  <ComponentIndex>k__BackingField: 0
-  <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
-  InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects: []
-  RuntimeParentNetworkBehaviour: {fileID: 0}
-  RuntimeChildNetworkBehaviours: []
-  _isNetworked: 1
-  _isSpawnable: 1
-  _isGlobal: 0
-  _initializeOrder: 0
-  _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 0
 --- !u!114 &954004659047073416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -457,3 +461,53 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &8303280405890828449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2936260714432119890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b575c3ed-418e-4492-8c06-2e1e20acd877
+    m_ActionName: 'Gameplay/Shoot[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7751050197579624633}
+        m_TargetAssemblyTypeName: Tank_Lobby, Assembly-CSharp
+        m_MethodName: onMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c42efdb0-9f2e-4034-b559-5a7b2d325021
+    m_ActionName: 'Gameplay/Move[/Keyboard/upArrow,/Keyboard/w,/Keyboard/downArrow,/Keyboard/s,/Keyboard/leftArrow,/Keyboard/a,/Keyboard/rightArrow,/Keyboard/d]'
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard
+  m_DefaultActionMap: Gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}

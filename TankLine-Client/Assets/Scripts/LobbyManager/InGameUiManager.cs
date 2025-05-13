@@ -13,7 +13,10 @@ public class InGameUiManager
     private readonly GameObject respawnCountDown;
     private readonly GameObject playerListDiv;
     private readonly GameObject gameOverPanel;
+    private readonly GameObject skinGrid;
+    private readonly GameObject playerListDivWrap;
     private bool isSettingsPanelOpen = false;
+    private bool isSkinPanelOpen = false;
     private bool isInGame;
 
     public InGameUiManager(GameObject _canvas, bool _isInGame)
@@ -27,25 +30,34 @@ public class InGameUiManager
         }
 
         // search gameobject
-        playerListDiv = canvas.transform.Find("PlayersCanvas").gameObject;
+        playerListDivWrap = canvas.transform.Find("WrapPlayer").gameObject;
+        playerListDiv = playerListDivWrap.transform.Find("PlayersCanvas").gameObject;
 
         // add onclick function to buttons
-        canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickPanel);
+        canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickSettingsPanel);
         canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
+        Debug.Log("toto");
 
         // waiting room ui
-        if (!isInGame) {
+        if (!isInGame)
+        {
             startButton = canvas.transform.Find("StartButton").gameObject;
             playerCount = canvas.transform.Find("PlayerCount").gameObject;
-            
+            skinGrid = canvas.transform.Find("SkinPanel").Find("SkinGrid").gameObject;
+            canvas.transform.Find("SkinPanel").gameObject.SetActive(isSkinPanelOpen);
+
             canvas.transform.Find("StartButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindFirstObjectByType<LobbyManager>().ClickedStartGame);
+            canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(MonoBehaviour.FindAnyObjectByType<LobbyManager>().GetAvailableSkins);
+            canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
+            canvas.transform.Find("SkinPanel").Find("CloseBtn").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
 
             // disable start button at the beggining
             DisableStartButton();
         }
 
         // in game ui
-        if (isInGame) {
+        if (isInGame)
+        {
             respawnCountDown = canvas.transform.Find("RespawnCountdown").gameObject;
             gameOverPanel = canvas.transform.Find("GameOverPanel").gameObject;
 
@@ -61,10 +73,16 @@ public class InGameUiManager
     }
 
 
-    public void ClickPanel()
+    public void ClickSettingsPanel()
     {
         isSettingsPanelOpen = !isSettingsPanelOpen;
         canvas.transform.Find("SettingsPanel").gameObject.SetActive(isSettingsPanelOpen);
+    }
+
+    public void ClickSkinsPanel()
+    {
+        isSkinPanelOpen = !isSkinPanelOpen;
+        canvas.transform.Find("SkinPanel").gameObject.SetActive(isSkinPanelOpen);
     }
 
     public void ExitToMenu()
@@ -114,7 +132,8 @@ public class InGameUiManager
             playerCount.GetComponent<TMP_Text>().text = clientPlayerList.Count.ToString() + "/6";
 
         // enable/disable start button if enough people
-        if (!isInGame) {
+        if (!isInGame)
+        {
             if (clientPlayerList.Count >= minimumPlayerToStart)
                 EnableStartButton();
             else
@@ -122,11 +141,13 @@ public class InGameUiManager
         }
     }
 
-    public System.Collections.IEnumerator RespawnCountdownCoroutine(int timeBeforeRespawn) {
+    public System.Collections.IEnumerator RespawnCountdownCoroutine(int timeBeforeRespawn)
+    {
         respawnCountDown.SetActive(true);
 
         TMP_Text txt = respawnCountDown.GetComponent<TMP_Text>();
-        for (int i=timeBeforeRespawn; i>0; i--) {
+        for (int i = timeBeforeRespawn; i > 0; i--)
+        {
             txt.text = $"Respawning in {i} seconds";
             yield return new WaitForSeconds(1);
         }
@@ -134,7 +155,8 @@ public class InGameUiManager
         respawnCountDown.SetActive(false);
     }
 
-    public void ShowDefeatPanel() {
+    public void ShowDefeatPanel()
+    {
         gameOverPanel.SetActive(true);
         ResetGameOverPanel();
 
@@ -142,13 +164,15 @@ public class InGameUiManager
         gameOverPanel.transform.Find("SpectateGameBtn").gameObject.SetActive(true);
     }
 
-    public void ShowEndGamePanel(string winnerName, bool isWinner) {
+    public void ShowEndGamePanel(string winnerName, bool isWinner)
+    {
         gameOverPanel.SetActive(true);
         ResetGameOverPanel();
 
         if (isWinner)
             gameOverPanel.transform.Find("Victory").gameObject.SetActive(true);
-        else {
+        else
+        {
             gameOverPanel.transform.Find("GameOver").gameObject.SetActive(true);
             gameOverPanel.transform.Find("GameOver").Find("WinnerName").GetComponent<TMP_Text>().text = $"Winner: {winnerName}";
         }
@@ -156,24 +180,28 @@ public class InGameUiManager
         gameOverPanel.transform.Find("ReplayBtn").gameObject.SetActive(true);
     }
 
-    public void UpdateReadyForReplay(int nbPlayer, int nbReady) {
+    public void UpdateReadyForReplay(int nbPlayer, int nbReady)
+    {
         GameObject ready = gameOverPanel.transform.Find("playerReady").gameObject;
-        
+
         ready.SetActive(true);
         ready.GetComponent<TMP_Text>().text = $"{nbReady}/{nbPlayer}";
     }
 
-    public System.Collections.IEnumerator StartAutoReplayCountdown(int nbSeconds) {
+    public System.Collections.IEnumerator StartAutoReplayCountdown(int nbSeconds)
+    {
         gameOverPanel.transform.Find("autoReplay").gameObject.SetActive(true);
         TMP_Text countdown = gameOverPanel.transform.Find("autoReplay").GetComponent<TMP_Text>();
 
-        for (int i=nbSeconds; i>0; i--) {
+        for (int i = nbSeconds; i > 0; i--)
+        {
             countdown.text = $"auto-replay in {i} seconds";
             yield return new WaitForSeconds(1);
         }
     }
 
-    private void ResetGameOverPanel() {
+    private void ResetGameOverPanel()
+    {
         gameOverPanel.transform.Find("Defeat").gameObject.SetActive(false);
         gameOverPanel.transform.Find("Victory").gameObject.SetActive(false);
         gameOverPanel.transform.Find("GameOver").gameObject.SetActive(false);
@@ -181,5 +209,39 @@ public class InGameUiManager
         gameOverPanel.transform.Find("ReplayBtn").gameObject.SetActive(false);
         gameOverPanel.transform.Find("playerReady").gameObject.SetActive(false);
         gameOverPanel.transform.Find("autoReplay").gameObject.SetActive(false);
+    }
+
+    public void CreateSkinsPanel(List<Material> skins, GameObject skinEntryPrefab)
+    {
+
+        // clear the skin picker just in case
+        foreach (Transform child in skinGrid.transform)
+        {
+            MonoBehaviour.Destroy(child.gameObject);
+        }
+
+        int i = 0;
+        // create a entry for every skin
+        foreach (Material skin in skins)
+        {
+            GameObject newEntry = MonoBehaviour.Instantiate(skinEntryPrefab, skinGrid.transform);
+            newEntry.GetComponent<RawImage>().color = skin.color;
+            newEntry.GetComponent<Button>().onClick.AddListener(() => { MonoBehaviour.FindAnyObjectByType<LobbyManager>().PickSkin(skins.IndexOf(skin)); });
+
+            i++;
+        }
+    }
+
+    public void UpdateSkinsPanel(List<int> availableSkins)
+    {
+
+        // update which skin is clickable or not
+        for (int i = 0; i < skinGrid.transform.childCount; i++)
+        {
+            GameObject skinEntry = skinGrid.transform.GetChild(i).gameObject;
+
+            // check if skin is available
+            skinEntry.GetComponent<Button>().interactable = availableSkins.Contains(i);
+        }
     }
 }

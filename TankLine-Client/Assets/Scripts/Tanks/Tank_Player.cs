@@ -1,6 +1,7 @@
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Tank_Player : Tank
 {
@@ -24,6 +25,8 @@ public class Tank_Player : Tank
     //<summary> For mobile controls </summary>
     public MoveJoystick joystick;
     public ShootJoystick shootJoystick;
+    public InputActionReference move;
+    Vector3 MoveDir;
 
     protected override void Start()
     {
@@ -48,18 +51,43 @@ public class Tank_Player : Tank
         this.ApplyRotation();
 
         // if left click recorded, try to shoot
-        if (Input.GetMouseButtonDown(LEFT_CLICK)) {
-            if (this.CanShoot()) {
+        // if (Input.GetMouseButtonDown(LEFT_CLICK))
+        // {
+        //     if (this.CanShoot())
+        //     {
+        //         this.Shoot();
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Prevent self-shoot. TODO : animation");
+        //     }
+        // }
+#endif
+#if UNITY_ANDROID
+        this.GunTrackJoystick(shootJoystick.GetInput()); 
+        this.ApplyRotation();
+#endif
+    }
+
+    public void onMove(InputAction.CallbackContext ctxt)
+    {
+        Vector3 NewMoveDir = ctxt.ReadValue<Vector2>();
+        MoveDir.x = NewMoveDir.x;
+        MoveDir.y = NewMoveDir.y;
+    }
+    public void onShoot(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.performed)
+        {
+            if (this.CanShoot())
+            {
                 this.Shoot();
-            } else {
+            }
+            else
+            {
                 Debug.Log("Prevent self-shoot. TODO : animation");
             }
         }
-#endif
-#if UNITY_ANDROID
-        // this.GunTrackJoystick(shootJoystick.GetInput()); 
-        this.ApplyRotation();
-#endif
     }
 
     /// <summary>
@@ -70,9 +98,13 @@ public class Tank_Player : Tank
         if (!base.IsOwner) return;
 
 #if UNITY_STANDALONE
+        // move.action.ReadValue<Vector2>();
+
         // process rotation input
-        float y = Input.GetAxis("Vertical");
-        float x = Input.GetAxis("Horizontal");
+        // float y = Input.GetAxis("Vertical");
+        // float x = Input.GetAxis("Horizontal");
+        float y = MoveDir.y;
+        float x = MoveDir.x;
         movementToMake = this.FaceDirection(x, y);
 #endif
 #if UNITY_ANDROID

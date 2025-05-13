@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 1147165037764171231}
   - component: {fileID: 5587966148600266509}
   - component: {fileID: 5432976333360167726}
+  - component: {fileID: 2292346337789267609}
   m_Layer: 10
   m_Name: tankOffline
   m_TagString: Untagged
@@ -276,6 +277,69 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5711717282606037894, guid: 479d9ed58408bbfbfa8fcca6367a07c8, type: 3}
   nbBulletShot: 0
   MaxBulletShot: 5
+  move: {fileID: -8431542246685893986, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
+--- !u!114 &2292346337789267609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4082007141357051064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5432976333360167726}
+        m_TargetAssemblyTypeName: Tank_Offline, Assembly-CSharp
+        m_MethodName: onShoot
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b575c3ed-418e-4492-8c06-2e1e20acd877
+    m_ActionName: 'Gameplay/Shoot[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5432976333360167726}
+        m_TargetAssemblyTypeName: Tank_Offline, Assembly-CSharp
+        m_MethodName: onMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c42efdb0-9f2e-4034-b559-5a7b2d325021
+    m_ActionName: 'Gameplay/Move[/Keyboard/upArrow,/Keyboard/w,/Keyboard/downArrow,/Keyboard/s,/Keyboard/leftArrow,/Keyboard/a,/Keyboard/rightArrow,/Keyboard/d]'
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard
+  m_DefaultActionMap: Gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &4740271135850945630
 GameObject:
   m_ObjectHideFlags: 0

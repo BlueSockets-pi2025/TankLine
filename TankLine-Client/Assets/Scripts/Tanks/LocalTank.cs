@@ -2,6 +2,8 @@ using System;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
+
 
 public class Tank_Offline : MonoBehaviour
 {
@@ -49,6 +51,8 @@ public class Tank_Offline : MonoBehaviour
     public MoveJoystick joystick;
     public ShootJoystick shootJoystick;
     // public Button shootButton;
+    public InputActionReference move;
+    Vector3 MoveDir;
 
 
     protected virtual void Start()
@@ -77,12 +81,41 @@ public class Tank_Offline : MonoBehaviour
     protected void Update()
     {
 #if UNITY_STANDALONE
+
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
         // if left click recorded, try to shoot
-        if (Input.GetMouseButtonDown(LEFT_CLICK))
+        // if (Input.GetMouseButtonDown(LEFT_CLICK))
+        // {
+        //     if (this.CanShoot())
+        //     {
+        //         this.Shoot();
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Prevent self-shoot. TODO : animation");
+        //     }
+        // }
+#endif
+#if UNITY_ANDROID
+        this.GunTrackJoystick(shootJoystick.GetInput()); 
+        this.ApplyRotation();
+
+        // shootButton.onClick.AddListener(OnShootButtonClick);
+#endif
+    }
+
+    public void onMove(InputAction.CallbackContext ctxt)
+    {
+        Vector3 NewMoveDir = ctxt.ReadValue<Vector2>();
+        MoveDir.x = NewMoveDir.x;
+        MoveDir.y = NewMoveDir.y;
+    }
+    public void onShoot(InputAction.CallbackContext ctxt)
+    {
+        if (ctxt.performed)
         {
             if (this.CanShoot())
             {
@@ -93,13 +126,6 @@ public class Tank_Offline : MonoBehaviour
                 // Debug.Log("Prevent self-shoot. TODO : animation");
             }
         }
-#endif
-#if UNITY_ANDROID
-        this.GunTrackJoystick(shootJoystick.GetInput()); 
-        this.ApplyRotation();
-
-        // shootButton.onClick.AddListener(OnShootButtonClick);
-#endif
     }
 
     /// <summary>
@@ -108,9 +134,12 @@ public class Tank_Offline : MonoBehaviour
     protected void FixedUpdate()
     {
 #if UNITY_STANDALONE
+
         // process rotation input
-        float y = Input.GetAxis("Vertical");
-        float x = Input.GetAxis("Horizontal");
+        float y = MoveDir.y;
+        float x = MoveDir.x;
+        // float y = Input.GetAxis("Vertical");
+        // float x = Input.GetAxis("Horizontal");
         movementToMake = this.FaceDirection(x, y);
         Debug.Log("UNITY_STANDALONE");
 #endif

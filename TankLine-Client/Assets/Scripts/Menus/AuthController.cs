@@ -41,6 +41,7 @@ public class AuthController : MonoBehaviour
     private string disconnectUrl;
     private string refreshExpirationUrl;
     private string refreshRefreshTokenUrl;
+    private string leaderboardUrl;
 
     private int minExpirationRefreshToken = 24; // Minimum expiration time for refresh token in hours when checking in launch
 
@@ -85,7 +86,8 @@ public class AuthController : MonoBehaviour
         StartCoroutine(Initialization());
     }
 
-    private IEnumerator Initialization() {
+    private IEnumerator Initialization()
+    {
         if (Application.platform == RuntimePlatform.Android)
         {
             Debug.Log("Platform is Android.");
@@ -133,6 +135,7 @@ public class AuthController : MonoBehaviour
         disconnectUrl = $"{baseUrl}/auth/disconnect";
         refreshExpirationUrl = $"{baseUrl}/auth/refresh-expiration";
         refreshRefreshTokenUrl = $"{baseUrl}/auth/refresh-refresh-token";
+        leaderboardUrl = $"{baseUrl}/leaderboard";
 
         Debug.Log("Initialization complete.");
         IsInitialized = true; // Indique que l'initialisation est terminée
@@ -148,28 +151,28 @@ public class AuthController : MonoBehaviour
         string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
 
         Debug.Log("Loading trusted certificate from: " + certificatePath);
-        
+
         //Debug.Log("Certificate path: " + certificatePath);
         Debug.Log("Current platform: " + Application.platform);
 
-        #if UNITY_ANDROID
+#if UNITY_ANDROID
             Debug.Log("Running on Android. Attempting to load certificate using UnityWebRequest.");
             yield return StartCoroutine(LoadCertificateForAndroid(certificatePath));
-        #else
-            Debug.Log("Running on a non-Android platform. Attempting to load certificate directly.");
-            if (File.Exists(certificatePath))
-            {
-                byte[] certificateBytes = File.ReadAllBytes(certificatePath);
-                trustedCertificate = new X509Certificate2(certificateBytes);
-                staticTrustedCertificate = trustedCertificate;
-                Debug.Log("Certificate successfully loaded.");
-            }
-            else
-            {
-                Debug.LogError("Certificate file not found! Ensure it's in the correct directory.");
-            }
-            yield return null; // Guarantee that the coroutine ends
-        #endif
+#else
+        Debug.Log("Running on a non-Android platform. Attempting to load certificate directly.");
+        if (File.Exists(certificatePath))
+        {
+            byte[] certificateBytes = File.ReadAllBytes(certificatePath);
+            trustedCertificate = new X509Certificate2(certificateBytes);
+            staticTrustedCertificate = trustedCertificate;
+            Debug.Log("Certificate successfully loaded.");
+        }
+        else
+        {
+            Debug.LogError("Certificate file not found! Ensure it's in the correct directory.");
+        }
+        yield return null; // Guarantee that the coroutine ends
+#endif
     }
 
     /// <summary>
@@ -201,24 +204,24 @@ public class AuthController : MonoBehaviour
     {
         string envFilePath;
 
-        #if UNITY_ANDROID
+#if UNITY_ANDROID
             Debug.Log("Running on Android. Attempting to load .env file using UnityWebRequest.");
             envFilePath = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
             yield return StartCoroutine(LoadEndpointsConfigForAndroid(envFilePath));
-        #else 
-            envFilePath = Application.streamingAssetsPath + "./env";
-            if (File.Exists(envFilePath))
-            {
-                string jsonEnv = File.ReadAllText(envFilePath);
-                endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
-                Debug.Log("Endpoints configuration successfully loaded.");
-            }
-            else
-            {
-                Debug.LogError("Env file not found! Ensure it's in the correct directory.");
-            }
-            yield return null;
-        #endif
+#else
+        envFilePath = Application.streamingAssetsPath + "./env";
+        if (File.Exists(envFilePath))
+        {
+            string jsonEnv = File.ReadAllText(envFilePath);
+            endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+            Debug.Log("Endpoints configuration successfully loaded.");
+        }
+        else
+        {
+            Debug.LogError("Env file not found! Ensure it's in the correct directory.");
+        }
+        yield return null;
+#endif
     }
 
     private IEnumerator LoadEndpointsConfigForAndroid(string envFilePath)
@@ -1148,6 +1151,43 @@ public class AuthController : MonoBehaviour
     }
 
     /// <summary>
+    /// Coroutine to send the request for leaderboard data.
+    /// </summary>
+    /// <param name="onSuccess">Callback for successful response.</param>, <param name="onError">Callback for error response.</param>
+    public IEnumerator GetLeaderboard(Action<List<LeaderboardEntry>> onSuccess, Action<string> onError)
+    {
+        yield return SendRequestWithAutoRefresh(
+            leaderboardUrl,
+            "GET",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            null, // No body for a GET request
+            onSuccess: (response) =>
+            {
+                // Get and parse the leaderboard data:
+                try
+                {
+                    string jsonResponse = response.downloadHandler.text;
+                    List<LeaderboardEntry> leaderboardEntries = JsonUtility.FromJson<LeaderboardList>($"{{\"entries\":{jsonResponse}}}").entries;
+                    onSuccess?.Invoke(leaderboardEntries);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error parsing leaderboard data: {ex.Message}");
+                    onError?.Invoke("Failed to parse leaderboard data.");
+                }
+            },
+            onError: (response) =>
+            {
+                string errorMessage = !string.IsNullOrEmpty(response.downloadHandler.text)
+                    ? response.downloadHandler.text
+                    : "An unknown error occurred.";
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                onError?.Invoke(errorMessage);
+            }
+        );
+    }
+
+    /// <summary>
     /// Coroutine to get the statistics of the played games.
     /// </summary>  
     private IEnumerator GetGamePlayedStats()
@@ -1166,16 +1206,13 @@ public class AuthController : MonoBehaviour
             onSuccess: (response) =>
             {
                 string json = response.downloadHandler?.text;
-
                 if (json == null)
                 {
                     Debug.LogError("DownloadHandler text is null.");
                     IsRequestSuccessful = false;
                     return;
                 }
-
                 Debug.Log("Game Played Statistics (Raw JSON): " + json);
-
                 try
                 {
                     if (string.IsNullOrWhiteSpace(json) || json.Trim() == "null")
@@ -1184,26 +1221,21 @@ public class AuthController : MonoBehaviour
                         IsRequestSuccessful = false;
                         return;
                     }
-
                     var stats = JsonUtility.FromJson<PlayedGameStats>(json);
-
                     if (stats == null)
                     {
                         Debug.LogWarning("Deserialization failed: 'stats' is null.");
                         IsRequestSuccessful = false;
                         return;
                     }
-
                     if (stats.totalGames == 0 || stats.totalVictories < 0 || stats.tanksDestroyed < 0 || string.IsNullOrEmpty(stats.mapPlayed))
                     {
                         Debug.LogWarning("Some critical game stats are missing or invalid.");
                         IsRequestSuccessful = false;
                         return;
                     }
-
                     CurrentPlayedGameStats = stats;
                     IsRequestSuccessful = true;
-
                     float victoryRatio = stats.totalGames > 0
                         ? (float)stats.totalVictories / stats.totalGames
                         : 0f;
@@ -1303,24 +1335,44 @@ public class AuthController : MonoBehaviour
     }
 }
 
-/// <summary>
+
 /// Custom certificate handler class to validate the server's SSL certificate.
-/// </summary>
 public class CustomCertificateHandler : CertificateHandler
 {
+    // This method is called to validate the certificate received from the server
     protected override bool ValidateCertificate(byte[] certificateData)
     {
+        // Retrieve the trusted certificate that was preloaded into Unity's assets
         X509Certificate2 trustedCert = AuthController.GetTrustedCertificate();
+
+        // If no trusted certificate is loaded, log an error and return false to reject the certificate
         if (trustedCert == null)
         {
             Debug.LogError("No trusted certificate loaded.");
-            return false;
+            return false;  // If no trusted certificate is found, the certificate validation fails
         }
 
+        // Create an X509Certificate2 object from the certificate data received from the server
         X509Certificate2 receivedCertificate = new X509Certificate2(certificateData);
-        return receivedCertificate.Equals(trustedCert);
+
+        // Compare the thumbprints (unique identifiers) of the two certificates
+        bool isMatch = string.Equals(
+            receivedCertificate.Thumbprint,    // Thumbprint of the certificate received from the server
+            trustedCert.Thumbprint,            // Thumbprint of the preloaded trusted certificate
+            StringComparison.OrdinalIgnoreCase  // Perform a case-insensitive comparison
+        );
+
+        // If the thumbprints do not match, log a warning
+        if (!isMatch)
+        {
+            Debug.LogWarning("Server certificate does not match trusted certificate.");
+        }
+
+        // Return whether the thumbprints match
+        return isMatch;
     }
 }
+
 
 [System.Serializable]
 public class RegisterRequest
@@ -1425,4 +1477,19 @@ public class SaveTokenResponse
 public class RefreshTokenExpirationResponse
 {
     public string expiresAt;
+}
+
+[System.Serializable]
+public class LeaderboardEntry
+{
+    public string username;
+    public int highestScore;
+    public int ranking;
+    public int gamesPlayed;
+}
+
+[System.Serializable]
+public class LeaderboardList
+{
+    public List<LeaderboardEntry> entries;
 }
