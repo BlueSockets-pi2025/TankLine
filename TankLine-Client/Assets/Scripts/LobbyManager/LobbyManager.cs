@@ -41,7 +41,7 @@ public class LobbyManager : NetworkBehaviour
         };
     }
 
-    void Start() {
+    IEnumerator Start() {
         // initialize everything
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
         uiManager = new(GameObject.Find("Canvas"), CurrentSceneName() == "LoadScene");
@@ -57,6 +57,12 @@ public class LobbyManager : NetworkBehaviour
         // send username to DB
         if (base.IsClientInitialized) {
             authController = gameObject.GetComponent<AuthController>();
+
+            while (!authController.IsInitialized) {
+                Debug.Log("Waiting for AuthController initialization...");
+                yield return null;
+            }
+
             StartCoroutine(SendPlayerName());
         }
     }
@@ -287,7 +293,7 @@ public class LobbyManager : NetworkBehaviour
 
 
     private IEnumerator SendPlayerName() {
-        // fetch user data
+
         yield return authController.User();
 
         if (authController.CurrentUser == null) {

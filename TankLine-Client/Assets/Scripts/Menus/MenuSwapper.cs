@@ -66,7 +66,7 @@ public class MenuSwapper : MonoBehaviour
         }
 
         Debug.Log("AuthController initialization complete.");
-
+        
         // Load first page: 
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))

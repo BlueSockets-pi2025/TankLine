@@ -120,7 +120,7 @@ public class TokenCrypto
     public static IEnumerator LoadEncryptionConfig(MonoBehaviour monoBehaviour)
     {
 
-        #if UNITY_ANDROID
+        #if UNITY_ANDROID || UNITY_IOS
             Debug.Log("Running on Android. Attempting to load .env in token crypto file using UnityWebRequest.");
             string path = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
             yield return monoBehaviour.StartCoroutine(LoadEncryptionConfigForAndroid(path));

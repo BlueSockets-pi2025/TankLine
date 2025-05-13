@@ -80,9 +80,15 @@ public class AuthController : MonoBehaviour
         // Disconnect to enable other users to connect without deleting the refresh token: 
         DisconnectSynchronously();
     }
-
-    private void Awake()
+    /*
+    public void OnApplicationQuitNative() // Mobile 
     {
+        Debug.Log("Application is quitting (detected via native Android).");
+        DisconnectSynchronously();
+    }
+    */
+    private void Awake()
+    {   
         StartCoroutine(Initialization());
     }
 
@@ -196,6 +202,8 @@ public class AuthController : MonoBehaviour
             Debug.LogError("Failed to load certificate on Android: " + request.error);
         }
     }
+
+    
 
     /// <summary>
     /// Load the server configuration (database server endpoints) from the `.env` file and store it in the variable `endpointsConfig`
