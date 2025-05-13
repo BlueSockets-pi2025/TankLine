@@ -30,14 +30,21 @@ namespace Heartbeat
             DontDestroyOnLoad(gameObject);
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
             authController = FindObjectOfType<AuthController>(); 
             if (authController == null)
             {
                 Debug.LogError("AuthController not found in the scene.");
-                return;
+                yield break;
             }
+
+            while (!authController.IsInitialized)
+            {
+                Debug.Log("Waiting for AuthController initialization...");
+                yield return null;
+            }
+            
             // Get the heartbeat URL from AuthController:
             heartbeatUrl = authController.GetHeartbeatUrl();
 

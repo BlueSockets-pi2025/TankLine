@@ -46,6 +46,8 @@ public class AuthController : MonoBehaviour
 
     private static AuthController instance;
 
+    public bool IsInitialized { get; private set; } = false; // Indicates if the AuthController is initialized (for other managers)
+
     private static X509Certificate2 trustedCertificate;
 
     public EnvVariables endpointsConfig; // Server configuration (database server endpoints)
@@ -131,6 +133,10 @@ public class AuthController : MonoBehaviour
         disconnectUrl = $"{baseUrl}/auth/disconnect";
         refreshExpirationUrl = $"{baseUrl}/auth/refresh-expiration";
         refreshRefreshTokenUrl = $"{baseUrl}/auth/refresh-refresh-token";
+
+        Debug.Log("Initialization complete.");
+        IsInitialized = true; // Indique que l'initialisation est terminée
+
     }
 
     /// <summary>

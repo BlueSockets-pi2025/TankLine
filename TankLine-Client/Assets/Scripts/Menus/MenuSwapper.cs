@@ -44,14 +44,23 @@ public class MenuSwapper : MonoBehaviour
         Canvas = _canvas.transform;       
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         authController = GetComponent<AuthController>();
         if (authController == null)
         {
             Debug.LogError("AuthController not found.");
-            return;
+            yield break;
         }
+
+        // Wait for AuthController to be initialized:
+        while (!authController.IsInitialized)
+        {
+            Debug.Log("Waiting for AuthController initialization...");
+            yield return null;
+        }
+
+        Debug.Log("AuthController initialization complete.");
 
         // Load first page: 
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
