@@ -64,7 +64,7 @@ public class Tank_Player : Tank
         // }
 #endif
 #if UNITY_ANDROID
-        this.GunTrackJoystick(shootJoystick.GetInput()); 
+        // this.GunTrackJoystick(shootJoystick.GetInput()); 
         this.ApplyRotation();
 #endif
     }
