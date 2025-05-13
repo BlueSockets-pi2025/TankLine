@@ -211,7 +211,6 @@ public class LobbyManager : NetworkBehaviour
 
         // init new ui manager
         uiManager = new(GameObject.Find("Canvas"), scene.name == "LoadScene");
-        Debug.Log($"new ui manager : {scene.name == "LoadScene"}");
         hasAutoReplayStarted = false;
         hasGameStarted = false;
         playerReadyForReplay = new();
@@ -371,6 +370,12 @@ public class LobbyManager : NetworkBehaviour
             OnPlayerListChange(alivePlayers);
         } else {
             OnPlayerListChange(serverPlayerList.Values.ToList());
+        }
+
+        // if this was the last player in game, return to waiting room
+        if (CurrentSceneName() == "LoadScene" && serverPlayerList.Count() == 0) {
+            Debug.Log("[In Game] No more player in game, returning to waiting room");
+            ClearAndReplayServer();
         }
 
         if (hasAutoReplayStarted) {

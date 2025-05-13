@@ -36,7 +36,6 @@ public class InGameUiManager
         // add onclick function to buttons
         canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickSettingsPanel);
         canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
-        Debug.Log("toto");
 
         // waiting room ui
         if (!isInGame)
