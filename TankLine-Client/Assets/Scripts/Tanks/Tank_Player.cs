@@ -23,10 +23,11 @@ public class Tank_Player : Tank
     protected float movementToMake = 0;
 
     //<summary> For mobile controls </summary>
-    public MoveJoystick joystick;
-    public ShootJoystick shootJoystick;
     public InputActionReference move;
     Vector3 MoveDir;
+
+    private MoveJoystick joystick;
+    private ShootJoystick shootJoystick;
 
     protected override void Start()
     {
@@ -35,6 +36,17 @@ public class Tank_Player : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
 
+        GameObject canvas = GameObject.Find("canvas");
+        GameObject controls = canvas.transform.Find("Controls")?.gameObject;
+        joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
+        shootJoystick = controls.transform.Find("ButtonShot")?.GetComponent<ShootJoystick>();
+
+#if UNITY_STANDALONE
+        controls.SetActive(false);
+#endif
+#if UNITY_ANDROID
+        controls.SetActive(true);
+#endif
 
     }
 
@@ -49,22 +61,9 @@ public class Tank_Player : Tank
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
-
-        // if left click recorded, try to shoot
-        // if (Input.GetMouseButtonDown(LEFT_CLICK))
-        // {
-        //     if (this.CanShoot())
-        //     {
-        //         this.Shoot();
-        //     }
-        //     else
-        //     {
-        //         Debug.Log("Prevent self-shoot. TODO : animation");
-        //     }
-        // }
 #endif
 #if UNITY_ANDROID
-        // this.GunTrackJoystick(shootJoystick.GetInput()); 
+        this.GunTrackJoystick(shootJoystick.GetInput()); 
         this.ApplyRotation();
 #endif
     }
@@ -250,6 +249,19 @@ public class Tank_Player : Tank
 
         // rotate this tank gun to face the mouse
         this.SetRotationGun(gunRotation + math.PI / 2);
+    }
+
+    //for android Joystick
+    protected void GunTrackJoystick(Vector2 joystickInput)
+    {
+        if (joystickInput.magnitude < 0.2f)
+            return; // Ignore les petits mouvements
+
+        // Convertit l’entrée joystick en angle
+        float gunRotation = Mathf.Atan2(-joystickInput.y, joystickInput.x);
+
+        // Applique la rotation au canon
+        this.SetRotationGun(gunRotation + Mathf.PI / 2);
     }
 
     /// <summary>

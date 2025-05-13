@@ -12,12 +12,25 @@ public class Tank_Lobby : Tank
     public InputActionReference move;
     Vector3 MoveDir;
 
+    private MoveJoystick joystick;
+    private ShootJoystick shootJoystick;
+
     protected override void Start()
     {
         // set thisTank to the GameObject this script is attached to
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
+        GameObject canvas = GameObject.Find("canvas");
+        GameObject controls = canvas.transform.Find("Controls")?.gameObject;
+        joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
+
+#if UNITY_STANDALONE
+        controls.SetActive(false);
+#endif
+#if UNITY_ANDROID
+        controls.SetActive(true);
+#endif
 
 
     }
@@ -28,10 +41,15 @@ public class Tank_Lobby : Tank
     protected void Update()
     {
         if (!base.IsOwner) return;
-
+#if UNITY_STANDALONE
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
+#endif
+#if UNITY_ANDROID
+        // this.GunTrackJoystick(shootJoystick.GetInput()); 
+        this.ApplyRotation();
+#endif
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
@@ -48,13 +66,19 @@ public class Tank_Lobby : Tank
     {
         if (!base.IsOwner) return;
 
+#if UNITY_STANDALONE
         // process rotation input
         // float y = Input.GetAxis("Vertical");
         // float x = Input.GetAxis("Horizontal");
         float y = MoveDir.y;
         float x = MoveDir.x;
         movementToMake = this.FaceDirection(x, y);
-
+#endif
+#if UNITY_ANDROID
+        float x = joystick.GetHorizontal();
+        float y = joystick.GetVertical();
+        movementToMake = this.FaceDirection(x, y);
+#endif
         // process movement input
         this.GoForward(movementToMake);
 
