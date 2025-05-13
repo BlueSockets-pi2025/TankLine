@@ -6,6 +6,7 @@ using UnityEngine;
 // Creation of a bush belonging to a BushGroup which becomes transparent on contact.
 public class BushObject : MonoBehaviour
 {
+    private const int PLAYER_LAYER = 10;
     private Renderer bushRenderer;
     private Color originalColor;
     private float transparencyGroup = 0.6f; // Opacity level when inside
@@ -19,6 +20,9 @@ public class BushObject : MonoBehaviour
     // Store the list of all bushes in contact with the player
     private static Dictionary<GameObject, HashSet<BushObject>> playerBushes = new Dictionary<GameObject, HashSet<BushObject>>();
 
+    public Material Solid;
+    public Material Transparent;
+
 
     private void Start()
     {
@@ -31,9 +35,6 @@ public class BushObject : MonoBehaviour
             return;
         }
 
-        // Store the original color
-        originalColor = bushRenderer.material.color;
-
         // Find the parent group
         parentGroup = GetComponentInParent<BushGroup>();
         if (parentGroup == null)
@@ -44,7 +45,7 @@ public class BushObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && other.gameObject.GetComponent<NetworkBehaviour>().IsOwner) 
+        if (other.gameObject.layer == PLAYER_LAYER )//&& other.gameObject.GetComponent<NetworkBehaviour>().IsOwner) 
         {
             // Add this bush to the player's bush list
             if (!playerBushes.ContainsKey(other.gameObject))
@@ -52,19 +53,19 @@ public class BushObject : MonoBehaviour
                 playerBushes[other.gameObject] = new HashSet<BushObject>();
             }
             playerBushes[other.gameObject].Add(this);
-            parentGroup?.SetTransparencyForGroup(transparencyGroup);
+            parentGroup?.SetTransparentForGroup();
 
             // Update all bushes in contact with the player
             foreach (BushObject bush in playerBushes[other.gameObject])
             {
-                bush.SetTransparency(transparencyOne);
+                bush.SetTransparent();
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player") && other.gameObject.GetComponent<NetworkBehaviour>().IsOwner)
+        if (other.gameObject.layer == PLAYER_LAYER )//&& other.gameObject.GetComponent<NetworkBehaviour>().IsOwner)
         {
             if (playerBushes.ContainsKey(other.gameObject))
             {
@@ -85,15 +86,15 @@ public class BushObject : MonoBehaviour
                 // If the player is no longer in any bushes of the parentGroup, remove transparency
                 if (!stillInSameGroup)
                 {
-                    parentGroup?.SetTransparencyForGroup(1f); // Restore full opacity
+                    parentGroup?.SetSolidForGroup(); // Restore full opacity
                 }
                 else
                 {
-                    parentGroup?.SetTransparencyForGroup(transparencyGroup);
+                    parentGroup?.SetTransparentForGroup();
                     // Update all bushes in contact with the player
                     foreach (BushObject bush in playerBushes[other.gameObject])
                     {
-                        bush.SetTransparency(transparencyOne);
+                        bush.SetTransparent();
                     }
                 }
                 if (playerBushes[other.gameObject].Count == 0)
@@ -105,35 +106,13 @@ public class BushObject : MonoBehaviour
     }
 
     // Function called by the BushGroup class to change the transparency of the bush
-    public void SetTransparency(float targetAlpha)
+    public void SetTransparent()
     {
-        if (fadeCoroutine != null)
-        {
-            StopCoroutine(fadeCoroutine);
-        }
-        fadeCoroutine = StartCoroutine(FadeTransparency(targetAlpha));
+        bushRenderer.material = Transparent;
     }
 
-    private IEnumerator FadeTransparency(float targetAlpha)
+    public void SetSolid()
     {
-        if (bushRenderer != null)
-        {
-            Color currentColor = bushRenderer.material.color;
-            float startAlpha = currentColor.a;
-            float elapsedTime = 0f;
-
-            while (elapsedTime < fadeDuration)
-            {
-                elapsedTime += Time.deltaTime;
-                float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeDuration);
-                currentColor.a = newAlpha;
-                bushRenderer.material.color = currentColor;
-                yield return null;
-            }
-
-            // Ensure final value is set correctly
-            currentColor.a = targetAlpha;
-            bushRenderer.material.color = currentColor;
-        }
+        bushRenderer.material = Solid;
     }
 }

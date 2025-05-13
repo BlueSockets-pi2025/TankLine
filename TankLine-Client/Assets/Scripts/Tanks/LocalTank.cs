@@ -484,4 +484,12 @@ public class Tank_Offline : MonoBehaviour
     {
         nbBulletShot--;
     }
+
+    public void OnDestroy()
+    {
+        BushGroup[] bushes = FindObjectsByType<BushGroup>(FindObjectsSortMode.None);
+        foreach (BushGroup bush in bushes) {
+            bush.SetSolidForGroup();
+        }
+    }
 }
