@@ -1,12 +1,16 @@
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Tank_Lobby : Tank
 {
     const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 2;
 
     protected float movementToMake = 0;
+
+    public InputActionReference move;
+    Vector3 MoveDir;
 
     protected override void Start()
     {
@@ -30,6 +34,13 @@ public class Tank_Lobby : Tank
         this.ApplyRotation();
     }
 
+    public void onMove(InputAction.CallbackContext ctxt)
+    {
+        Vector3 NewMoveDir = ctxt.ReadValue<Vector2>();
+        MoveDir.x = NewMoveDir.x;
+        MoveDir.y = NewMoveDir.y;
+    }
+
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
@@ -38,8 +49,10 @@ public class Tank_Lobby : Tank
         if (!base.IsOwner) return;
 
         // process rotation input
-        float y = Input.GetAxis("Vertical");
-        float x = Input.GetAxis("Horizontal");
+        // float y = Input.GetAxis("Vertical");
+        // float x = Input.GetAxis("Horizontal");
+        float y = MoveDir.y;
+        float x = MoveDir.x;
         movementToMake = this.FaceDirection(x, y);
 
         // process movement input

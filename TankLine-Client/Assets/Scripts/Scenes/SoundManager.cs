@@ -1,8 +1,13 @@
 using UnityEngine;
 
+public enum SFXType
+{
+    ButtonClick, Death, Win
+}
+
 public class SoundManager : MonoBehaviour
 {
-    public static SoundManager Instance;
+    public static SoundManager Instance { get; private set; }
     [Header("Sources")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
@@ -69,6 +74,30 @@ public class SoundManager : MonoBehaviour
         }
     }
     //SoundManager.Instance.PlaySFX(pingClip);
+
+    public void PlaySFXEnum(SFXType sfx)
+    {
+        AudioClip clipToPlay = null;
+
+        switch (sfx)
+        {
+            case SFXType.ButtonClick:
+                clipToPlay = btnClicSfx;
+                break;
+            case SFXType.Death:
+                clipToPlay = deathSfx;
+                break;
+            case SFXType.Win:
+                clipToPlay = winnerSfx;
+                break;
+        }
+
+        if (clipToPlay != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clipToPlay);
+        }
+    }
+
 
 }
 

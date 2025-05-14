@@ -2,7 +2,8 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
-using Heartbeat; 
+using Heartbeat;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class MenuSwapper : MonoBehaviour
@@ -12,7 +13,8 @@ public class MenuSwapper : MonoBehaviour
 
     public GameObject _canvas;
     private Transform Canvas;
-    public GameObject ErrorPopup, MessagePopup;
+    public GameObject ErrorPopup, MessagePopup, ExitGamePopup;
+    public InputActionAsset actions;
 
     public GameObject CurrentPage;
 
@@ -25,13 +27,16 @@ public class MenuSwapper : MonoBehaviour
 
     public Toggle RememberMeToggle; // reference to the “Remember Me” checkbox
 
+    public GameObject leaderboardContent; 
+    public GameObject leaderboardEntryPrefab; 
+
     // Testing : 
     public TMP_Text gamesPlayedInputField;
     public TMP_Text highestScoreInputField;
     public TMP_Text UserNameField;
     public TMP_Text UserRankField;
 
-    public static bool isFirstLaunch = true ; 
+    public static bool isFirstLaunch = true;
 
     void Awake()
     {
@@ -41,7 +46,7 @@ public class MenuSwapper : MonoBehaviour
         else
             Destroy(gameObject);
 
-        Canvas = _canvas.transform;       
+        Canvas = _canvas.transform;
     }
 
     private void Start()
@@ -53,13 +58,21 @@ public class MenuSwapper : MonoBehaviour
             return;
         }
 
-        // Load first page: 
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+        {
+            actions.LoadBindingOverridesFromJson(rebinds);
+            rebinds = actions.SaveBindingOverridesAsJson();
+        }
+
+        // Load first page
+        // OpenPage("PagePrincipale"); 
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         if (currentScene == "ConnectionMenu")
         {
             OpenPage("PagePrincipale");
-            
+
             if (RememberMeToggle != null)
             {
                 // Set the checkbox to true by default:
@@ -69,10 +82,10 @@ public class MenuSwapper : MonoBehaviour
             if (isFirstLaunch)
             {
                 AutoLogin();
-                isFirstLaunch = false; 
+                isFirstLaunch = false;
                 Debug.Log("FIRST LAUNCH");
             }
-            else Debug.Log ("NOT FIRST LAUNCH");
+            else Debug.Log("NOT FIRST LAUNCH");
         }
 
         else if (currentScene == "MainMenu")
@@ -97,6 +110,7 @@ public class MenuSwapper : MonoBehaviour
         // Restore refresh token in HTTP-ONLY cookies (from local persistent file between sessions):
         yield return authController.RestoreRefreshCookie();
 
+
         if (!authController.IsRequestSuccessful) // If remember me hasn't been activated, for example, or if you're connecting for the first time 
         {
             Debug.Log("Failed to restore refresh token. Redirecting to login page.");
@@ -106,7 +120,7 @@ public class MenuSwapper : MonoBehaviour
 
         // Attempt auto-login using the refresh token:
         yield return authController.AutoLogin();
-        
+
         if (authController.IsRequestSuccessful)
         {
             Debug.Log("Auto-login successful. Skipping login page.");
@@ -164,14 +178,14 @@ public class MenuSwapper : MonoBehaviour
 
         CurrentPage.SetActive(true);
 
-        // if (pageName == "Score")
-        // {
-        //     Debug.Log("Opening Score page. Updating leaderboard...");
-        //     UpdateLeaderboard();
-        // }
+        if (pageName == "Score")
+        {
+            Debug.Log("Opening Score page. Updating leaderboard...");
+            UpdateLeaderboard();
+        }
 
         // if switch to mainMenu or play, load stats & name
-        if (pageName == "MainMenu" || pageName == "Play")
+        if (pageName == "MainMenu" || pageName == "Play" || pageName == "Score")
         {
             StartCoroutine(UpdateStatisticsCoroutine(CurrentPage.transform.Find("Badge")));
         }
@@ -202,6 +216,19 @@ public class MenuSwapper : MonoBehaviour
     public void CloseMessage()
     {
         MessagePopup.SetActive(false);
+    }
+
+    public void OpenExitGame()
+    {
+        ExitGamePopup.SetActive(true);
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+    public void CloseExitGame()
+    {
+        ExitGamePopup.SetActive(false);
     }
 
     /// <summary>
@@ -250,8 +277,8 @@ public class MenuSwapper : MonoBehaviour
 
             if (authController.IsRequestSuccessful)
             {
-                Debug.Log("DEBUG"); 
-                Debug.Log(authController.CurrentUser.username); 
+                Debug.Log("DEBUG");
+                Debug.Log(authController.CurrentUser.username);
                 yield return authController.UserStatistics();
 
                 if (authController.IsRequestSuccessful)
@@ -598,7 +625,7 @@ public class MenuSwapper : MonoBehaviour
             return;
         }
         StartCoroutine(LogoutCoroutine());
-        
+
     }
 
     /// <summary>
@@ -615,7 +642,7 @@ public class MenuSwapper : MonoBehaviour
 
             // Wait for popup to close:
             yield return new WaitUntil(() => !MessagePopup.activeSelf);
-            
+
             // Load scene after closing popup:
             UnityEngine.SceneManagement.SceneManager.LoadScene("ConnectionMenu");
         }
@@ -666,7 +693,7 @@ public class MenuSwapper : MonoBehaviour
     private IEnumerator UpdateStatisticsCoroutine(Transform badge)
     {
 
-        string found_badge  ; 
+        string found_badge;
         if (authController == null)
         {
             Debug.LogError("AuthController is not initialized.");
@@ -682,8 +709,8 @@ public class MenuSwapper : MonoBehaviour
             {
                 badge.Find("GamePlayed").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.gamesPlayed.ToString();
                 badge.Find("HighScore").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.highestScore.ToString();
-                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();    
-                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.username ;
+                badge.Find("Rank").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.ranking.ToString();
+                badge.Find("UserName").GetComponent<TMP_Text>().text = authController.CurrentUserStatistics.username;
             }
 
             else
@@ -696,6 +723,63 @@ public class MenuSwapper : MonoBehaviour
             OpenErr($"Failed to retrieve user statistics: \n {authController.ErrorResponse}");
         }
     }
+
+    /// <summary>
+    /// Update the leaderboard with the current user statistics </br>
+    /// </summary>
+    public void UpdateLeaderboard()
+    {
+        if (authController == null)
+        {
+            Debug.LogError("AuthController is not initialized.");
+            return;
+        }
+
+        StartCoroutine(authController.GetLeaderboard(
+            onSuccess: (leaderboardEntries) =>
+            {
+                Debug.Log("Leaderboard data fetched successfully.");
+                UpdateLeaderboardUI(leaderboardEntries);
+            },
+            onError: (errorMessage) =>
+            {
+                Debug.LogError($"Failed to fetch leaderboard: {errorMessage}");
+                OpenErr($"Failed to fetch leaderboard: {errorMessage}");
+            }
+        ));
+    }
+
+    /// <summary>
+    /// Update the leaderboard UI with the fetched data </br>
+    /// </summary>
+    /// <param name="leaderboardEntries">The list of leaderboard entries</param>
+    private void UpdateLeaderboardUI(List<LeaderboardEntry> leaderboardEntries)
+    {
+        // Delete old entries:
+        foreach (Transform child in leaderboardContent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Add new entries:
+        foreach (var entry in leaderboardEntries)
+        {
+            GameObject newEntry = Instantiate(leaderboardEntryPrefab, leaderboardContent.transform);
+
+            newEntry.SetActive(true); // Ensure the new entry is active
+            
+            // Retrieve text fields from prefab:
+            TMP_Text rankText = newEntry.transform.Find("Rank")?.GetComponent<TMP_Text>();
+            TMP_Text nameText = newEntry.transform.Find("Name")?.GetComponent<TMP_Text>();
+            TMP_Text scoreText = newEntry.transform.Find("Score")?.GetComponent<TMP_Text>();
+
+            // Update text fields:
+            if (rankText != null) rankText.text = $"{entry.ranking}";
+            if (nameText != null) nameText.text = entry.username;
+            if (scoreText != null) scoreText.text = $"{entry.highestScore}";
+        }
+    }
+
 
     /// <summary>
     /// Password field verification function on registration 
@@ -824,14 +908,16 @@ public class MenuSwapper : MonoBehaviour
     /// <summary>
     /// Load a random waiting room scene </br>
     /// </summary>
-    public void ConnectToRandomWaitingRoom() {
+    public void ConnectToRandomWaitingRoom()
+    {
         ConnectToWaitingRoom();
     }
 
     /// <summary>
     /// Load the waiting room scene </br>
     /// </summary>
-    public void ConnectToWaitingRoom() {
+    public void ConnectToWaitingRoom()
+    {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
@@ -891,18 +977,22 @@ public class MenuSwapper : MonoBehaviour
     public void GamesPlayed()
     {
         StartCoroutine(GamesPlayedAndNavigate());
-    }    
-    
+    }
+
     /// <summary>
     /// Coroutine function to get the games played statistics </br>
     /// </summary>
-    private IEnumerator GamesPlayedAndNavigate() {
+    private IEnumerator GamesPlayedAndNavigate()
+    {
         yield return authController.GamesPlayedStatistics();
 
-        if (authController.IsRequestSuccessful) {
-            OpenPage("ACHIEVEMENTS"); 
-        } else {
-            OpenMessage("You have not played a game yet. Start your epic journey now !"); 
+        if (authController.IsRequestSuccessful)
+        {
+            OpenPage("ACHIEVEMENTS");
+        }
+        else
+        {
+            OpenMessage("You have not played a game yet. Start your epic journey now !");
         }
     }
 }

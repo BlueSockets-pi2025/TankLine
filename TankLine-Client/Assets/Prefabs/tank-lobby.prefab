@@ -182,6 +182,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b709a1ce5bf28864e83d6ff7a30471c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 954004659047073416}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b709a1ce5bf28864e83d6ff7a30471c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6829957458133562723}
   m_SourcePrefab: {fileID: 100100000, guid: b709a1ce5bf28864e83d6ff7a30471c9, type: 3}
 --- !u!4 &2590802598270934760 stripped
 Transform:
@@ -253,12 +256,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eb349f74fca8ca2d97eb19f95294a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7205870284494420305}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7205870284494420305}
   movementSpeed: 3
   rotationSpeed: 0.06544985
   nbLifeLeft: 3
+  move: {fileID: -8431542246685893986, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!114 &7205870284494420305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,20 +289,22 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 1
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7295777086980786445
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
+    Position: {x: -3.1708283, y: -0.00000047683716, z: -0.5499201}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 0.8, y: 0.8, z: 0.8}
+    IsValid: 1
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  NetworkBehaviours:
+  - {fileID: 7751050197579624633}
+  - {fileID: 954004659047073416}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -321,9 +327,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7205870284494420305}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7205870284494420305}
   _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:
@@ -352,6 +358,56 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &6829957458133562723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2936260714432119890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b575c3ed-418e-4492-8c06-2e1e20acd877
+    m_ActionName: 'Gameplay/Shoot[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7751050197579624633}
+        m_TargetAssemblyTypeName: Tank_Lobby, Assembly-CSharp
+        m_MethodName: onMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c42efdb0-9f2e-4034-b559-5a7b2d325021
+    m_ActionName: 'Gameplay/Move[/Keyboard/upArrow,/Keyboard/w,/Keyboard/downArrow,/Keyboard/s,/Keyboard/leftArrow,/Keyboard/a,/Keyboard/rightArrow,/Keyboard/d]'
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard
+  m_DefaultActionMap: Gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1001 &4891430320475475173
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -419,61 +475,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 65476d5793922c5b9bf5a7eb71310a22, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6481931791455509327}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65476d5793922c5b9bf5a7eb71310a22, type: 3}
 --- !u!4 &4930140356889635598 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 65476d5793922c5b9bf5a7eb71310a22, type: 3}
   m_PrefabInstance: {fileID: 4891430320475475173}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5701750796975681972 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 65476d5793922c5b9bf5a7eb71310a22, type: 3}
-  m_PrefabInstance: {fileID: 4891430320475475173}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6481931791455509327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5701750796975681972}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 7205870284494420305}
-  _networkObjectCache: {fileID: 0}
-  _componentConfiguration: 0
-  _synchronizeParent: 0
-  _packing:
-    Position: 1
-    Rotation: 1
-    Scale: 0
-  _interpolation: 2
-  _extrapolation: 2
-  _enableTeleport: 0
-  _teleportThreshold: 1
-  _clientAuthoritative: 1
-  _sendToOwner: 1
-  _interval: 1
-  _synchronizePosition: 1
-  _positionSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeRotation: 1
-  _rotationSnapping:
-    X: 0
-    Y: 0
-    Z: 0
-  _synchronizeScale: 1
-  _scaleSnapping:
-    X: 0
-    Y: 0
-    Z: 0
