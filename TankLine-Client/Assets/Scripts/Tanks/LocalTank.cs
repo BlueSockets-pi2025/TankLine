@@ -97,7 +97,7 @@ public class Tank_Offline : MonoBehaviour
 
         // Tank gun rotation
         degreeRotation = gunRotation * Mathf.Rad2Deg; // transform radians to degrees
-        thisGun.rotation = Quaternion.Euler(0, degreeRotation, 0);
+        thisGun.rotation = Quaternion.Euler(-90, degreeRotation, 0);
     }
 
 
@@ -470,7 +470,7 @@ public class Tank_Offline : MonoBehaviour
             Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
 
             // spawn object
-            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f * dir, Quaternion.identity);
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 1.0f * dir, Quaternion.identity);
 
             // change direction and tankOwner (for bullet count)
             Bullet_Offline newBullet = newBulletObject.GetComponent<Bullet_Offline>();
