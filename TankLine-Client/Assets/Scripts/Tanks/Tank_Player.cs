@@ -72,7 +72,7 @@ public class Tank_Player : Tank
         {
             if (this.CanShoot())
             {
-                this.Shoot();
+                this.Shoot(gunRotation);
             }
             else
             {
@@ -370,16 +370,16 @@ public class Tank_Player : Tank
 
     // only call this function as server
     [ServerRpc(RequireOwnership = true)]
-    protected void Shoot()
+    protected void Shoot(float clientGunRotation)
     {
+        Debug.Log($"Shooting : {clientGunRotation}");
         if (nbBulletShot < MaxBulletShot)
         {
             // compute new bullet position
             Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
 
             // compute new bullet direction
-            float rotation = thisGun.rotation.eulerAngles.y * Mathf.Deg2Rad;
-            Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
+            Vector3 dir = new Vector3(math.cos(clientGunRotation - math.PI / 2), 0, -math.sin(clientGunRotation - math.PI / 2));
 
             // spawn object
             GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f * dir, Quaternion.identity);

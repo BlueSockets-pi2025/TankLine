@@ -154,6 +154,10 @@ public class Bullet : NetworkBehaviour {
             Despawn(thisBullet);
             return;
         }
+
+        else {
+            Debug.Log($"[WARNING] Bullet collided with non identified object at {transform.position}");
+        }
     }
 
     /// <summary>

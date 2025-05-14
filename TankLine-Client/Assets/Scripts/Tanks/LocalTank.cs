@@ -94,7 +94,7 @@ public class Tank_Offline : MonoBehaviour
         {
             if (this.CanShoot())
             {
-                this.Shoot();
+                this.Shoot(gunRotation);
             }
             else
             {
@@ -492,7 +492,7 @@ public class Tank_Offline : MonoBehaviour
         }
     }
 
-    protected void Shoot()
+    protected void Shoot(float clientGunRotation)
     {
         if (nbBulletShot < MaxBulletShot)
         {
@@ -500,8 +500,7 @@ public class Tank_Offline : MonoBehaviour
             Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
 
             // compute new bullet direction
-            float rotation = thisGun.rotation.eulerAngles.y * Mathf.Deg2Rad;
-            Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
+            Vector3 dir = new Vector3(math.cos(clientGunRotation - math.PI / 2), 0, -math.sin(clientGunRotation - math.PI / 2));
 
             // spawn object
             GameObject newBulletObject = Instantiate(bulletPrefab, pos + 1.0f * dir, Quaternion.identity);

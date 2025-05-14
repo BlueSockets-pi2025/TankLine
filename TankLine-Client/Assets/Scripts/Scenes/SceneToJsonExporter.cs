@@ -82,7 +82,7 @@ public class SceneToJsonExporter : MonoBehaviour
     /// <returns>The GameObjectJson structure corresponding</returns>
     GameObjectJson ExportGameObjectToJson(GameObject go) {
         GameObjectJson data = new() {
-            position = SerializableVector3.FromVector3(go.transform.localPosition),
+            position = SerializableVector3.FromVector3(go.transform.position),
             isNetworked = go.GetComponent<NetworkObject>() == true,
             prefabName = GetPrefabName(go)
         };

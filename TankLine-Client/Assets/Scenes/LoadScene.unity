@@ -1916,15 +1916,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01bbadf26f1ef7a4b911301c7165fc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapFileName: sceneTest.json
+  mapFileName: Map1.json
   prefabs:
-  - {fileID: 1114065550118025602, guid: 76c8fc39345ac944aa4c4d5f5a8ff6bc, type: 3}
-  - {fileID: 1267046750248130937, guid: 6665ed6f0ea602c9b8c3e60f298b3e07, type: 3}
-  - {fileID: 3221579275689301036, guid: 5f6291392c163a34291c6feb5e4aa3af, type: 3}
-  - {fileID: 2477141789646438007, guid: d457434bbbc641b409c70ad5a5b6784b, type: 3}
-  - {fileID: 1128587291948520726, guid: fba6984ce6313a7df9d13b20b65da737, type: 3}
-  - {fileID: 4018368323860436445, guid: 337668dcc33026658a0be6cfe048456d, type: 3}
+  - {fileID: 5528622260270209908, guid: b66b73d6caf88c773add234ad3f8f1f0, type: 3}
+  - {fileID: 5124726017577983071, guid: 3a357e8ca15631ec0a213bdf8b5aa295, type: 3}
   - {fileID: 6622161684901545638, guid: 2ffd71d30a531d7ce875e3bd85dbc570, type: 3}
+  - {fileID: 1267046750248130937, guid: 6665ed6f0ea602c9b8c3e60f298b3e07, type: 3}
+  - {fileID: 1128587291948520726, guid: fba6984ce6313a7df9d13b20b65da737, type: 3}
+  - {fileID: 639376273469010979, guid: fbbf1cd60bd7c4283aeae91528e4fe47, type: 3}
+  - {fileID: 4544794023517313736, guid: f6ecdef17b2b609e990955af058b3b1f, type: 3}
+  - {fileID: 4018368323860436445, guid: 337668dcc33026658a0be6cfe048456d, type: 3}
+  - {fileID: 4588516546941789020, guid: 5fe222bd33502b9c9a5eae6917e42c61, type: 3}
+  - {fileID: 3439238974282075984, guid: e0587ec599490a2e69646295cd74510b, type: 3}
+  - {fileID: 2477141789646438007, guid: d457434bbbc641b409c70ad5a5b6784b, type: 3}
 --- !u!4 &259068394
 Transform:
   m_ObjectHideFlags: 0
@@ -1952,7 +1956,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01311817784f35d4dbc9df18e865ea5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapName: sceneTest.json
+  mapName: Map1.json
 --- !u!1 &265284117
 GameObject:
   m_ObjectHideFlags: 0
@@ -2110,7 +2114,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Text
-      value: Bas
+      value: Down Arrow
       objectReference: {fileID: 0}
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Color.b
@@ -3605,7 +3609,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Text
-      value: Gauche
+      value: Left Arrow
       objectReference: {fileID: 0}
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Color.b
@@ -10558,7 +10562,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 7dfc86f277d69d859a04728ea2a6bbe1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11825,7 +11829,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Text
-      value: Droite
+      value: Right Arrow
       objectReference: {fileID: 0}
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Color.b
@@ -12323,7 +12327,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Text
-      value: Haut
+      value: Up Arrow
       objectReference: {fileID: 0}
     - target: {fileID: 690190895482579582, guid: f25dcd618d3acd64795bf8bb32edb6c9, type: 3}
       propertyPath: m_Color.b
