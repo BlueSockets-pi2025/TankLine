@@ -242,6 +242,10 @@ PrefabInstance:
       propertyPath: deathVfxPrefab
       value: 
       objectReference: {fileID: 8848342378526296911, guid: d5f143a7f056f985bb6b6f24ecdbabc7, type: 3}
+    - target: {fileID: 5587966148600266509, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7496081908021487424, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.00827986

@@ -32,6 +32,10 @@ public class Tank_Lobby : Tank
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
+
+        // stick the tank to the ground
+        if (transform.position.y > 0.07)
+            transform.position = new(transform.position.x, 0, transform.position.z);
     }
 
     public void onMove(InputAction.CallbackContext ctxt)

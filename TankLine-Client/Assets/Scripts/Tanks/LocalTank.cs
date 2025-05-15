@@ -70,6 +70,10 @@ public class Tank_Offline : MonoBehaviour
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
 
+        // stick the tank to the ground
+        if (transform.position.y > 0.07)
+            transform.position = new(transform.position.x, 0, transform.position.z);
+
         // if left click recorded, try to shoot
         // if (Input.GetMouseButtonDown(LEFT_CLICK))
         // {
