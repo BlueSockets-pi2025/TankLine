@@ -1,0 +1,118 @@
+fileFormatVersion: 2
+guid: d37f592d9eead32a68dd707aa69c2aa9
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone/Cone:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_001/Cone_002:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_002/Cone_003:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_003/Cone_004:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_004/Cone_005:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_005/Cone_006:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_006/Cone_007:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_007/Cone_008:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_008/Cone_009:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_009/Cone_010:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_010/Cone_011:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_011/Cone_012:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_012/Cone_013:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Cone_013/Cone_014:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Sphere/Sphere:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Torus/Torus:000:'
+    second: {fileID: 2100000, guid: a2d1f8780e0b8780290b405a6af3ebb7, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f53f5fc499d31e44b9deee84d28a9ee8, type: 3}
+  rootGameObjectId: effect_explosion ground2
+  rootGameObjectName: effect_explosion ground2
+  importerVersion: 1
+  streamSettings:
+    normals: 1
+    tangents: 1
+    cameraAspectRatio: 2
+    importVisibility: 1
+    scaleFactor: 0.01
+    swapHandedness: 1
+    flipFaces: 0
+    interpolateSamples: 1
+    importPointPolygon: 1
+    importLinePolygon: 1
+    importTrianglePolygon: 1
+    importXform: 1
+    importCameras: 1
+    importMeshes: 1
+    importPoints: 0
+    importCurves: 1
+    createCurveRenderers: 0
+  abcStartTime: 0.041666666666666664
+  abcEndTime: 0.5
+  startTime: 0.041666666666666664
+  endTime: 0.5
+  importWarning: 
+  firstImport: 0
+  isHDF5: 0

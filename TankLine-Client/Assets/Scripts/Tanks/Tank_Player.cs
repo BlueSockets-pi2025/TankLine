@@ -1,3 +1,4 @@
+using System;
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
@@ -16,6 +17,9 @@ public class Tank_Player : Tank
     /// <summary> The maximum number of bullet shot at the same time and still on the map </summary>
     [Range(1, 50)]
     public int MaxBulletShot = 5;
+
+    /// <summary>The death alembic prefab</summary>
+    public GameObject deathVfxPrefab;
 
     const int LEFT_CLICK = 0;
     const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 2;
@@ -401,10 +405,15 @@ public class Tank_Player : Tank
 
     public void OnDestroy()
     {
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
+        
         BushGroup[] bushes = FindObjectsByType<BushGroup>(FindObjectsSortMode.None);
         foreach (BushGroup bush in bushes)
         {
             bush.SetSolidForGroup();
         }
+
+        // play death vfx
+        Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
     }
 }

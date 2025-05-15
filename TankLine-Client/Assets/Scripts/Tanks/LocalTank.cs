@@ -38,6 +38,7 @@ public class Tank_Offline : MonoBehaviour
     const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 2;
 
     protected float movementToMake = 0;
+    public GameObject deathVfxPrefab;
 
 
     /// <summary> The whole tank current angle in radians </summary>
@@ -48,6 +49,7 @@ public class Tank_Offline : MonoBehaviour
 
     public InputActionReference move;
     Vector3 MoveDir;
+    
 
 
     protected virtual void Start()
@@ -520,9 +522,14 @@ public class Tank_Offline : MonoBehaviour
 
     public void OnDestroy()
     {
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
+
         BushGroup[] bushes = FindObjectsByType<BushGroup>(FindObjectsSortMode.None);
         foreach (BushGroup bush in bushes) {
             bush.SetSolidForGroup();
         }
+
+        // play death vfx
+        Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
     }
 }

@@ -103,6 +103,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5711717282606037894, guid: 479d9ed58408bbfbfa8fcca6367a07c8, type: 3}
   nbBulletShot: 0
   MaxBulletShot: 5
+  deathVfxPrefab: {fileID: 8848342378526296911, guid: d5f143a7f056f985bb6b6f24ecdbabc7, type: 3}
   move: {fileID: -8431542246685893986, guid: 15deeca9db2e5604daeb45641a87d71b, type: 3}
 --- !u!114 &2292346337789267609
 MonoBehaviour:

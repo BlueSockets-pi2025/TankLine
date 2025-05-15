@@ -33,6 +33,9 @@ public class Bullet : NetworkBehaviour {
     [HideInInspector]
     public GameObject tankOwner = null;
 
+    /// <summary>The explosion alambic prefab</summary>
+    public GameObject bulletExplosionVfxPrefab;
+
     /// <summary> The smoothness of the correction applied to the bullet position to match with the server 
     // (0 means no smoothness, almost teleport to right location, and 1 means high smoothness, almost no correction)</summary>
     [Range(0f, 1f)]
@@ -170,6 +173,11 @@ public class Bullet : NetworkBehaviour {
             Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
             playerOwner.DecreaseNbBulletShot();
         }
+
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
+
+        // play death vfx
+        Instantiate(bulletExplosionVfxPrefab, transform.position, Quaternion.identity);
     }
 
     public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer) {
