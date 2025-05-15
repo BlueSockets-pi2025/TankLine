@@ -10,13 +10,16 @@ public class BreakableObject : NetworkBehaviour
     public int nbStartingLife = 3;
 
     public Mesh[] meshes;
+    public Color[] colors;
     private MeshFilter activeMesh;
+    private MeshRenderer meshRenderer;
     private Rigidbody rb;
 
     private void Awake()
     {
         activeMesh = GetComponent<MeshFilter>();
-        if (activeMesh == null)
+        meshRenderer = GetComponent<MeshRenderer>();
+        if (activeMesh == null || meshRenderer == null)
         {
             Debug.LogError("Renderer not found on " + gameObject.name);
         }
@@ -57,9 +60,8 @@ public class BreakableObject : NetworkBehaviour
     {
         if (newHealth > 0 && newHealth <= meshes.Length)
         {
-            // objRenderer.material.mainTexture = textures[newHealth - 1]; // Change the texture
-            activeMesh.mesh = meshes[newHealth - 1]; // Change the material
-
+            activeMesh.mesh = meshes[newHealth - 1]; // Change the mesh
+            meshRenderer.material.color = colors[newHealth - 1]; // Change the material color
         }
     }
 

@@ -159,9 +159,13 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 6295259926097432813}
   nbStartingLife: 3
   meshes:
-  - {fileID: 1307502118332443084, guid: bf07e63067be468b283d610c079cbc06, type: 3}
-  - {fileID: -2751532895155448342, guid: d54461da6831c1622a8436b279a5b1b2, type: 3}
-  - {fileID: -2751532895155448342, guid: 51604038ab31c1b6a8d7c9ee63fd18e0, type: 3}
+  - {fileID: 2881047743226252486, guid: bf07e63067be468b283d610c079cbc06, type: 3}
+  - {fileID: -2373395595794821815, guid: d54461da6831c1622a8436b279a5b1b2, type: 3}
+  - {fileID: 598330859269960731, guid: 51604038ab31c1b6a8d7c9ee63fd18e0, type: 3}
+  colors:
+  - {r: 0.44313726, g: 0.03137255, b: 0.011764706, a: 1}
+  - {r: 0.42352942, g: 0.1882353, b: 0.003921569, a: 1}
+  - {r: 0.47843137, g: 0.3019608, b: 0, a: 1}
 --- !u!114 &6295259926097432813
 MonoBehaviour:
   m_ObjectHideFlags: 0
