@@ -87,7 +87,7 @@ public class InGameUiManager
     public void ExitToMenu()
     {
         // Disconnect, then return to menu
-        MonoBehaviour.FindAnyObjectByType<LobbyManager>().DisconnectClient(MonoBehaviour.FindAnyObjectByType<NetworkObject>().ClientManager.Connection);
+        MonoBehaviour.FindAnyObjectByType<LobbyManager>().DisconnectClient(MonoBehaviour.FindAnyObjectByType<LobbyManager>().ClientManager.Connection);
         MonoBehaviour.Destroy(MonoBehaviour.FindFirstObjectByType<NetworkManager>().gameObject);
         UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
