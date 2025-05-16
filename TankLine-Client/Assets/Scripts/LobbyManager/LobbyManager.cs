@@ -490,7 +490,14 @@ public class LobbyManager : NetworkBehaviour
                 GameObject go = player.GameObject();
                 Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
-                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+                Material[] mat = go.transform.Find("base").GetComponent<Renderer>().materials;
+                mat[4] = skinColor;
+                mat[5] = skinColor;
+                go.transform.Find("base").GetComponent<Renderer>().SetMaterials(mat.ToList());
+                mat = go.transform.Find("tankGun").GetComponent<Renderer>().materials;
+                mat[0] = skinColor;
+                mat[1] = skinColor;
+                go.transform.Find("tankGun").GetComponent<Renderer>().SetMaterials(mat.ToList());
             }
         }
 
@@ -501,7 +508,14 @@ public class LobbyManager : NetworkBehaviour
                 GameObject go = player.GameObject();
                 Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
-                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+                Material[] mat = go.transform.Find("base").GetComponent<Renderer>().materials;
+                mat[4] = skinColor;
+                mat[5] = skinColor;
+                go.transform.Find("base").GetComponent<Renderer>().SetMaterials(mat.ToList());
+                mat = go.transform.Find("tankGun").GetComponent<Renderer>().materials;
+                mat[0] = skinColor;
+                mat[1] = skinColor;
+                go.transform.Find("tankGun").GetComponent<Renderer>().SetMaterials(mat.ToList());
             }
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -25,6 +26,9 @@ public class Bullet_Offline : MonoBehaviour
     /// <summary> The tank that shot this bullet </summary>
     [HideInInspector]
     public GameObject tankOwner = null;
+
+    /// <summary>The explosion alambic prefab</summary>
+    public GameObject bulletExplosionVfxPrefab;
 
     /// <summary> The smoothness of the correction applied to the bullet position to match with the server 
     // (0 means no smoothness, almost teleport to right location, and 1 means high smoothness, almost no correction)</summary>
@@ -150,5 +154,10 @@ public class Bullet_Offline : MonoBehaviour
             Tank_Offline playerOwner = tankOwner.GetComponent<Tank_Offline>();
             playerOwner.DecreaseNbBulletShot();
         }
+
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
+
+        // play death vfx
+        Instantiate(bulletExplosionVfxPrefab, transform.position, Quaternion.identity);
     }
 }

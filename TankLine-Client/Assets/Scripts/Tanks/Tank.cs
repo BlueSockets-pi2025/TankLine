@@ -46,7 +46,7 @@ public class Tank : NetworkBehaviour {
 
         // Tank gun rotation
         degreeRotation = gunRotation * Mathf.Rad2Deg; // transform radians to degrees
-        thisGun.rotation = Quaternion.Euler(0, degreeRotation, 0);
+        thisGun.rotation = Quaternion.Euler(-90, degreeRotation, 0);
     }
 
 
