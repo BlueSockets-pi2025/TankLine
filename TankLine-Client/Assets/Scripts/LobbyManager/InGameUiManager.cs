@@ -15,6 +15,9 @@ public class InGameUiManager
     private readonly GameObject gameOverPanel;
     private readonly GameObject skinGrid;
     private readonly GameObject playerListDivWrap;
+    private readonly GameObject lifePanel;
+    private readonly GameObject bulletPanel;
+    
     private bool isSettingsPanelOpen = false;
     private bool isSkinPanelOpen = false;
     private bool isInGame;
@@ -59,6 +62,8 @@ public class InGameUiManager
         {
             respawnCountDown = canvas.transform.Find("RespawnCountdown").gameObject;
             gameOverPanel = canvas.transform.Find("GameOverPanel").gameObject;
+            lifePanel = canvas.transform.Find("PlayerLife").gameObject;
+            bulletPanel = canvas.transform.Find("PlayerBullet").gameObject;
 
             ResetGameOverPanel();
 
@@ -152,6 +157,34 @@ public class InGameUiManager
         }
 
         respawnCountDown.SetActive(false);
+    }
+
+    public void SetLifeUI(int newlife)
+    {
+        // If there is less life than before
+        for (int i = 3; i > newlife; i--)
+        {
+            lifePanel.transform.Find($"heart_{i}").gameObject.SetActive(false);
+        }
+        // If there is more life than before
+        for (int i = 1; i <= newlife; i++)
+        {
+            lifePanel.transform.Find($"heart_{i}").gameObject.SetActive(true);
+        }
+    }
+
+    public void SetBulletUI(int newShotbullet, int bulletmax)
+    {
+        // If there is less bullet than before
+        for (int i = bulletmax; i > (bulletmax - newShotbullet); i--)
+        {
+            bulletPanel.transform.Find($"bullet_{i}").gameObject.SetActive(false);
+        }
+        // If there is more bullet than before
+        for (int i = 1; i <= (bulletmax-newShotbullet); i++)
+        {
+            bulletPanel.transform.Find($"bullet_{i}").gameObject.SetActive(true);
+        }
     }
 
     public void ShowDefeatPanel()

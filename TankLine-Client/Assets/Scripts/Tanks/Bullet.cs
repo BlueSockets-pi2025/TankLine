@@ -167,9 +167,11 @@ public class Bullet : NetworkBehaviour {
     /// Function called by unity before destroying the object. <br/>
     /// Used to decrease the number of shot fired by the tank owner when a bullet dies.
     /// </summary>
-    public void OnDestroy() {
+    public void OnDestroy()
+    {
         // decrease the nb of bullet shot from the tank that shot this bullet
-        if (tankOwner != null) {
+        if (tankOwner != null)
+        {
             Tank_Player playerOwner = tankOwner.GetComponent<Tank_Player>();
             playerOwner.DecreaseNbBulletShot();
         }
