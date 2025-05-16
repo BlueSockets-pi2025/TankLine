@@ -1,5 +1,6 @@
 using System;
 using FishNet.Object;
+using FishNet.Connection;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,14 +30,16 @@ public class Tank_Player : Tank
     public InputActionReference move;
     Vector3 MoveDir;
 
+    private InGameUiManager uiManager;
+
     protected override void Start()
     {
         // set thisTank to the GameObject this script is attached to
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
-
-
+        // get the canvas
+        uiManager = new(GameObject.Find("Canvas"), true);
     }
 
     /// <summary>
@@ -80,6 +83,12 @@ public class Tank_Player : Tank
         {
             if (this.CanShoot())
             {
+                if (nbBulletShot < MaxBulletShot)
+                {
+                    nbBulletShot++;
+                    uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+                }
+
                 this.Shoot(gunRotation);
             }
             else
@@ -405,7 +414,19 @@ public class Tank_Player : Tank
     public void DecreaseNbBulletShot()
     {
         nbBulletShot--;
+
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
+
+        DecreaseNbBulletShotUI(base.Owner,nbBulletShot);
     }
+
+    [TargetRpc]
+    public void DecreaseNbBulletShotUI(NetworkConnection connection, int current)
+    {
+        nbBulletShot = current;
+        uiManager.SetBulletUI(current, MaxBulletShot);
+    }
+    
 
     public void OnDestroy()
     {
