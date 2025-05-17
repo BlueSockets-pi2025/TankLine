@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
         UpdateGameState(GameState.Connection);
         Debug.Log("Start GameManager");
 
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        // Screen.orientation = ScreenOrientation.LandscapeLeft;
 #if UNITY_ANDROID
 		Screen.SetResolution(1280, 720, true);
 		Application.targetFrameRate = 60;

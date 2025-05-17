@@ -5,18 +5,9 @@ public class MoveJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPoi
 {
     private Vector2 inputVector;
     public RectTransform handle;
-    private Tank_Offline tank;
-    // protected Transform tank;
-
-    private void Start()
-    {
-        tank = FindObjectOfType<Tank_Offline>();
-        // tank = gameObject.transform;
-    }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (tank == null) return;
         Vector2 pos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             GetComponent<RectTransform>(),
@@ -31,13 +22,11 @@ public class MoveJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPoi
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (tank == null) return;
         OnDrag(eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (tank == null) return;
         inputVector = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
     }

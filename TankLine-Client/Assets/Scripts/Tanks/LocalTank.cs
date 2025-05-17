@@ -588,8 +588,10 @@ public class Tank_Offline : MonoBehaviour
             bush.SetSolidForGroup();
         }
 
+#if UNITY_STANDALONE
         // play death vfx
         Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
+#endif
     }
 
     public string GetCurrentSceneName()

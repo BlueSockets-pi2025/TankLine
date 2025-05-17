@@ -24,12 +24,14 @@ public class Tank_Lobby : Tank
         GameObject canvas = GameObject.Find("Canvas");
         GameObject controls = canvas.transform.Find("Controls").gameObject;
         joystick = controls.transform.Find("ImgMove").GetComponent<MoveJoystick>();
+        shootJoystick = controls.transform.Find("ButtonShot").GetComponent<ShootJoystick>();
 
 #if UNITY_STANDALONE
         controls.SetActive(false);
 #endif
 #if UNITY_ANDROID
         controls.SetActive(true);
+        shootJoystick.player = gameObject;
 #endif
 
 
@@ -47,7 +49,7 @@ public class Tank_Lobby : Tank
         this.ApplyRotation();
 #endif
 #if UNITY_ANDROID
-        // this.GunTrackJoystick(shootJoystick.GetInput()); 
+        this.GunTrackJoystick(shootJoystick.GetInput()); 
         this.ApplyRotation();
 #endif
 
@@ -220,6 +222,19 @@ public class Tank_Lobby : Tank
 
         // rotate this tank gun to face the mouse
         this.SetRotationGun(gunRotation + math.PI / 2);
+    }
+
+    //for android Joystick
+    protected void GunTrackJoystick(Vector2 joystickInput)
+    {
+        if (joystickInput.magnitude < 0.2f)
+            return; // Ignore les petits mouvements
+
+        // Convertit l’entrée joystick en angle
+        float gunRotation = Mathf.Atan2(-joystickInput.y, joystickInput.x);
+
+        // Applique la rotation au canon
+        this.SetRotationGun(gunRotation + Mathf.PI / 2);
     }
 
     /// <summary>

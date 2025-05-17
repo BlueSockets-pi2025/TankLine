@@ -45,7 +45,7 @@ public class Tank_Player : Tank
 
         //Mobile controls
         GameObject canvas = GameObject.Find("Canvas");
-        GameObject controls = canvas.transform.Find("Controls")?.gameObject;
+        GameObject controls = canvas.transform.Find("Controls").gameObject;
         joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
         if (joystick == null)
         {
@@ -63,7 +63,7 @@ public class Tank_Player : Tank
 #endif
 #if UNITY_ANDROID
         controls.SetActive(true);
-        Debug.Log("Tank_player, android, controls true");
+        shootJoystick.player = gameObject;
 #endif
 
 
@@ -130,6 +130,24 @@ public class Tank_Player : Tank
             {
                 Debug.Log("Prevent self-shoot. TODO : animation");
             }
+        }
+    }
+
+    public void OnShootButtonClick()
+    {
+        if (this.CanShoot())
+        {
+            if (nbBulletShot < MaxBulletShot)
+            {
+                nbBulletShot++;
+                uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+            }
+
+            this.Shoot(gunRotation);
+        }
+        else
+        {
+            // Debug.Log("Prevent self-shoot. TODO : animation");
         }
     }
 
@@ -501,8 +519,10 @@ public class Tank_Player : Tank
             bush.SetSolidForGroup();
         }
 
+#if UNITY_STANDALONE
         // play death vfx
         Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
+#endif
     }
     public string GetCurrentSceneName()
     {

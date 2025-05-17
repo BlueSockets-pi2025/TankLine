@@ -5,7 +5,8 @@ using UnityEngine;
 using Unity.VisualScripting;
 using System;
 
-public class Bullet : NetworkBehaviour {
+public class Bullet : NetworkBehaviour
+{
 
     const string BREAKABLE_TAG = "BreakableWall";
     const int WALL_LAYER = 3;
@@ -22,11 +23,11 @@ public class Bullet : NetworkBehaviour {
 
 
     /// <summary> Number of rebound left to make </summary>
-    [Range(0,100)]
+    [Range(0, 100)]
     public int nbRebounds = 1;
 
     /// <summary> This bullet speed movement (READONLY) </summary>
-    [Range(1,10)]
+    [Range(1, 10)]
     public float bulletSpeed = 6;
 
     /// <summary> The tank that shot this bullet </summary>
@@ -51,9 +52,10 @@ public class Bullet : NetworkBehaviour {
     /// <summary> The server bullet position simulated from the last informations received </summary>
     protected Vector3 virtualServerPosition;
 
-    void Awake() {
+    void Awake()
+    {
         // instanciate variables
-        direction.Value = new Vector3(0,0,0);
+        direction.Value = new Vector3(0, 0, 0);
         thisBullet = gameObject;
         meshTransform = thisBullet.transform.Find("shell");
 
@@ -65,17 +67,23 @@ public class Bullet : NetworkBehaviour {
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
-    void FixedUpdate() {
+    void FixedUpdate()
+    {
         // every 20 frames (1/3 seconds) send the server bullet position for correction
-        if (base.IsServerInitialized && Time.frameCount % 20 == 0) {
+        if (base.IsServerInitialized && Time.frameCount % 20 == 0)
+        {
             serverPosition.Value = thisBullet.transform.position;
-        } 
+        }
         // else, correct this bullet instance position
-        else {
+        else
+        {
             // if the difference is smaller than the correction, apply the difference
-            if ((thisBullet.transform.position - virtualServerPosition).magnitude <= correctionWithServer.magnitude) {
+            if ((thisBullet.transform.position - virtualServerPosition).magnitude <= correctionWithServer.magnitude)
+            {
                 thisBullet.transform.position = virtualServerPosition;
-            } else {
+            }
+            else
+            {
                 thisBullet.transform.Translate(correctionWithServer);
             }
         }
@@ -88,27 +96,32 @@ public class Bullet : NetworkBehaviour {
     /// Automatically called by unity when this object rigidbody is in a collision with another object
     /// </summary>
 
-    void OnCollisionEnter(Collision collision) {
+    void OnCollisionEnter(Collision collision)
+    {
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
 
         /* 
             ############################## WALL COLLISIONS ############################## 
         */
-        if (collision.gameObject.layer == WALL_LAYER) {
+        if (collision.gameObject.layer == WALL_LAYER)
+        {
 
             // if breakable wall
-            if (collision.gameObject.CompareTag(BREAKABLE_TAG)) {
+            if (collision.gameObject.CompareTag(BREAKABLE_TAG))
+            {
                 BreakableObject wall = collision.gameObject.GetComponent<BreakableObject>();
 
                 wall.TakeDamage();
                 Despawn(thisBullet);
-            } 
-            
+            }
+
             // if static wall
-            else {
+            else
+            {
 
                 // if all bounces have been made, delete
-                if (nbRebounds <= 0) {
+                if (nbRebounds <= 0)
+                {
                     Despawn(thisBullet);
                     return;
                 }
@@ -120,16 +133,19 @@ public class Bullet : NetworkBehaviour {
 
                 // get the contact point direction
                 // right-left direction
-                if (math.abs(relativeCollision.x) > 0.0001f) {
+                if (math.abs(relativeCollision.x) > 0.0001f)
+                {
                     direction.Value = new Vector3(-direction.Value.x, 0, direction.Value.z);
                 }
 
                 // up-down direction
-                else if (math.abs(relativeCollision.z) > 0.0001f) {
+                else if (math.abs(relativeCollision.z) > 0.0001f)
+                {
                     direction.Value = new Vector3(direction.Value.x, 0, -direction.Value.z);
                 }
 
-                else {
+                else
+                {
                     Debug.LogError("Collision detected but not direction.");
                 }
             }
@@ -138,8 +154,9 @@ public class Bullet : NetworkBehaviour {
         /* 
             ############################## PLAYER COLLISIONS ############################## 
         */
-        else if (collision.gameObject.layer == PLAYER_LAYER) {
-            
+        else if (collision.gameObject.layer == PLAYER_LAYER)
+        {
+
             Tank_Player hitTank = collision.gameObject.GetComponent<Tank_Player>();
 
             FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner);
@@ -152,13 +169,15 @@ public class Bullet : NetworkBehaviour {
         /* 
             ############################## SHELL COLLISIONS ############################## 
         */
-        else if (collision.gameObject.layer == SHELL_LAYER) {
+        else if (collision.gameObject.layer == SHELL_LAYER)
+        {
             Despawn(collision.gameObject);
             Despawn(thisBullet);
             return;
         }
 
-        else {
+        else
+        {
             Debug.Log($"[WARNING] Bullet collided with non identified object at {transform.position}");
         }
     }
@@ -177,26 +196,32 @@ public class Bullet : NetworkBehaviour {
         }
 
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
-
+#if UNITY_STANDALONE
         // play death vfx
         Instantiate(bulletExplosionVfxPrefab, transform.position, Quaternion.identity);
+#endif
     }
 
-    public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer) {
+    public void OnDirectionChange(Vector3 oldDir, Vector3 newDir, bool asServer)
+    {
         // update the bullet rotation
         meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.Value.z, direction.Value.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
 
-    public void OnServerPositionChange(Vector3 oldPos, Vector3 newPos, bool asServer) {
+    public void OnServerPositionChange(Vector3 oldPos, Vector3 newPos, bool asServer)
+    {
         if (asServer) return;
 
         virtualServerPosition = newPos;
 
         // if distances is too high, teleport 
-        if (Vector3.Distance(newPos, thisBullet.transform.position) > THRESHOLD_CORRECTION_DISTANCE) {
+        if (Vector3.Distance(newPos, thisBullet.transform.position) > THRESHOLD_CORRECTION_DISTANCE)
+        {
             thisBullet.transform.position = newPos;
-            correctionWithServer = new Vector3(0,0,0);
-        } else {
+            correctionWithServer = new Vector3(0, 0, 0);
+        }
+        else
+        {
             correctionWithServer = newPos - thisBullet.transform.position;
             correctionWithServer *= 1f - correctionSmoothness;
         }
