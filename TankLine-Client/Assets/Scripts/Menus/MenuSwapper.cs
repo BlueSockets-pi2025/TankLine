@@ -66,7 +66,7 @@ public class MenuSwapper : MonoBehaviour
         }
 
         Debug.Log("AuthController initialization complete.");
-        
+
         // Load first page: 
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))
@@ -102,6 +102,16 @@ public class MenuSwapper : MonoBehaviour
         {
             OpenPage("MainMenu");
             //AutoLogin();
+
+#if UNITY_ANDROID
+        Canvas.transform.Find("OptionsKeyboard").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsGeneral/keyboard").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsMouse/keyboard").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsMouse").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsGeneral/mouse").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsKeyboard/mouse").gameObject.SetActive(false);
+#endif
+
         }
     }
 

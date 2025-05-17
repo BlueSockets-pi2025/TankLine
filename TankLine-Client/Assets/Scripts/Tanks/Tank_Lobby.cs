@@ -22,8 +22,8 @@ public class Tank_Lobby : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
         GameObject canvas = GameObject.Find("Canvas");
-        GameObject controls = canvas.transform.Find("Controls")?.gameObject;
-        joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
+        GameObject controls = canvas.transform.Find("Controls").gameObject;
+        joystick = controls.transform.Find("ImgMove").GetComponent<MoveJoystick>();
 
 #if UNITY_STANDALONE
         controls.SetActive(false);

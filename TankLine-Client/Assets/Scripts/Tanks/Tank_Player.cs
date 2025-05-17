@@ -63,6 +63,7 @@ public class Tank_Player : Tank
 #endif
 #if UNITY_ANDROID
         controls.SetActive(true);
+        Debug.Log("Tank_player, android, controls true");
 #endif
 
 

@@ -17,7 +17,7 @@ public class InGameUiManager
     private readonly GameObject playerListDivWrap;
     private readonly GameObject lifePanel;
     private readonly GameObject bulletPanel;
-    
+
     private bool isSettingsPanelOpen = false;
     private bool isSkinPanelOpen = false;
     private bool isInGame;
@@ -41,9 +41,12 @@ public class InGameUiManager
         canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
 
 #if UNITY_ANDROID
-        canvas.transform.Find("OptionKeyboard").gameObject.SetActive(false);
-        canvas.transform.Find("OptionGeneral/Keyboard")?.gameObject.SetActive(false);
-        canvas.transform.Find("OptionMouse/Keyboard")?.gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionKeyboard").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionGeneral/keyboard").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionMouse/keyboard").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionMouse").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionGeneral/mouse").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionKeyboard/mouse").gameObject.SetActive(false);
 #endif
 
         // waiting room ui
@@ -187,7 +190,7 @@ public class InGameUiManager
             bulletPanel.transform.Find($"bullet_{i}").gameObject.SetActive(false);
         }
         // If there is more bullet than before
-        for (int i = 1; i <= (bulletmax-newShotbullet); i++)
+        for (int i = 1; i <= (bulletmax - newShotbullet); i++)
         {
             bulletPanel.transform.Find($"bullet_{i}").gameObject.SetActive(true);
         }
