@@ -57,15 +57,21 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
         if (!isDragging)
         {
             FindObjectOfType<Tank_Offline>().OnShootButtonClick();
-            //de Tank_player
-            // if (FindObjectOfType<Tank_Player>().CanShoot())
-            // {
-            //     FindObjectOfType<Tank_Player>().Shoot();
-            // }
-            // else
-            // {
-            //     Debug.Log("Prevent self-shoot. TODO : animation");
-            // }
+            
+            // Notify tutorial if active
+            var tutorial = FindObjectOfType<TankTutorial>();
+            if (tutorial != null)
+            {
+                tutorial.NotifyShotFired();
+            }
+                // if (FindObjectOfType<Tank_Player>().CanShoot())
+                // {
+                //     FindObjectOfType<Tank_Player>().Shoot();
+                // }
+                // else
+                // {
+                //     Debug.Log("Prevent self-shoot. TODO : animation");
+                // }
         }
     }
 }
