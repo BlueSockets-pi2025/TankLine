@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using Scripts.Tutoriel;
 
 
 public class Tank_Offline : MonoBehaviour
@@ -105,6 +106,11 @@ public class Tank_Offline : MonoBehaviour
 
         // shootButton.onClick.AddListener(OnShootButtonClick);
 #endif
+        if (GetCurrentSceneName() == "Tuto")
+        {
+            var tutorial = FindObjectOfType<TankTutorial>();
+            if (!tutorial.IsInShootingStep) return;
+        }
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
@@ -564,5 +570,10 @@ public class Tank_Offline : MonoBehaviour
     public void DecreaseNbBulletShot()
     {
         nbBulletShot--;
+    }
+    public string GetCurrentSceneName()
+    {
+        string haja= Application.loadedLevelName;
+        return haja;
     }
 }

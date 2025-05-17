@@ -51,4 +51,9 @@ public class MoveJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPoi
     {
         return inputVector.y;
     }
+    public Vector2 GetInputVector()
+    {
+        return inputVector;
+    }
+
 }

@@ -47,8 +47,7 @@ public class Bullet_Offline : MonoBehaviour
     /// <summary>
     /// Automatically called by unity every frame before the physic engine
     /// </summary>
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
         thisBullet.transform.Translate(bulletSpeed * Time.deltaTime * direction);
         meshTransform.rotation = Quaternion.Euler(0, (math.atan2(-direction.z, direction.x) + math.PI / 2) * Mathf.Rad2Deg, 9.648f);
     }
@@ -116,15 +115,15 @@ public class Bullet_Offline : MonoBehaviour
         */
         else if (collision.gameObject.layer == PLAYER_LAYER)
         {
-            Tank_Offline hitTank = collision.gameObject.GetComponent<Tank_Offline>();
-
-            if (hitTank != null)
+            //Tank_Offline hitTank = collision.gameObject.GetComponent<Tank_Offline>();
+            Tank_Bot hitTank = collision.gameObject.GetComponent<Tank_Bot>();
+             if (hitTank != null)
             {
-                hitTank.LoseSingleLife(); // the tank hit by the bullet lose a life
+                hitTank.LoseSingleLife();
             }
 
             Destroy(thisBullet);
-
+            
             return;
         }
 
@@ -149,7 +148,8 @@ public class Bullet_Offline : MonoBehaviour
         if (tankOwner != null)
         {
             Tank_Offline playerOwner = tankOwner.GetComponent<Tank_Offline>();
-            playerOwner.DecreaseNbBulletShot();
+            if (playerOwner != null)
+                playerOwner.DecreaseNbBulletShot();
         }
     }
 }

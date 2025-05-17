@@ -1,6 +1,7 @@
 using FishNet.Object;
 using Unity.Mathematics;
 using UnityEngine;
+using Scripts.Tutoriel;
 using UnityEngine.InputSystem;
 
 public class Tank_Player : Tank
@@ -49,7 +50,7 @@ public class Tank_Player : Tank
         {
             Debug.LogError("[Tank_Player] shootJoystick is null in Start.");
         }
-        
+
 #if UNITY_STANDALONE
         controls.SetActive(false);
 #endif
@@ -82,6 +83,11 @@ public class Tank_Player : Tank
             Debug.LogError("[Tank_Player] shootJoystick is null in Update.");
         }
 #endif
+     if(GetCurrentSceneName()=="Tuto")
+        {
+            var tutorial = FindObjectOfType<TankTutorial>();
+            if(!tutorial.IsInShootingStep) return;
+        }
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
@@ -449,5 +455,10 @@ public class Tank_Player : Tank
     public void DecreaseNbBulletShot()
     {
         nbBulletShot--;
+    }
+    public string GetCurrentSceneName()
+    {
+        string haja= Application.loadedLevelName;
+        return haja;
     }
 }
