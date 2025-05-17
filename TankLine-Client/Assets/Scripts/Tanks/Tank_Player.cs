@@ -45,7 +45,11 @@ public class Tank_Player : Tank
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
         activeIndicator();
-
+    }
+    
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
         playerInput = GetComponent<PlayerInput>();
         activeInput();
     }
@@ -91,6 +95,11 @@ public class Tank_Player : Tank
         if (!base.IsOwner)
         {
             playerInput.enabled = false;
+        }
+        else
+        {
+            playerInput.enabled = true;
+            playerInput.ActivateInput();
         }
     }
 

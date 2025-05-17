@@ -11,6 +11,7 @@ public class Tank_Lobby : Tank
 
     public InputActionReference move;
     Vector3 MoveDir;
+    private PlayerInput playerInput;
 
     protected override void Start()
     {
@@ -19,7 +20,26 @@ public class Tank_Lobby : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
 
+    }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        playerInput = GetComponent<PlayerInput>();
+        activeInput();
+    }
+
+    public void activeInput()
+    {
+        if (!base.IsOwner)
+        {
+            playerInput.enabled = false;
+        }
+        else
+        {
+            playerInput.enabled = true;
+            playerInput.ActivateInput();
+        }
     }
 
     /// <summary>
