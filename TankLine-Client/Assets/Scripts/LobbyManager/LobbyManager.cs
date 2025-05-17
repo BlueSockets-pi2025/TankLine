@@ -433,6 +433,11 @@ public class LobbyManager : NetworkBehaviour
     }
 
     [TargetRpc]
+    private void SetLife(NetworkConnection conn, int newlife) {
+        uiManager.SetLifeUI(newlife);
+    }
+
+    [TargetRpc]
     private void ShowDefeatPanel(NetworkConnection conn) {
         uiManager.ShowDefeatPanel();
     }
@@ -496,7 +501,14 @@ public class LobbyManager : NetworkBehaviour
                 GameObject go = player.GameObject();
                 Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
-                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+                Material[] mat = go.transform.Find("base").GetComponent<Renderer>().materials;
+                mat[4] = skinColor;
+                mat[5] = skinColor;
+                go.transform.Find("base").GetComponent<Renderer>().SetMaterials(mat.ToList());
+                mat = go.transform.Find("tankGun").GetComponent<Renderer>().materials;
+                mat[0] = skinColor;
+                mat[1] = skinColor;
+                go.transform.Find("tankGun").GetComponent<Renderer>().SetMaterials(mat.ToList());
             }
         }
 
@@ -507,7 +519,14 @@ public class LobbyManager : NetworkBehaviour
                 GameObject go = player.GameObject();
                 Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
-                go.transform.Find("base").GetComponent<Renderer>().material = skinColor;
+                Material[] mat = go.transform.Find("base").GetComponent<Renderer>().materials;
+                mat[4] = skinColor;
+                mat[5] = skinColor;
+                go.transform.Find("base").GetComponent<Renderer>().SetMaterials(mat.ToList());
+                mat = go.transform.Find("tankGun").GetComponent<Renderer>().materials;
+                mat[0] = skinColor;
+                mat[1] = skinColor;
+                go.transform.Find("tankGun").GetComponent<Renderer>().SetMaterials(mat.ToList());
             }
         }
     }
@@ -549,27 +568,34 @@ public class LobbyManager : NetworkBehaviour
 
             // despawn player
             playerSpawner.DespawnPlayer(serverPlayerList[connection].name);
-
+            // set UI player life 
+            SetLife(connection,serverPlayerList[connection].livesLeft);
+            
             // if life left, respawn after a short duration
-            if (serverPlayerList[connection].livesLeft > 0) {
+            if (serverPlayerList[connection].livesLeft > 0)
+            {
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. {serverPlayerList[connection].livesLeft} lives left, respawning in {respawnCooldown} secondes");
 
                 StartRespawnCountdown(connection); // send the message to the player to update their UI
 
                 StartCoroutine(RespawnCoroutine(connection, serverPlayerList[connection]));
-            } 
+            }
 
             // if no life left, remove from the list alivePlayer
-            else {
+            else
+            {
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. No life left, game over");
                 alivePlayers.Remove(serverPlayerList[connection]);
                 OnPlayerListChange(alivePlayers); // update the list for every players
 
                 // if only one player is alive, end game
-                if (alivePlayers.Count() == 1) {
+                if (alivePlayers.Count() == 1)
+                {
                     Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
                     ShowEndGamePanel(alivePlayers[0].name);
-                } else {
+                }
+                else
+                {
                     ShowDefeatPanel(connection);
                 }
             }

@@ -40,6 +40,7 @@ public class Tank_Offline : MonoBehaviour
     const float MIN_ROTATION_BEFORE_MOVEMENT = math.PI / 2;
 
     protected float movementToMake = 0;
+    public GameObject deathVfxPrefab;
 
 
     /// <summary> The whole tank current angle in radians </summary>
@@ -54,6 +55,7 @@ public class Tank_Offline : MonoBehaviour
     // public Button shootButton;
     public InputActionReference move;
     Vector3 MoveDir;
+
 
 
     protected virtual void Start()
@@ -86,6 +88,10 @@ public class Tank_Offline : MonoBehaviour
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
+
+        // stick the tank to the ground
+        if (transform.position.y > 0.07)
+            transform.position = new(transform.position.x, 0, transform.position.z);
 
         // if left click recorded, try to shoot
         // if (Input.GetMouseButtonDown(LEFT_CLICK))
@@ -125,7 +131,7 @@ public class Tank_Offline : MonoBehaviour
         {
             if (this.CanShoot())
             {
-                this.Shoot();
+                this.Shoot(gunRotation);
             }
             else
             {
@@ -170,7 +176,7 @@ public class Tank_Offline : MonoBehaviour
 
         // Tank gun rotation
         degreeRotation = gunRotation * Mathf.Rad2Deg; // transform radians to degrees
-        thisGun.rotation = Quaternion.Euler(0, degreeRotation, 0);
+        thisGun.rotation = Quaternion.Euler(-90, degreeRotation, 0);
     }
 
 
@@ -487,7 +493,7 @@ public class Tank_Offline : MonoBehaviour
         // if already in this direction, return
         if (math.abs(targetDirection - tankRotation) <= 0.0001f)
         {
-            return math.max(math.abs(x), math.abs(y)) * isBackward;
+            return isBackward;
         }
 
         // apply rotation
@@ -514,11 +520,11 @@ public class Tank_Offline : MonoBehaviour
             // else, set the movement force proportionally inverse to the difference between the target angle and the current angle
             if (math.abs(targetDirection - tankRotation) < 0.0001f)
             { // avoid division by 0
-                return math.max(math.abs(x), math.abs(y)) * isBackward;
+                return isBackward;
             }
             else
             {
-                return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * math.max(math.abs(x), math.abs(y)) * isBackward;
+                return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * isBackward;
             }
         }
     }
@@ -545,7 +551,7 @@ public class Tank_Offline : MonoBehaviour
         }
     }
 
-    protected void Shoot()
+    protected void Shoot(float clientGunRotation)
     {
         if (nbBulletShot < MaxBulletShot)
         {
@@ -553,11 +559,10 @@ public class Tank_Offline : MonoBehaviour
             Vector3 pos = new Vector3(thisGun.position.x, 0.5f, thisGun.position.z);
 
             // compute new bullet direction
-            float rotation = thisGun.rotation.eulerAngles.y * Mathf.Deg2Rad;
-            Vector3 dir = new Vector3(math.cos(rotation - math.PI / 2), 0, -math.sin(rotation - math.PI / 2));
+            Vector3 dir = new Vector3(math.cos(clientGunRotation - math.PI / 2), 0, -math.sin(clientGunRotation - math.PI / 2));
 
             // spawn object
-            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 0.9f * dir, Quaternion.identity);
+            GameObject newBulletObject = Instantiate(bulletPrefab, pos + 1.0f * dir, Quaternion.identity);
 
             // change direction and tankOwner (for bullet count)
             Bullet_Offline newBullet = newBulletObject.GetComponent<Bullet_Offline>();
@@ -571,9 +576,18 @@ public class Tank_Offline : MonoBehaviour
     {
         nbBulletShot--;
     }
-    public string GetCurrentSceneName()
+
+    public void OnDestroy()
     {
-        string haja= Application.loadedLevelName;
-        return haja;
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
+
+        BushGroup[] bushes = FindObjectsByType<BushGroup>(FindObjectsSortMode.None);
+        foreach (BushGroup bush in bushes)
+        {
+            bush.SetSolidForGroup();
+        }
+
+        // play death vfx
+        Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
     }
 }

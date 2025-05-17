@@ -50,6 +50,10 @@ public class Tank_Lobby : Tank
         // this.GunTrackJoystick(shootJoystick.GetInput()); 
         this.ApplyRotation();
 #endif
+
+        // stick the tank to the ground
+        if (transform.position.y > 0.07)
+            transform.position = new(transform.position.x, 0, transform.position.z);
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
@@ -291,7 +295,7 @@ public class Tank_Lobby : Tank
         // if already in this direction, return
         if (math.abs(targetDirection - tankRotation) <= 0.0001f)
         {
-            return math.max(math.abs(x), math.abs(y)) * isBackward;
+            return isBackward;
         }
 
         // apply rotation
@@ -318,11 +322,11 @@ public class Tank_Lobby : Tank
             // else, set the movement force proportionally inverse to the difference between the target angle and the current angle
             if (math.abs(targetDirection - tankRotation) < 0.0001f)
             { // avoid division by 0
-                return math.max(math.abs(x), math.abs(y)) * isBackward;
+                return isBackward;
             }
             else
             {
-                return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * math.max(math.abs(x), math.abs(y)) * isBackward;
+                return math.clamp(1 - (math.abs(targetDirection - tankRotation) / MIN_ROTATION_BEFORE_MOVEMENT), 0, 1) * isBackward;
             }
         }
     }

@@ -9,14 +9,17 @@ public class BreakableObject : NetworkBehaviour
 
     public int nbStartingLife = 3;
 
-    public Material[] textures; // Texture (public Texture[]) or Material (public Material[]) table to represent the number of lives remaining
-    private Renderer objRenderer;
+    public Mesh[] meshes;
+    public Color[] colors;
+    private MeshFilter activeMesh;
+    private MeshRenderer meshRenderer;
     private Rigidbody rb;
 
     private void Awake()
     {
-        objRenderer = GetComponent<Renderer>();
-        if (objRenderer == null)
+        activeMesh = GetComponent<MeshFilter>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        if (activeMesh == null || meshRenderer == null)
         {
             Debug.LogError("Renderer not found on " + gameObject.name);
         }
@@ -55,11 +58,10 @@ public class BreakableObject : NetworkBehaviour
 
     void UpdateVisualState(int oldHealth, int newHealth, bool asServer)
     {
-        if (newHealth > 0 && newHealth <= textures.Length)
+        if (newHealth > 0 && newHealth <= meshes.Length)
         {
-            // objRenderer.material.mainTexture = textures[newHealth - 1]; // Change the texture
-            objRenderer.material = textures[newHealth - 1]; // Change the material
-
+            activeMesh.mesh = meshes[newHealth - 1]; // Change the mesh
+            meshRenderer.material.color = colors[newHealth - 1]; // Change the material color
         }
     }
 

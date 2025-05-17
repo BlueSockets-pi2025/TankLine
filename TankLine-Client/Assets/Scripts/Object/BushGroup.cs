@@ -21,11 +21,19 @@ public class BushGroup : MonoBehaviour
     }
 
     //Change transparency for the whole group
-    public void SetTransparencyForGroup(float alpha)
+    public void SetTransparentForGroup()
     {
         foreach (BushObject bush in bushes)
         {
-            bush.SetTransparency(alpha);
+            bush.SetTransparent();
+        }
+    }
+
+    public void SetSolidForGroup()
+    {
+        foreach (BushObject bush in bushes)
+        {
+            bush.SetSolid();
         }
     }
 }

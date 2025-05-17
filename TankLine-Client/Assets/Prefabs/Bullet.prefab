@@ -213,7 +213,8 @@ MonoBehaviour:
   nbRebounds: 1
   bulletSpeed: 5
   tankOwner: {fileID: 0}
-  correctionSmoothness: 0.950
+  bulletExplosionVfxPrefab: {fileID: 2151106765254089568, guid: 41c148cc237492f94a777acdbd0ea363, type: 3}
+  correctionSmoothness: 0.95
 --- !u!135 &2219632991942527035
 SphereCollider:
   m_ObjectHideFlags: 0
