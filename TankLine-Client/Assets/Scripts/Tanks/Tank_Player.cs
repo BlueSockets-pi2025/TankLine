@@ -46,12 +46,32 @@ public class Tank_Player : Tank
         indicator = thisTank.Find("indicator").gameObject;
         activeIndicator();
     }
-    
+
     public override void OnStartClient()
     {
         base.OnStartClient();
         playerInput = GetComponent<PlayerInput>();
         activeInput();
+    }
+
+    public void activeIndicator()
+    {
+        if (base.IsOwner)
+        {
+            indicator.SetActive(true);
+        }
+    }
+    public void activeInput()
+    {
+        if (!base.IsOwner)
+        {
+            playerInput.enabled = false;
+        }
+        else
+        {
+            playerInput.enabled = true;
+            playerInput.ActivateInput();
+        }
     }
 
     /// <summary>
@@ -82,27 +102,6 @@ public class Tank_Player : Tank
         //     }
         // }
     }
-
-    public void activeIndicator()
-    {
-        if (base.IsOwner)
-        {
-            indicator.SetActive(true);
-        }
-    }
-    public void activeInput()
-    {
-        if (!base.IsOwner)
-        {
-            playerInput.enabled = false;
-        }
-        else
-        {
-            playerInput.enabled = true;
-            playerInput.ActivateInput();
-        }
-    }
-
 
     public void onMove(InputAction.CallbackContext ctxt)
     {
