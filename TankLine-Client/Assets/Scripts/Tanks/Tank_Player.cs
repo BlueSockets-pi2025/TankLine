@@ -31,6 +31,7 @@ public class Tank_Player : Tank
     Vector3 MoveDir;
 
     private InGameUiManager uiManager;
+    private GameObject indicator;
 
     protected override void Start()
     {
@@ -40,6 +41,9 @@ public class Tank_Player : Tank
         thisGun = thisTank.transform.Find("tankGun");
         // get the canvas
         uiManager = new(GameObject.Find("Canvas"), true);
+        // get the indicator
+        indicator = thisTank.Find("indicator").gameObject;
+        activeIndicator();
     }
 
     /// <summary>
@@ -69,6 +73,14 @@ public class Tank_Player : Tank
         //         Debug.Log("Prevent self-shoot. TODO : animation");
         //     }
         // }
+    }
+
+    public void activeIndicator()
+    {
+        if (base.IsOwner)
+        {
+            indicator.SetActive(true);
+        }
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
