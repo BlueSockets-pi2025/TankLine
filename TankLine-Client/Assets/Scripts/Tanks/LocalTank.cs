@@ -56,6 +56,7 @@ public class Tank_Offline : MonoBehaviour
     public InputActionReference move;
     Vector3 MoveDir;
 
+    private InGameUiManager uiManager;
 
 
     protected virtual void Start()
@@ -64,13 +65,22 @@ public class Tank_Offline : MonoBehaviour
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
+
+        uiManager = new(GameObject.Find("Canvas"), true);
+
     }
 
     public void OnShootButtonClick()
     {
         if (this.CanShoot())
         {
-            this.Shoot();
+            if (nbBulletShot < MaxBulletShot)
+            {
+                nbBulletShot++;
+                uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+            }
+
+            this.Shoot(gunRotation);
         }
         else
         {
@@ -88,23 +98,6 @@ public class Tank_Offline : MonoBehaviour
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
-
-        // stick the tank to the ground
-        if (transform.position.y > 0.07)
-            transform.position = new(transform.position.x, 0, transform.position.z);
-
-        // if left click recorded, try to shoot
-        // if (Input.GetMouseButtonDown(LEFT_CLICK))
-        // {
-        //     if (this.CanShoot())
-        //     {
-        //         this.Shoot();
-        //     }
-        //     else
-        //     {
-        //         Debug.Log("Prevent self-shoot. TODO : animation");
-        //     }
-        // }
 #endif
 #if UNITY_ANDROID
         this.GunTrackJoystick(shootJoystick.GetInput()); 
@@ -117,6 +110,11 @@ public class Tank_Offline : MonoBehaviour
             var tutorial = FindObjectOfType<TankTutorial>();
             if (!tutorial.IsInShootingStep) return;
         }
+
+        // stick the tank to the ground
+        if (transform.position.y > 0.07)
+            transform.position = new(transform.position.x, 0, transform.position.z);
+
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
@@ -131,6 +129,11 @@ public class Tank_Offline : MonoBehaviour
         {
             if (this.CanShoot())
             {
+                if (nbBulletShot < MaxBulletShot)
+                {
+                    nbBulletShot++;
+                    uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+                }
                 this.Shoot(gunRotation);
             }
             else
@@ -150,8 +153,6 @@ public class Tank_Offline : MonoBehaviour
         // process rotation input
         float y = MoveDir.y;
         float x = MoveDir.x;
-        // float y = Input.GetAxis("Vertical");
-        // float x = Input.GetAxis("Horizontal");
         movementToMake = this.FaceDirection(x, y);
         Debug.Log("UNITY_STANDALONE");
 #endif
@@ -589,5 +590,11 @@ public class Tank_Offline : MonoBehaviour
 
         // play death vfx
         Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
+    }
+
+    public string GetCurrentSceneName()
+    {
+        string haja = Application.loadedLevelName;
+        return haja;
     }
 }

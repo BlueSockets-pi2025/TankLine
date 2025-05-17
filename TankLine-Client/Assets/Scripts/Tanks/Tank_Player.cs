@@ -43,9 +43,9 @@ public class Tank_Player : Tank
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
 
-        // get the canvas
-        uiManager = new(GameObject.Find("Canvas"), true);
-        GameObject controls = uiManager.transform.Find("Controls")?.gameObject;
+        //Mobile controls
+        GameObject canvas = GameObject.Find("Canvas");
+        GameObject controls = canvas.transform.Find("Controls")?.gameObject;
         joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
         if (joystick == null)
         {
@@ -65,6 +65,9 @@ public class Tank_Player : Tank
         controls.SetActive(true);
 #endif
 
+
+        // get the canvas
+        uiManager = new(GameObject.Find("Canvas"), true);
 
     }
 
