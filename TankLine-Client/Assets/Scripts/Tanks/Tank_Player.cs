@@ -32,6 +32,7 @@ public class Tank_Player : Tank
 
     private InGameUiManager uiManager;
     private GameObject indicator;
+    private PlayerInput playerInput;
 
     protected override void Start()
     {
@@ -44,6 +45,9 @@ public class Tank_Player : Tank
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
         activeIndicator();
+
+        playerInput = GetComponent<PlayerInput>();
+        activeInput();
     }
 
     /// <summary>
@@ -82,6 +86,14 @@ public class Tank_Player : Tank
             indicator.SetActive(true);
         }
     }
+    public void activeInput()
+    {
+        if (!base.IsOwner)
+        {
+            playerInput.enabled = false;
+        }
+    }
+
 
     public void onMove(InputAction.CallbackContext ctxt)
     {
