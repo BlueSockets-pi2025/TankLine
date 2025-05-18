@@ -65,8 +65,8 @@ public class Tank_Offline : MonoBehaviour
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
-
-        uiManager = new(GameObject.Find("Canvas"), true);
+        if(GetCurrentSceneName()!="Tuto")
+            uiManager = new(GameObject.Find("Canvas"), true);
 
     }
 
@@ -77,7 +77,8 @@ public class Tank_Offline : MonoBehaviour
             if (nbBulletShot < MaxBulletShot)
             {
                 nbBulletShot++;
-                uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+                if(GetCurrentSceneName()!="Tuto")
+                    uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
             }
 
             this.Shoot(gunRotation);
@@ -132,7 +133,8 @@ public class Tank_Offline : MonoBehaviour
                 if (nbBulletShot < MaxBulletShot)
                 {
                     nbBulletShot++;
-                    uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+                    if(GetCurrentSceneName()!="Tuto")
+                        uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
                 }
                 this.Shoot(gunRotation);
             }
