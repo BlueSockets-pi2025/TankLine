@@ -42,6 +42,7 @@ public class Tank_Player : Tank
         thisGun = thisTank.transform.Find("tankGun");
         // get the canvas
         uiManager = new(GameObject.Find("Canvas"), true);
+        uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
         activeIndicator();
