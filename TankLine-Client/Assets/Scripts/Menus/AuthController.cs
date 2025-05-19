@@ -35,6 +35,9 @@ public class AuthController : MonoBehaviour
     private string refreshRefreshTokenUrl;
     private string leaderboardUrl;
 
+    private string addGameUrl;
+
+
     private int minExpirationRefreshToken = 24; // Minimum expiration time for refresh token in hours when checking in launch
 
     private static AuthController instance;
@@ -58,7 +61,7 @@ public class AuthController : MonoBehaviour
     public TMP_Text tanks_destroyed;
     public TMP_Text nb_games_played;
     public TMP_Text victory_or_defeat;
-    public TMP_Text rank;
+    public TMP_Text score;
     public TMP_Text date;
     
     private static X509Certificate2 staticTrustedCertificate;
@@ -70,7 +73,7 @@ public class AuthController : MonoBehaviour
     }
 
     private void Awake()
-    {   
+    {
         // Load the trusted certificate from the specified path:
         LoadCertificate();
 
@@ -111,6 +114,8 @@ public class AuthController : MonoBehaviour
         refreshExpirationUrl = $"{baseUrl}/auth/refresh-expiration";
         refreshRefreshTokenUrl = $"{baseUrl}/auth/refresh-refresh-token";
         leaderboardUrl = $"{baseUrl}/leaderboard";
+        addGameUrl = $"{baseUrl}/PlayedGames/addgame";
+
     }   
 
     /// <summary>
@@ -1098,6 +1103,89 @@ public class AuthController : MonoBehaviour
             }
         );
     }
+    
+
+
+
+    /// <summary>
+    /// Format the date and time for API request.
+    /// </summary>
+    /// <param name="day">Day of the date.</param>
+    /// <param name="month">Month of the date.</param>
+    /// <param name="year">Year of the date.</param>
+    /// <param name="hour">Hour of the date (24h).</param>
+    /// <param name="minute">Minute of the date.</param>
+    /// <returns>Formatted ISO 8601 date-time string with UTC "Z" suffix.</returns>
+    private string FormatDateTimeForApi(string day, string month, string year, string hour, string minute)
+    {
+        if (
+            int.TryParse(day, out int dayInt) &&
+            int.TryParse(month, out int monthInt) &&
+            int.TryParse(year, out int yearInt) &&
+            int.TryParse(hour, out int hourInt) &&
+            int.TryParse(minute, out int minuteInt)
+        )
+        {
+            try
+            {
+                DateTime dateTime = new DateTime(yearInt, monthInt, dayInt, hourInt, minuteInt, 0, DateTimeKind.Utc);
+                return dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Date construction error: " + ex.Message);
+                return null;
+            }
+        }
+        else
+        {
+            Debug.LogError("Invalid date or time format.");
+            return null;
+        }
+    }
+
+
+
+
+
+private IEnumerator AddGameAchievements(string mapId, int playerRank, bool gameWon, int tanksDestroyed, int totalScore, string day, string month, string year, string hour, string minute)
+    {
+        AddGameStats gameStats = new AddGameStats
+        {
+            tanksDestroyed = tanksDestroyed,
+            mapId = mapId,
+            playerRank = playerRank,
+            gameWon = gameWon,
+            totalScore = totalScore,
+            gameDate = FormatDateTimeForApi(day, month, year, hour, minute)
+        };
+
+        string jsonData = JsonUtility.ToJson(gameStats);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+
+        yield return SendRequestWithAutoRefresh(
+            addGameUrl,
+            "POST",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            bodyRaw,  // added the body 
+            onSuccess: (response) =>
+            {
+                Debug.Log("Games Played Updated");
+                IsRequestSuccessful = true;
+            },
+            onError: (response) =>
+            {
+                Debug.LogError("Failed to retrieve games played: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(response.downloadHandler.text) ? response.downloadHandler.text : "An unknown error occurred.";
+                IsRequestSuccessful = false;
+            }
+        );
+    }
+
+
+
+
 
     /// <summary>
     /// Coroutine to get the statistics of the played games.
@@ -1117,7 +1205,7 @@ public class AuthController : MonoBehaviour
             null, // No body for GET
             onSuccess: (response) =>
             {
-                string json = response.downloadHandler?.text; 
+                string json = response.downloadHandler?.text;
                 if (json == null)
                 {
                     Debug.LogError("DownloadHandler text is null.");
@@ -1153,8 +1241,8 @@ public class AuthController : MonoBehaviour
                         : 0f;
 
                     Debug.LogWarning("Updating UI with game stats.");
-                    
-                    if (username != null ) 
+
+                    if (username != null)
                     {
                         username.text = stats.username.ToString();
 
@@ -1190,11 +1278,12 @@ public class AuthController : MonoBehaviour
                         Debug.LogWarning("Updated map.");
                     }
 
-                    if (rank != null)
+                    if (score != null)
                     {
-                        rank.text = stats.playerRank.ToString();
-                        Debug.LogWarning("Updated rank.");
+                        score.text = stats.totalScore.ToString();
+                        Debug.LogWarning("Updated score.");
                     }
+         
 
                     if (victory_or_defeat != null)
                     {
@@ -1256,7 +1345,7 @@ public class CustomCertificateHandler : CertificateHandler
     {
         // Retrieve the trusted certificate that was preloaded into Unity's assets
         X509Certificate2 trustedCert = AuthController.GetTrustedCertificate();
-        
+
         // If no trusted certificate is loaded, log an error and return false to reject the certificate
         if (trustedCert == null)
         {
@@ -1283,6 +1372,10 @@ public class CustomCertificateHandler : CertificateHandler
         // Return whether the thumbprints match
         return isMatch;
     }
+    
+
+
+
 }
 
 
@@ -1377,6 +1470,9 @@ public class PlayedGameStats
     public int playerRank;
     public bool gameWon;
     public string gameDate;  
+
+    public int totalScore;  
+
 }
 
 [System.Serializable]
@@ -1410,4 +1506,19 @@ public class LeaderboardEntry
 public class LeaderboardList
 {
     public List<LeaderboardEntry> entries;
+}
+
+
+
+
+[System.Serializable]
+public class AddGameStats
+{
+
+    public int tanksDestroyed;
+    public string mapId;
+    public int playerRank;
+    public bool gameWon;
+    public string gameDate;
+    public int totalScore;  
 }
