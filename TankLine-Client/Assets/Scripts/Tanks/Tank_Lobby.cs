@@ -11,6 +11,7 @@ public class Tank_Lobby : Tank
 
     public InputActionReference move;
     Vector3 MoveDir;
+    private PlayerInput playerInput;
 
     private MoveJoystick joystick;
     private ShootJoystick shootJoystick;
@@ -34,7 +35,26 @@ public class Tank_Lobby : Tank
         shootJoystick.player = gameObject;
 #endif
 
+    }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        playerInput = GetComponent<PlayerInput>();
+        activeInput();
+    }
+
+    public void activeInput()
+    {
+        if (!base.IsOwner)
+        {
+            playerInput.enabled = false;
+        }
+        else
+        {
+            playerInput.enabled = true;
+            playerInput.ActivateInput();
+        }
     }
 
     /// <summary>
