@@ -17,7 +17,7 @@ public class InGameUiManager
     private readonly GameObject playerListDivWrap;
     private readonly GameObject lifePanel;
     private readonly GameObject bulletPanel;
-    
+
     private bool isSettingsPanelOpen = false;
     private bool isSkinPanelOpen = false;
     private bool isInGame;
@@ -40,6 +40,15 @@ public class InGameUiManager
         canvas.transform.Find("GearButton").GetComponent<Button>().onClick.AddListener(this.ClickSettingsPanel);
         canvas.transform.Find("SettingsPanel").Find("ExitButton").GetComponent<Button>().onClick.AddListener(this.ExitToMenu);
 
+#if UNITY_ANDROID
+        canvas.transform.Find("SettingsPanel").Find("OptionKeyboard").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionGeneral/keyboard").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionMouse/keyboard").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionMouse").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionGeneral/mouse").gameObject.SetActive(false);
+        canvas.transform.Find("SettingsPanel").Find("OptionKeyboard/mouse").gameObject.SetActive(false);
+#endif
+
         // waiting room ui
         if (!isInGame)
         {
@@ -53,6 +62,14 @@ public class InGameUiManager
             canvas.transform.Find("SkinPickerButton").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
             canvas.transform.Find("SkinPanel").Find("CloseBtn").GetComponent<Button>().onClick.AddListener(this.ClickSkinsPanel);
 
+#if UNITY_ANDROID
+            RectTransform startUI = startButton.GetComponent<RectTransform>();
+            startUI.anchorMin = new Vector2(0.5f, 0f);
+            startUI.anchorMax = new Vector2(0.5f, 0f);
+            startUI.pivot = new Vector2(0.5f, 0f);
+            startUI.anchoredPosition = new Vector2(0f, 100f);
+#endif
+
             // disable start button at the beggining
             DisableStartButton();
         }
@@ -64,6 +81,14 @@ public class InGameUiManager
             gameOverPanel = canvas.transform.Find("GameOverPanel").gameObject;
             lifePanel = canvas.transform.Find("PlayerLife").gameObject;
             bulletPanel = canvas.transform.Find("PlayerBullet").gameObject;
+
+#if UNITY_ANDROID
+            RectTransform bulletUI = bulletPanel.GetComponent<RectTransform>();
+            bulletUI.anchorMin = new Vector2(0.5f, 0f);
+            bulletUI.anchorMax = new Vector2(0.5f, 0f);
+            bulletUI.pivot = new Vector2(0.5f, 0f);
+            bulletUI.anchoredPosition = new Vector2(0f, 100f);
+#endif
 
             ResetGameOverPanel();
 
@@ -181,7 +206,7 @@ public class InGameUiManager
             bulletPanel.transform.Find($"bullet_{i}").gameObject.SetActive(false);
         }
         // If there is more bullet than before
-        for (int i = 1; i <= (bulletmax-newShotbullet); i++)
+        for (int i = 1; i <= (bulletmax - newShotbullet); i++)
         {
             bulletPanel.transform.Find($"bullet_{i}").gameObject.SetActive(true);
         }

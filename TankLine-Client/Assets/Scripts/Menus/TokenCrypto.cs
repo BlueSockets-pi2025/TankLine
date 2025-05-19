@@ -4,10 +4,12 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
+using UnityEngine.Networking;
 
 public class TokenCrypto
 {
-    public const string PathToEnvFile = "/.env";
+    public const string envFile = "/.env";
     public static EnvVariables encryptionConfig;
 
     //Encryption salt and password stored in environment variables: 
@@ -115,18 +117,49 @@ public class TokenCrypto
     /// <summary>
     /// Load the encryption configuration from the `.env` file and store it in the variable `encryptionConfig`
     /// </summary>
-    public static void LoadEncryptionConfig()
+    public static IEnumerator LoadEncryptionConfig(MonoBehaviour monoBehaviour)
     {
-        string jsonEnv = File.ReadAllText(Application.streamingAssetsPath + PathToEnvFile);
-        encryptionConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+
+        #if UNITY_ANDROID || UNITY_IOS
+            Debug.Log("Running on Android. Attempting to load .env in token crypto file using UnityWebRequest.");
+            string path = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
+            yield return monoBehaviour.StartCoroutine(LoadEncryptionConfigForAndroid(path));
+
+        #else 
+            string jsonEnv = File.ReadAllText(Application.streamingAssetsPath + envFile);
+            encryptionConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+        #endif
+
+        Debug.Log("Encryption config:" + JsonUtility.ToJson(encryptionConfig));
 
         if (encryptionConfig == null || string.IsNullOrEmpty(encryptionConfig.ENCRYPTION_PASSWORD) || string.IsNullOrEmpty(encryptionConfig.ENCRYPTION_SALT))
         {
-            throw new InvalidOperationException("Invalid encryption configuration. Ensure the `.env` file contains valid ENCRYPTION_PASSWORD and ENCRYPTION_SALT.");
+                throw new InvalidOperationException("Invalid encryption configuration. Ensure the `.env` file contains valid ENCRYPTION_PASSWORD and ENCRYPTION_SALT.");
         }
 
         password = encryptionConfig.ENCRYPTION_PASSWORD;
         salt = Convert.FromBase64String(encryptionConfig.ENCRYPTION_SALT);
+
+        yield return null;
+    }
+
+    private static IEnumerator LoadEncryptionConfigForAndroid(string envFilePath)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(envFilePath);
+        yield return request.SendWebRequest();
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string envContent = request.downloadHandler.text;
+            encryptionConfig = JsonUtility.FromJson<EnvVariables>(envContent);
+            Debug.Log("Encryption configuration successfully loaded on Android.");
+
+            Debug.Log("Env return:" + envContent);
+            Debug.Log("Encryption config:" + encryptionConfig);
+        }
+        else
+        {
+            Debug.LogError("Failed to load .env file on Android (token crypto): " + request.error);
+        }
     }
 
     /// <summary>

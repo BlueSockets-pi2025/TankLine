@@ -45,7 +45,7 @@ public class LobbyManager : NetworkBehaviour
         };
     }
 
-    void Start()
+    IEnumerator Start()
     {
         // initialize everything
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
@@ -64,6 +64,13 @@ public class LobbyManager : NetworkBehaviour
         if (base.IsClientInitialized)
         {
             authController = gameObject.GetComponent<AuthController>();
+
+            while (!authController.IsInitialized)
+            {
+                Debug.Log("Waiting for AuthController initialization...");
+                yield return null;
+            }
+
             StartCoroutine(SendPlayerName());
         }
     }
@@ -673,7 +680,7 @@ public class LobbyManager : NetworkBehaviour
                 }
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. No life left, game over");
                 SendScoresToDatabase(connection, playerScores[connection]); // send the score to the database
-                SendAchievementsToDatabase(connection, false, tanksDestroyed[connection], playerScores[connection]); 
+                SendAchievementsToDatabase(connection, false, tanksDestroyed[connection], playerScores[connection]);
                 alivePlayers.Remove(serverPlayerList[connection]);
                 OnPlayerListChange(alivePlayers); // update the list for every players
 

@@ -1,0 +1,10 @@
+# ninja log v5
+63	2750	7688442232924215	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	25be860ebb84c31a
+39	2801	7688442233473876	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	67386205502ce23f
+105	3015	7688442235702512	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	810e52a5b48072ea
+51	2836	7688442233890295	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	c50df2dc6ae7eb66
+27	3208	7688442237753690	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c77c1f18cf62c710
+75	2918	7688442234607464	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	5bf9b068253b59a2
+90	3668	7688442242252574	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	6fddbe6cfd7b353c
+15	3958	7688442245158231	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	b34a0b9efc9b82d5
+3959	4323	7688442248843838	C:/Users/bapti/Documents/L3/S6/PROJET_INTEGRATEUR/MOBILE/TankLine/TankLine-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6x2z1q6f/obj/arm64-v8a/libgame.so	c2c60ef414bf1917

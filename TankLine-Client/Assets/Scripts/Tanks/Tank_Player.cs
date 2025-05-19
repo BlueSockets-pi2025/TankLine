@@ -3,6 +3,7 @@ using FishNet.Object;
 using FishNet.Connection;
 using Unity.Mathematics;
 using UnityEngine;
+using Scripts.Tutoriel;
 using UnityEngine.InputSystem;
 
 public class Tank_Player : Tank
@@ -27,9 +28,12 @@ public class Tank_Player : Tank
 
     protected float movementToMake = 0;
 
+    //<summary> For mobile controls </summary>
     public InputActionReference move;
     Vector3 MoveDir;
 
+    private MoveJoystick joystick;
+    private ShootJoystick shootJoystick;
     private InGameUiManager uiManager;
     private GameObject indicator;
     private PlayerInput playerInput;
@@ -40,6 +44,31 @@ public class Tank_Player : Tank
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
+
+        //Mobile controls
+        GameObject canvas = GameObject.Find("Canvas");
+        GameObject controls = canvas.transform.Find("Controls").gameObject;
+        joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
+        if (joystick == null)
+        {
+            Debug.LogError("[Tank_Player] joystick is null in Start.");
+        }
+
+        shootJoystick = controls.transform.Find("ButtonShot")?.GetComponent<ShootJoystick>();
+        if (shootJoystick == null)
+        {
+            Debug.LogError("[Tank_Player] shootJoystick is null in Start.");
+        }
+
+#if UNITY_STANDALONE
+        controls.SetActive(false);
+#endif
+#if UNITY_ANDROID
+        controls.SetActive(true);
+        shootJoystick.player = gameObject;
+#endif
+
+
         // get the canvas
         uiManager = new(GameObject.Find("Canvas"), true);
         uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
@@ -82,26 +111,31 @@ public class Tank_Player : Tank
     {
         if (!base.IsOwner) return;
 
+#if UNITY_STANDALONE
         // process mouse aiming
         this.GunTrackPlayerMouse();
         this.ApplyRotation();
+#endif
+#if UNITY_ANDROID
+        if (shootJoystick != null)
+        {
+            this.GunTrackJoystick(shootJoystick.GetInput());
+            this.ApplyRotation();
+        }
+        else
+        {
+            Debug.LogError("[Tank_Player] shootJoystick is null in Update.");
+        }
+#endif
+        if (GetCurrentSceneName() == "Tuto" || GetCurrentSceneName() == "TutoPC")
+        {
+            var tutorial = FindObjectOfType<TankTutorial>();
+            if (!tutorial.IsInShootingStep) return;
+        }
 
         // stick the tank to the ground
         if (transform.position.y > 0.07)
             transform.position = new(transform.position.x, 0, transform.position.z);
-
-        // if left click recorded, try to shoot
-        // if (Input.GetMouseButtonDown(LEFT_CLICK))
-        // {
-        //     if (this.CanShoot())
-        //     {
-        //         this.Shoot();
-        //     }
-        //     else
-        //     {
-        //         Debug.Log("Prevent self-shoot. TODO : animation");
-        //     }
-        // }
     }
 
     public void onMove(InputAction.CallbackContext ctxt)
@@ -129,7 +163,24 @@ public class Tank_Player : Tank
                 Debug.Log("Prevent self-shoot. TODO : animation");
             }
         }
+    }
 
+    public void OnShootButtonClick()
+    {
+        if (this.CanShoot())
+        {
+            if (nbBulletShot < MaxBulletShot)
+            {
+                nbBulletShot++;
+                uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
+            }
+
+            this.Shoot(gunRotation);
+        }
+        else
+        {
+            // Debug.Log("Prevent self-shoot. TODO : animation");
+        }
     }
 
     /// <summary>
@@ -139,6 +190,7 @@ public class Tank_Player : Tank
     {
         if (!base.IsOwner) return;
 
+#if UNITY_STANDALONE
         // move.action.ReadValue<Vector2>();
 
         // process rotation input
@@ -147,6 +199,21 @@ public class Tank_Player : Tank
         float y = MoveDir.y;
         float x = MoveDir.x;
         movementToMake = this.FaceDirection(x, y);
+#endif
+#if UNITY_ANDROID
+
+        if (joystick != null)
+        {
+            float x = joystick.GetHorizontal();
+            float y = joystick.GetVertical();
+            movementToMake = this.FaceDirection(x, y);
+        }
+        else
+        {
+            Debug.LogError("[Tank_Player] joystick is null in FixedUpdate.");
+        }
+
+#endif
 
         // process movement input
         this.GoForward(movementToMake);
@@ -287,6 +354,19 @@ public class Tank_Player : Tank
         this.SetRotationGun(gunRotation + math.PI / 2);
     }
 
+    //for android Joystick
+    protected void GunTrackJoystick(Vector2 joystickInput)
+    {
+        if (joystickInput.magnitude < 0.2f)
+            return; // Ignore les petits mouvements
+
+        // Convertit l’entrée joystick en angle
+        float gunRotation = Mathf.Atan2(-joystickInput.y, joystickInput.x);
+
+        // Applique la rotation au canon
+        this.SetRotationGun(gunRotation + Mathf.PI / 2);
+    }
+
     /// <summary>
     /// Make the player face the direction (x,y)
     /// </summary>
@@ -401,7 +481,7 @@ public class Tank_Player : Tank
     /// Used to prevent bug and insta-self shooting when close to a wall
     /// </summary>
     /// <returns>True if there isn't a wall too close where the player is trying to shoot.</returns>
-    protected bool CanShoot()
+    public bool CanShoot()
     {
         Vector3 origin = new Vector3(thisTank.position.x, 0.5f, thisTank.position.z);
         Vector3 direction = new Vector3(math.cos(gunRotation - math.PI / 2), 0, -math.sin(gunRotation - math.PI / 2));
@@ -420,7 +500,7 @@ public class Tank_Player : Tank
 
     // only call this function as server
     [ServerRpc(RequireOwnership = true)]
-    protected void Shoot(float clientGunRotation)
+    public void Shoot(float clientGunRotation)
     {
         Debug.Log($"Shooting : {clientGunRotation}");
         if (nbBulletShot < MaxBulletShot)
@@ -450,7 +530,7 @@ public class Tank_Player : Tank
 
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") != "true") return;
 
-        DecreaseNbBulletShotUI(base.Owner,nbBulletShot);
+        DecreaseNbBulletShotUI(base.Owner, nbBulletShot);
     }
 
     [TargetRpc]
@@ -459,19 +539,26 @@ public class Tank_Player : Tank
         nbBulletShot = current;
         uiManager.SetBulletUI(current, MaxBulletShot);
     }
-    
+
 
     public void OnDestroy()
     {
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return; // only exec on client
-        
+
         BushGroup[] bushes = FindObjectsByType<BushGroup>(FindObjectsSortMode.None);
         foreach (BushGroup bush in bushes)
         {
             bush.SetSolidForGroup();
         }
 
+#if UNITY_STANDALONE
         // play death vfx
         Instantiate(deathVfxPrefab, transform.position, Quaternion.identity);
+#endif
+    }
+    public string GetCurrentSceneName()
+    {
+        string haja = Application.loadedLevelName;
+        return haja;
     }
 }
