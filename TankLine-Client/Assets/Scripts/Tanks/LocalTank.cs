@@ -59,8 +59,25 @@ public class Tank_Offline : MonoBehaviour
         thisTank = gameObject.transform;
         // get the "tankGun" child
         thisGun = thisTank.transform.Find("tankGun");
-        
-        if(GetCurrentSceneName() != "Tuto" && GetCurrentSceneName() != "TutoPC")
+#if UNITY_ANDROID
+//Mobile controls
+        GameObject canvas = GameObject.Find("Canvas");
+        GameObject controls = canvas.transform.Find("Controls").gameObject;
+        joystick = controls.transform.Find("ImgMove")?.GetComponent<MoveJoystick>();
+        if (joystick == null)
+        {
+            Debug.LogError("[Tank_Player] joystick is null in Start.");
+        }
+
+        shootJoystick = controls.transform.Find("ButtonShot")?.GetComponent<ShootJoystick>();
+        if (shootJoystick == null)
+        {
+            Debug.LogError("[Tank_Player] shootJoystick is null in Start.");
+        }
+        shootJoystick.player = gameObject;
+#endif
+
+        if (GetCurrentSceneName() != "Tuto" && GetCurrentSceneName() != "TutoPC")
             uiManager = new(GameObject.Find("Canvas"), true);
     }
 
@@ -70,7 +87,7 @@ public class Tank_Offline : MonoBehaviour
     protected void Update()
     {
         // Handle aiming based on platform
-#if UNITY_STANDALONE || UNITY_WEBGL || UNITY_EDITOR
+#if UNITY_STANDALONE || UNITY_WEBGL
         GunTrackPlayerMouse();
 #elif UNITY_ANDROID || UNITY_IOS
         GunTrackJoystick(shootJoystick.GetInput());
@@ -78,17 +95,17 @@ public class Tank_Offline : MonoBehaviour
 
         ApplyRotation();
 
-        if (GetCurrentSceneName() != "Tuto" && GetCurrentSceneName() != "TutoPC")
+        if (GetCurrentSceneName() == "Tuto" || GetCurrentSceneName() == "TutoPC")
         {
             var tutorial = FindObjectOfType<TankTutorial>();
             if (!tutorial.IsInShootingStep) return;
         }
 
         // Handle shooting input
-#if UNITY_STANDALONE || UNITY_WEBGL || UNITY_EDITOR
+#if UNITY_STANDALONE || UNITY_WEBGL
         if (Input.GetMouseButtonDown(LEFT_CLICK))
         {
-            TryShoot();
+            // TryShoot();
         }
 #endif
 
@@ -103,9 +120,9 @@ public class Tank_Offline : MonoBehaviour
     protected void FixedUpdate()
     {
         float x, y;
-        
+
         // Get input based on platform
-#if UNITY_STANDALONE || UNITY_WEBGL || UNITY_EDITOR
+#if UNITY_STANDALONE || UNITY_WEBGL
         y = MoveDir.y;
         x = MoveDir.x;
 #elif UNITY_ANDROID || UNITY_IOS
@@ -128,6 +145,12 @@ public class Tank_Offline : MonoBehaviour
     {
         if (ctxt.performed)
         {
+            if (GetCurrentSceneName() == "Tuto" || GetCurrentSceneName() == "TutoPC")
+            {
+                var tutorial = FindObjectOfType<TankTutorial>();
+                tutorial.OnShootPerformed();
+                if (!tutorial.IsInShootingStep) return;
+            }
             TryShoot();
         }
     }
@@ -143,8 +166,7 @@ public class Tank_Offline : MonoBehaviour
         {
             if (nbBulletShot < MaxBulletShot)
             {
-                nbBulletShot++;
-                if(GetCurrentSceneName() != "Tuto" && GetCurrentSceneName() != "TutoPC")
+                if (GetCurrentSceneName() != "Tuto" && GetCurrentSceneName() != "TutoPC")
                     uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
             }
 
@@ -324,7 +346,7 @@ public class Tank_Offline : MonoBehaviour
     {
         Camera cam = Camera.main;
         Vector3 tankPosOnScreen = cam.WorldToScreenPoint(thisTank.position);
-        Vector3 difference = new Vector3(Input.mousePosition.x - tankPosOnScreen.x, 
+        Vector3 difference = new Vector3(Input.mousePosition.x - tankPosOnScreen.x,
                                        Input.mousePosition.y - tankPosOnScreen.y, 0);
         difference.Normalize();
 

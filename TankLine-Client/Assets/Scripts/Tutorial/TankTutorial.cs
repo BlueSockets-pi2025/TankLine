@@ -13,6 +13,7 @@ namespace Scripts.Tutoriel
         public TMP_Text tutorialText;
         public Button nextButton;
         public Button skipButton;
+        public Button exitButton;
 
         [Header("Tutorial Steps")]
         public string[] tutorialSteps = {
@@ -36,7 +37,7 @@ namespace Scripts.Tutoriel
         private bool hasMoved = false;
         private bool hasAimed = false;
         private bool hasShot = false;
-        private bool[] wasdKeysPressed = new bool[4]; 
+        private bool[] wasdKeysPressed = new bool[4];
         private bool[] arrowKeysPressed = new bool[4];
 
         public bool IsInShootingStep { get; private set; } = false;
@@ -44,7 +45,7 @@ namespace Scripts.Tutoriel
         private void Start()
         {
             stepCompleted = new bool[tutorialSteps.Length];
-            
+
             // Find mobile controls if not assigned
 #if UNITY_ANDROID || UNITY_IOS
             if (moveJoystick == null)
@@ -55,8 +56,9 @@ namespace Scripts.Tutoriel
 
             tutorialPanel.SetActive(true);
             tutorialText.text = tutorialSteps[0];
-            nextButton.onClick.AddListener(NextStep);
-            skipButton.onClick.AddListener(SkipTutorial);
+            nextButton.onClick.AddListener(NextStepButton);
+            skipButton.onClick.AddListener(SkipTutorialButton);
+            exitButton.onClick.AddListener(ExitTutorial);
 
             if (enemyTanksContainer != null)
             {
@@ -66,7 +68,7 @@ namespace Scripts.Tutoriel
 
         private void Update()
         {
-            if (!waitingForInput) return;
+            // if (!waitingForInput) return;
 
             switch (currentStep)
             {
@@ -77,29 +79,29 @@ namespace Scripts.Tutoriel
                         hasMoved = true;
                     }
 #else
-                        wasdKeysPressed[0] = wasdKeysPressed[0] || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A);
-                        wasdKeysPressed[1] = wasdKeysPressed[1] || Input.GetKey(KeyCode.S);
-                        wasdKeysPressed[2] = wasdKeysPressed[2] || Input.GetKey(KeyCode.D);
-                        wasdKeysPressed[3] = wasdKeysPressed[3] || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.W);
+                    wasdKeysPressed[0] = wasdKeysPressed[0] || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A);
+                    wasdKeysPressed[1] = wasdKeysPressed[1] || Input.GetKey(KeyCode.S);
+                    wasdKeysPressed[2] = wasdKeysPressed[2] || Input.GetKey(KeyCode.D);
+                    wasdKeysPressed[3] = wasdKeysPressed[3] || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.W);
 
-                        arrowKeysPressed[0] = arrowKeysPressed[0] || Input.GetKey(KeyCode.LeftArrow);
-                        arrowKeysPressed[1] = arrowKeysPressed[1] || Input.GetKey(KeyCode.RightArrow);
-                        arrowKeysPressed[2] = arrowKeysPressed[2] || Input.GetKey(KeyCode.UpArrow);
-                        arrowKeysPressed[3] = arrowKeysPressed[3] || Input.GetKey(KeyCode.DownArrow);
+                    arrowKeysPressed[0] = arrowKeysPressed[0] || Input.GetKey(KeyCode.LeftArrow);
+                    arrowKeysPressed[1] = arrowKeysPressed[1] || Input.GetKey(KeyCode.RightArrow);
+                    arrowKeysPressed[2] = arrowKeysPressed[2] || Input.GetKey(KeyCode.UpArrow);
+                    arrowKeysPressed[3] = arrowKeysPressed[3] || Input.GetKey(KeyCode.DownArrow);
 
-                        bool allWASDPressed = true;
-                        bool allArrowsPressed = true;
+                    bool allWASDPressed = true;
+                    bool allArrowsPressed = true;
 
-                        for (int i = 0; i < 4; i++)
-                        {
-                            if (!wasdKeysPressed[i]) allWASDPressed = false;
-                            if (!arrowKeysPressed[i]) allArrowsPressed = false;
-                        }
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (!wasdKeysPressed[i]) allWASDPressed = false;
+                        if (!arrowKeysPressed[i]) allArrowsPressed = false;
+                    }
 
-                        if (allWASDPressed || allArrowsPressed)
-                        {
-                            hasMoved = true;
-                        }
+                    if (allWASDPressed || allArrowsPressed)
+                    {
+                        hasMoved = true;
+                    }
 #endif
                     if (hasMoved)
                     {
@@ -126,12 +128,21 @@ namespace Scripts.Tutoriel
                     break;
 
                 case 3: // Shooting step
-                    // Shooting is handled through NotifyShotFired() for mobile and OnShootPerformed for PC
+                    break;
+                case 4:
+                    if (!enemyTanksContainer)
+                    {
+                        exitButton.gameObject.SetActive(true);
+                    }
                     break;
             }
         }
+        public void NextStepButton()
+        {
+            StartCoroutine(NextStep());
+        }
 
-        public void NextStep()
+        public IEnumerator NextStep()
         {
             if (currentStep < tutorialSteps.Length - 1)
             {
@@ -154,11 +165,18 @@ namespace Scripts.Tutoriel
                 {
                     nextButton.gameObject.SetActive(true);
                     waitingForInput = false;
+
                 }
 
                 if (currentStep == tutorialSteps.Length - 1 && enemyTanksContainer != null)
                 {
+                    Debug.Log("step" + currentStep);
                     enemyTanksContainer.SetActive(true);
+                    nextButton.gameObject.SetActive(false);
+                    skipButton.gameObject.SetActive(false);
+                    yield return new WaitForSeconds(3f);
+                    tutorialText.gameObject.SetActive(false);
+
                 }
             }
             else
@@ -167,22 +185,38 @@ namespace Scripts.Tutoriel
                 this.enabled = false;
             }
         }
-
-        public void SkipTutorial()
+        public void SkipTutorialButton()
         {
-            tutorialPanel.SetActive(false);
-            IsInShootingStep = true;
-            if (enemyTanksContainer != null) enemyTanksContainer.SetActive(true);
-            this.enabled = false;
+            StartCoroutine(SkipTutorial());
         }
 
-        public void NotifyShotFired()
+        public IEnumerator SkipTutorial()
+        {
+            // tutorialPanel.SetActive(false);
+            nextButton.gameObject.SetActive(false);
+            skipButton.gameObject.SetActive(false);
+            IsInShootingStep = true;
+            if (enemyTanksContainer != null) enemyTanksContainer.SetActive(true);
+            currentStep = 4;
+            tutorialText.text = tutorialSteps[currentStep];
+            yield return new WaitForSeconds(3f);
+            tutorialText.gameObject.SetActive(false);
+        }
+
+        public void ExitTutorial()
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        }
+
+        public bool NotifyShotFired()
         {
             if (currentStep == 3 && !stepCompleted[currentStep])
             {
                 hasShot = true;
                 CompleteStep();
             }
+            if (currentStep == 4) { hasShot = true; }
+            return hasShot;
         }
 
         private void CompleteStep()
@@ -191,7 +225,6 @@ namespace Scripts.Tutoriel
             {
                 stepCompleted[currentStep] = true;
                 waitingForInput = false;
-                nextButton.gameObject.SetActive(true);
 
                 StartCoroutine(ShowCompletionFeedback());
             }
@@ -202,11 +235,12 @@ namespace Scripts.Tutoriel
             string originalText = tutorialText.text;
             tutorialText.text = originalText + "\n<color=green>(Completed!)</color>";
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1f);
+            nextButton.gameObject.SetActive(true);
 
             tutorialText.text = originalText;
         }
-        private void OnShootPerformed(InputAction.CallbackContext context)
+        public void OnShootPerformed()
         {
             if (currentStep == 3 && !stepCompleted[currentStep])
             {

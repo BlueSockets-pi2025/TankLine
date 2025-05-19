@@ -95,7 +95,7 @@ public class Tank_Player : Tank
             Debug.LogError("[Tank_Player] shootJoystick is null in Update.");
         }
 #endif
-        if (GetCurrentSceneName() == "Tuto")
+        if (GetCurrentSceneName() == "Tuto" || GetCurrentSceneName() == "TutoPC")
         {
             var tutorial = FindObjectOfType<TankTutorial>();
             if (!tutorial.IsInShootingStep) return;

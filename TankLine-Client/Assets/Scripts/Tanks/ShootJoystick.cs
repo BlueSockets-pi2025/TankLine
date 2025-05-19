@@ -10,6 +10,7 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
     private bool isDragging = false;
     private TankTutorial tutorial;
     public GameObject player;
+    bool canShoot = false;
 
     public void Start()
     {
@@ -57,7 +58,13 @@ public class ShootJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPo
             // var tutorial = FindObjectOfType<TankTutorial>();
             if (tutorial != null)
             {
-                tutorial.NotifyShotFired();
+                Debug.Log("NotifyShotFired");
+
+                canShoot = tutorial.NotifyShotFired();
+                if (canShoot)
+                {
+                    player.GetComponent<Tank_Offline>()?.OnShootButtonClick();
+                }
             }
 
             if (player != null)
