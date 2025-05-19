@@ -64,14 +64,12 @@ public class Tank_Player : Tank
         controls.SetActive(false);
 #endif
 #if UNITY_ANDROID
-
-        playerInput = GetComponent<PlayerInput>();
-        activeInput();
-
         controls.SetActive(true);
         shootJoystick.player = gameObject;
 #endif
 
+        playerInput = GetComponent<PlayerInput>();
+        activeInput();
 
         // get the canvas
         uiManager = new(GameObject.Find("Canvas"), true);
@@ -79,13 +77,6 @@ public class Tank_Player : Tank
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
         activeIndicator();
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        playerInput = GetComponent<PlayerInput>();
-        activeInput();
     }
 
     public void activeIndicator()
@@ -99,12 +90,12 @@ public class Tank_Player : Tank
     {
         if (!base.IsOwner)
         {
-            Debug.Log("TEST - Mobile input - X");
+            Debug.Log("TEST - Mobile input - X" + GetComponent<Renderer>().materials[4]);
             playerInput.enabled = false;
         }
         else
         {
-            Debug.Log("TEST - Mobile input - active");
+            Debug.Log("TEST - Mobile input - active" + GetComponent<Renderer>().materials[4]);
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
