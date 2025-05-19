@@ -940,6 +940,14 @@ public class MenuSwapper : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
+    public void OpenTutorialScene()
+{
+#if UNITY_ANDROID
+    UnityEngine.SceneManagement.SceneManager.LoadScene("Tuto");
+#else
+    UnityEngine.SceneManagement.SceneManager.LoadScene("TutoPC");
+#endif
+}
 
     /// <summary>
     /// Rcursive search for a GameObject in the hierarchy by name </br>

@@ -624,7 +624,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -769, y: -390}
+  m_AnchoredPosition: {x: -769, y: 399.604}
   m_SizeDelta: {x: 159.7436, y: 47.7602}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &254477930
@@ -834,6 +834,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1004455161}
   - {fileID: 185417240}
   - {fileID: 749797476}
   - {fileID: 254477929}
@@ -1144,7 +1145,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 774.23975, y: -390}
+  m_AnchoredPosition: {x: 774.23975, y: 399.604}
   m_SizeDelta: {x: 159.7436, y: 47.7602}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &749797477
@@ -1234,6 +1235,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8084708807031135194, guid: d457434bbbc641b409c70ad5a5b6784b, type: 3}
   m_PrefabInstance: {fileID: 607744346}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &768310260 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7289510549969258243, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+  m_PrefabInstance: {fileID: 1004455160}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b66af7a7813db6641bd0b547a256e04d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &787615060 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8084708807031135194, guid: d457434bbbc641b409c70ad5a5b6784b, type: 3}
@@ -1558,6 +1570,108 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 951775929}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &1004455160
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 490365343}
+    m_Modifications:
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6884292677313646427, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+      propertyPath: m_Name
+      value: Controls
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+--- !u!224 &1004455161 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3441282524841000390, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+  m_PrefabInstance: {fileID: 1004455160}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1052445062
 GameObject:
   m_ObjectHideFlags: 0
@@ -1593,15 +1707,15 @@ MonoBehaviour:
   skipButton: {fileID: 254477930}
   tutorialSteps:
   - Welcome to Tankline
-  - You can move your tank using QSZD or Arrow keys
-  - Move your mouse to change the direction of your tank's turret
-  - Left-click to shoot bullets at your enemies
+  - Use the left joystick to move your tank
+  - Use the right joystick to aim your tank's turret
+  - Tap the right joystick to shoot bullets at your enemies
+  - Kill the enemy !
   - You're now ready to start your journey! Destroy the enemy tanks
   playerTank: {fileID: 1769032338}
   enemyTanksContainer: {fileID: 706275095}
-  moveJoystick: {fileID: 0}
-  shootJoystick: {fileID: 0}
-  aimAction: {fileID: 0}
+  moveJoystick: {fileID: 768310260}
+  shootJoystick: {fileID: 1267344125}
 --- !u!4 &1052445064
 Transform:
   m_ObjectHideFlags: 0
@@ -2371,6 +2485,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1267122791}
   m_CullTransparentMesh: 1
+--- !u!114 &1267344125 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3683282425946260726, guid: 40b6d05178ba44643a738356005ab578, type: 3}
+  m_PrefabInstance: {fileID: 1004455160}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52ae629608a9ff047a8962fb082de3a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1318924482
 GameObject:
   m_ObjectHideFlags: 0
@@ -3098,7 +3223,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2292346337789267609, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: m_DefaultControlScheme
-      value: Keyboard
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4082007141357051064, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: m_Name
@@ -3107,7 +3232,7 @@ PrefabInstance:
     - target: {fileID: 5432976333360167726, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: joystick
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 768310260}
     - target: {fileID: 5432976333360167726, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: nbLifeLeft
       value: 10
@@ -3119,7 +3244,7 @@ PrefabInstance:
     - target: {fileID: 5432976333360167726, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: shootJoystick
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1267344125}
     - target: {fileID: 7496081908021487424, guid: 91726694676ffd48eb9e27913a6c24d3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.4781556

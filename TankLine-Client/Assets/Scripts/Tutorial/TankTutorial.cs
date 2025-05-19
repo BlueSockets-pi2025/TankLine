@@ -4,6 +4,7 @@ namespace Scripts.Tutoriel
     using UnityEngine.UI;
     using TMPro;
     using System.Collections;
+    using UnityEngine.InputSystem;
 
     public class TankTutorial : MonoBehaviour
     {
@@ -27,6 +28,7 @@ namespace Scripts.Tutoriel
         public GameObject enemyTanksContainer;
         public MoveJoystick moveJoystick;
         public ShootJoystick shootJoystick;
+        public InputActionReference aimAction;
 
         private int currentStep = 0;
         private bool waitingForInput = false;
@@ -34,6 +36,8 @@ namespace Scripts.Tutoriel
         private bool hasMoved = false;
         private bool hasAimed = false;
         private bool hasShot = false;
+        private bool[] wasdKeysPressed = new bool[4]; 
+        private bool[] arrowKeysPressed = new bool[4];
 
         public bool IsInShootingStep { get; private set; } = false;
 
@@ -41,10 +45,13 @@ namespace Scripts.Tutoriel
         {
             stepCompleted = new bool[tutorialSteps.Length];
             
+            // Find mobile controls if not assigned
+#if UNITY_ANDROID || UNITY_IOS
             if (moveJoystick == null)
                 moveJoystick = FindObjectOfType<MoveJoystick>();
             if (shootJoystick == null)
                 shootJoystick = FindObjectOfType<ShootJoystick>();
+#endif
 
             tutorialPanel.SetActive(true);
             tutorialText.text = tutorialSteps[0];
@@ -63,31 +70,63 @@ namespace Scripts.Tutoriel
 
             switch (currentStep)
             {
-                case 1: 
+                case 1: // Movement step
+#if UNITY_ANDROID || UNITY_IOS
                     if (moveJoystick.GetInputVector().magnitude > 0.5f)
                     {
                         hasMoved = true;
                     }
-                    
+#else
+                        wasdKeysPressed[0] = wasdKeysPressed[0] || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A);
+                        wasdKeysPressed[1] = wasdKeysPressed[1] || Input.GetKey(KeyCode.S);
+                        wasdKeysPressed[2] = wasdKeysPressed[2] || Input.GetKey(KeyCode.D);
+                        wasdKeysPressed[3] = wasdKeysPressed[3] || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.W);
+
+                        arrowKeysPressed[0] = arrowKeysPressed[0] || Input.GetKey(KeyCode.LeftArrow);
+                        arrowKeysPressed[1] = arrowKeysPressed[1] || Input.GetKey(KeyCode.RightArrow);
+                        arrowKeysPressed[2] = arrowKeysPressed[2] || Input.GetKey(KeyCode.UpArrow);
+                        arrowKeysPressed[3] = arrowKeysPressed[3] || Input.GetKey(KeyCode.DownArrow);
+
+                        bool allWASDPressed = true;
+                        bool allArrowsPressed = true;
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (!wasdKeysPressed[i]) allWASDPressed = false;
+                            if (!arrowKeysPressed[i]) allArrowsPressed = false;
+                        }
+
+                        if (allWASDPressed || allArrowsPressed)
+                        {
+                            hasMoved = true;
+                        }
+#endif
                     if (hasMoved)
                     {
                         CompleteStep();
                     }
                     break;
 
-                case 2: 
+                case 2: // Aiming step
+#if UNITY_ANDROID || UNITY_IOS
                     if (shootJoystick.GetInput().magnitude > 0.5f)
                     {
                         hasAimed = true;
                     }
-                    
+#else
+                    if (Mathf.Abs(Input.GetAxis("Mouse X")) > 1.5f || Mathf.Abs(Input.GetAxis("Mouse Y")) > 1.5f)
+                    {
+                        hasAimed = true;
+                    }
+#endif
                     if (hasAimed)
                     {
                         CompleteStep();
                     }
                     break;
 
-                case 3: 
+                case 3: // Shooting step
+                    // Shooting is handled through NotifyShotFired() for mobile and OnShootPerformed for PC
                     break;
             }
         }
@@ -103,6 +142,8 @@ namespace Scripts.Tutoriel
                 hasMoved = false;
                 hasAimed = false;
                 hasShot = false;
+                wasdKeysPressed = new bool[4];
+                arrowKeysPressed = new bool[4];
 
                 if (currentStep >= 1 && currentStep <= 3)
                 {
@@ -164,6 +205,14 @@ namespace Scripts.Tutoriel
             yield return new WaitForSeconds(3f);
 
             tutorialText.text = originalText;
+        }
+        private void OnShootPerformed(InputAction.CallbackContext context)
+        {
+            if (currentStep == 3 && !stepCompleted[currentStep])
+            {
+                hasShot = true;
+                CompleteStep();
+            }
         }
     }
 }
