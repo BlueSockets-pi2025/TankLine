@@ -90,12 +90,12 @@ public class Tank_Player : Tank
     {
         if (!base.IsOwner)
         {
-            Debug.Log("TEST - Mobile input - X" + GetComponent<Renderer>().materials[4]);
+            Debug.Log("TEST - Mobile input - X" + transform.Find("base").GetComponent<Renderer>().materials[4]);
             playerInput.enabled = false;
         }
         else
         {
-            Debug.Log("TEST - Mobile input - active" + GetComponent<Renderer>().materials[4]);
+            Debug.Log("TEST - Mobile input - active" + transform.Find("base").GetComponent<Renderer>().materials[4]);
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
