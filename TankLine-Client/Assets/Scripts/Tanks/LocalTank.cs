@@ -190,11 +190,7 @@ public class Tank_Offline : MonoBehaviour
 
     private float PlatformSpecificGunRotation()
     {
-#if UNITY_STANDALONE || UNITY_WEBGL || UNITY_EDITOR
-        return 0;
-#elif UNITY_ANDROID || UNITY_IOS
         return -90;
-#endif
     }
 
     /*
