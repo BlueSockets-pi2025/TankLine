@@ -79,6 +79,13 @@ public class Tank_Player : Tank
         activeIndicator();
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        playerInput = GetComponent<PlayerInput>();
+        activeInput();
+    }
+
     public void activeIndicator()
     {
         if (base.IsOwner)
@@ -90,12 +97,12 @@ public class Tank_Player : Tank
     {
         if (!base.IsOwner)
         {
-            Debug.Log("TEST - Mobile input - X" + transform.Find("base").GetComponent<Renderer>().materials[4]);
+            Debug.Log("TEST - Mobile input - X " + transform.Find("base").GetComponent<Renderer>().materials[4]);
             playerInput.enabled = false;
         }
         else
         {
-            Debug.Log("TEST - Mobile input - active" + transform.Find("base").GetComponent<Renderer>().materials[4]);
+            Debug.Log("TEST - Mobile input - active " + transform.Find("base").GetComponent<Renderer>().materials[4]);
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
