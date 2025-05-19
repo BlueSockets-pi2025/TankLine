@@ -40,9 +40,6 @@ public class MapLoader : MonoBehaviour
             return;
         }
 
-        //Load the map from the name of the file
-        LoadMap(File.ReadAllText(path));
-
         // tell the server we are ready
         try
             { FindFirstObjectByType<LobbyManager>().IsReady(); }
