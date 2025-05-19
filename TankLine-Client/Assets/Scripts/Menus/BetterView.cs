@@ -15,9 +15,10 @@ public class BetterView : MonoBehaviour
 
     void Start()
     {
+        #if UNITY_ANDROID
         for (int i = 0; i < inputFields.Count; i++)
         {
-            int j=i;
+            int j = i;
             var input = inputFields[i];
             if (input != null)
             {
@@ -25,10 +26,12 @@ public class BetterView : MonoBehaviour
                 input.onDeselect.AddListener((_) => OnAnyInputDeselected());
             }
         }
+        #endif
     }
 
     void OnDestroy()
     {
+         #if UNITY_ANDROID
         for (int i = 0; i < inputFields.Count; i++)
         {
             var input = inputFields[i];
@@ -38,6 +41,7 @@ public class BetterView : MonoBehaviour
                 input.onDeselect.RemoveAllListeners();
             }
         }
+         #endif
     }
 
     void OnAnyInputSelected(int indexField)
