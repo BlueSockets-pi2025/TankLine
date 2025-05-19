@@ -93,8 +93,18 @@ public class Tank_Player : Tank
             indicator.SetActive(true);
         }
     }
+
+    public override void OnOwnershipClient(NetworkConnection prevOwner)
+    {
+        base.OnOwnershipClient(prevOwner);
+        Debug.Log($"OnOwnershipClient: IsOwner={IsOwner}");
+        activeInput();
+    }
+
     public void activeInput()
     {
+        if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return;
+
         if (!base.IsOwner)
         {
             Debug.Log("TEST - Mobile input - X " + transform.Find("base").GetComponent<Renderer>().materials[4]);
