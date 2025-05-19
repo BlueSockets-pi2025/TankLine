@@ -103,6 +103,7 @@ public class Tank_Player : Tank
         }
         else
         {
+            Debug.Log("TEST - Mobile input");
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
