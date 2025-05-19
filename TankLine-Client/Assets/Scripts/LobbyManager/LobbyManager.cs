@@ -757,7 +757,7 @@ public class LobbyManager : NetworkBehaviour
         string hour = now.Hour.ToString();
         string minute = now.Minute.ToString();
 
-        StartCoroutine(authController.AddGameAchievements("Map1.json", 0, gameWon, tanksDestroyed, totalScore, day, month, year, hour, minute));
+        StartCoroutine(authController.AddGameAchievements("MapSpring1", 0, gameWon, tanksDestroyed, totalScore, day, month, year, hour, minute));
     }
 
 }
