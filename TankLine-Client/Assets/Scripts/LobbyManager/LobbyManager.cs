@@ -15,10 +15,11 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(AuthController))]
 [RequireComponent(typeof(NetworkObserver))]
 [RequireComponent(typeof(PlayerSpawner))]
-public class LobbyManager : NetworkBehaviour 
+public class LobbyManager : NetworkBehaviour
 {
 
-    void Awake() {
+    void Awake()
+    {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneChangement;
         gameObject.GetComponent<NetworkObject>().SetIsGlobal(true);
 
@@ -26,22 +27,26 @@ public class LobbyManager : NetworkBehaviour
 
         // find networkManager
         NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
-        if (networkManager == null) {
+        if (networkManager == null)
+        {
             Debug.LogError($"[ERROR] NetworkManager is null in waiting room");
             return;
         }
 
         // on client connexion change
-        networkManager.ServerManager.OnRemoteConnectionState += (connection, state) => {
+        networkManager.ServerManager.OnRemoteConnectionState += (connection, state) =>
+        {
             // if client is disconnecting
-            if (state.ConnectionState == FishNet.Transporting.RemoteConnectionState.Stopped) {
+            if (state.ConnectionState == FishNet.Transporting.RemoteConnectionState.Stopped)
+            {
                 // remove from list
                 RemovePlayerFromList_ServerSide(connection);
             }
         };
     }
 
-    void Start() {
+    void Start()
+    {
         // initialize everything
         playerSpawner = gameObject.GetComponent<PlayerSpawner>();
         uiManager = new(GameObject.Find("Canvas"), CurrentSceneName() == "LoadScene");
@@ -50,12 +55,14 @@ public class LobbyManager : NetworkBehaviour
         uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
 
         // load skins
-        for (int i=0; i<skins.Count; i++) {
+        for (int i = 0; i < skins.Count; i++)
+        {
             availableSkins.Add(i);
         }
 
         // send username to DB
-        if (base.IsClientInitialized) {
+        if (base.IsClientInitialized)
+        {
             authController = gameObject.GetComponent<AuthController>();
             StartCoroutine(SendPlayerName());
         }
@@ -83,47 +90,55 @@ public class LobbyManager : NetworkBehaviour
     private IEnumerator loadingTimeoutCoroutine;
     private bool hasGameStarted = false;
 
-    public void ChangeSpawnPrefab(string sceneName) {
-        if (playerSpawner == null) {
+    public void ChangeSpawnPrefab(string sceneName)
+    {
+        if (playerSpawner == null)
+        {
             Debug.Log("[ERROR] : PlayerSpawner null in ChangeSpawnPrefab");
             return;
         }
-        switch (sceneName) {
+        switch (sceneName)
+        {
             case "LoadScene":
                 playerSpawner.playerObjectPrefab = InGameTankPrefab;
                 break;
             case "WaitingRoom":
                 playerSpawner.playerObjectPrefab = WaitingRoomTankPrefab;
                 break;
-            
+
             default:
                 Debug.LogError("Scene not found for ChangeSpawnPrefab");
                 break;
         }
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    private void NewPlayerReady() {
+    [ServerRpc(RequireOwnership = false)]
+    private void NewPlayerReady()
+    {
         nbPlayerReady++;
         Debug.Log($"[In-Game] Waiting players : {nbPlayerReady}/{serverPlayerList.Count}");
 
         // if everyone ready, spawn everyone
-        if (nbPlayerReady >= serverPlayerList.Count) {
+        if (nbPlayerReady >= serverPlayerList.Count)
+        {
             hasAutoReplayStarted = false;
             StartGame();
         }
     }
 
-    public void IsReady() {
+    public void IsReady()
+    {
         playerSpawner.InitSpawnPoint();
         NewPlayerReady();
     }
 
-    public void OnPlayerSpawned() {
+    public void OnPlayerSpawned()
+    {
         SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
 
-    public void StartGame() {
+    public void StartGame()
+    {
         alivePlayers = serverPlayerList.Values.ToList();
         OnPlayerListChange(alivePlayers); // send names to update UI
         Debug.Log("[In-Game] Starting game... Spawning player");
@@ -135,25 +150,28 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
-    private IEnumerator StartLoadingTimeoutCoroutine(int nbSeconds) {
+    private IEnumerator StartLoadingTimeoutCoroutine(int nbSeconds)
+    {
         yield return new WaitForSeconds(nbSeconds);
 
         if (!hasGameStarted)
             StartGame();
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    private void JoinedWaitingRoom(NetworkConnection connection = null) {
+    [ServerRpc(RequireOwnership = false)]
+    private void JoinedWaitingRoom(NetworkConnection connection = null)
+    {
         PlayerData player = serverPlayerList[connection];
 
-        if (player == null) {
+        if (player == null)
+        {
             Debug.Log("[ERROR] Player joining waiting room from previous game is null");
             return;
         }
 
         Debug.Log($"[Waiting room] Player {player.name} joining from previous game. Spawning character...");
         playerSpawner.SpawnPlayer(connection, player.name);
-        
+
         OnPlayerListChange(serverPlayerList.Values.ToList());
     }
 
@@ -170,7 +188,8 @@ public class LobbyManager : NetworkBehaviour
         ############################################################
     */
 
-    public string CurrentSceneName() {
+    public string CurrentSceneName()
+    {
         return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
     }
 
@@ -194,8 +213,10 @@ public class LobbyManager : NetworkBehaviour
         LaunchGame_Server();
     }
 
-    private void OnSceneChangement(Scene scene, LoadSceneMode mode) {
-        if (scene.name == "MainMenu") {
+    private void OnSceneChangement(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "MainMenu")
+        {
             UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneChangement;
             Debug.Log("MainMenu scene : destroying networkManager & LobbyManager");
             NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
@@ -214,33 +235,43 @@ public class LobbyManager : NetworkBehaviour
         hasAutoReplayStarted = false;
         hasGameStarted = false;
         playerReadyForReplay = new();
+        playerScores.Clear();
+        foreach (var kvp in serverPlayerList)
+        {
+            playerScores.Add(kvp.Key, 0);
+        }
 
         // if in game
-        if (scene.name == "LoadScene") {
+        if (scene.name == "LoadScene")
+        {
             // reset the number of player ready when reloading a new game
             nbPlayerReady = 0;
 
             // set a timeout to launch game even if a player can't make it in game
-            if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") {
+            if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true")
+            {
                 loadingTimeoutCoroutine = StartLoadingTimeoutCoroutine(5);
                 StartCoroutine(loadingTimeoutCoroutine);
             }
-        } else 
-        
+        }
+        else
+
         // if in waiting room
-        if (scene.name == "WaitingRoom") {
+        if (scene.name == "WaitingRoom")
+        {
 
             // if is running on server
-            if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") {
-
+            if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true")
+            {
                 // send player list to update ui
                 OnPlayerListChange(serverPlayerList.Values.ToList());
 
                 ReplayClient();
-            } 
+            }
 
             // if on the client
-            else {
+            else
+            {
                 JoinedWaitingRoom(base.ClientManager.Connection);
                 uiManager.CreateSkinsPanel(skins, skinEntryPrefab);
                 GetAvailableSkins();
@@ -249,22 +280,26 @@ public class LobbyManager : NetworkBehaviour
     }
 
     [ObserversRpc]
-    private void ReplayClient() {
+    private void ReplayClient()
+    {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
-    private void ClearAndReplayServer() {
+    private void ClearAndReplayServer()
+    {
         nbPlayerReady++;
 
         // reset number of lives
-        foreach (PlayerData player in serverPlayerList.Values.ToList()) {
+        foreach (PlayerData player in serverPlayerList.Values.ToList())
+        {
             player.livesLeft = maxPlayerLives;
         }
 
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
 
-    private IEnumerator AutoReplayCoroutine(int nbSeconds) {
+    private IEnumerator AutoReplayCoroutine(int nbSeconds)
+    {
         yield return new WaitForSeconds(nbSeconds);
         if (hasAutoReplayStarted)
             ClearAndReplayServer();
@@ -285,13 +320,17 @@ public class LobbyManager : NetworkBehaviour
     private List<PlayerData> clientPlayerList = new();
 
 
-    private IEnumerator SendPlayerName() {
+    private IEnumerator SendPlayerName()
+    {
         // fetch user data
         yield return authController.User();
 
-        if (authController.CurrentUser == null) {
+        if (authController.CurrentUser == null)
+        {
             Debug.LogError("[ERROR] Current user is null, cannot send data");
-        } else {
+        }
+        else
+        {
             // send username to server
             string userName = authController.CurrentUser.username.ToString();
             Debug.Log("connecting...");
@@ -304,7 +343,8 @@ public class LobbyManager : NetworkBehaviour
     /// </summary>
     /// <param name="name">The username to add</param>
     [ServerRpc(RequireOwnership = false)]
-    public void AddPlayerToList(NetworkConnection connection, string name) {
+    public void AddPlayerToList(NetworkConnection connection, string name)
+    {
         Debug.Log($"[Lobby #number] New player connected : {name}");
 
         // add player to list
@@ -324,7 +364,8 @@ public class LobbyManager : NetworkBehaviour
     /// </summary>
     /// <param name="connection">Auto-fill by fishnet, the connection of the client who calls this procedure</param>
     [ServerRpc(RequireOwnership = false)]
-    public void DisconnectClient(NetworkConnection connection = null) {
+    public void DisconnectClient(NetworkConnection connection = null)
+    {
         if (connection == null) return;
 
         Debug.Log($"[Lobby #number] Disconnecting player : {serverPlayerList[connection].name}");
@@ -337,7 +378,8 @@ public class LobbyManager : NetworkBehaviour
     /// Remove a player to the server-side playerList (call only from server-side)
     /// </summary>
     /// <param name="connection">The connection to remove</param>
-    private void RemovePlayerFromList_ServerSide(NetworkConnection connection) {
+    private void RemovePlayerFromList_ServerSide(NetworkConnection connection)
+    {
         Debug.Log($"[Lobby #number] Removing player from list : {serverPlayerList[connection].name}");
 
         // despawn player
@@ -351,14 +393,17 @@ public class LobbyManager : NetworkBehaviour
             alivePlayers.Remove(serverPlayerList[connection]);
 
         // if autoreplay has started, remove the player from the ReadyForReplay
-        if (hasAutoReplayStarted) {
-            if (playerReadyForReplay.Exists(player => player.name == serverPlayerList[connection].name)) {
+        if (hasAutoReplayStarted)
+        {
+            if (playerReadyForReplay.Exists(player => player.name == serverPlayerList[connection].name))
+            {
                 playerReadyForReplay.Remove(serverPlayerList[connection]);
             }
         }
 
         // if only one player is alive, end game
-        if (alivePlayers.Count() == 1) {
+        if (alivePlayers.Count() == 1)
+        {
             Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
             ShowEndGamePanel(alivePlayers[0].name);
         }
@@ -366,24 +411,30 @@ public class LobbyManager : NetworkBehaviour
         // remove player from list
         serverPlayerList.Remove(connection);
 
-        if (CurrentSceneName() == "LoadScene") {
+        if (CurrentSceneName() == "LoadScene")
+        {
             OnPlayerListChange(alivePlayers);
-        } else {
+        }
+        else
+        {
             OnPlayerListChange(serverPlayerList.Values.ToList());
         }
 
         // if this was the last player in game, return to waiting room
-        if (CurrentSceneName() == "LoadScene" && serverPlayerList.Count() == 0) {
+        if (CurrentSceneName() == "LoadScene" && serverPlayerList.Count() == 0)
+        {
             Debug.Log("[In Game] No more player in game, returning to waiting room");
             ClearAndReplayServer();
         }
 
-        if (hasAutoReplayStarted) {
+        if (hasAutoReplayStarted)
+        {
             // update the ui
             UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
 
             // check if every remaining players are ready
-            if (playerReadyForReplay.Count == serverPlayerList.Count) {
+            if (playerReadyForReplay.Count == serverPlayerList.Count)
+            {
                 ClearAndReplayServer();
             }
         }
@@ -394,7 +445,8 @@ public class LobbyManager : NetworkBehaviour
     /// </summary>
     /// <param name="newNames">The new player list sent by the server</param>
     [ObserversRpc]
-    private void OnPlayerListChange(List<PlayerData> newNames) {
+    private void OnPlayerListChange(List<PlayerData> newNames)
+    {
         clientPlayerList = newNames;
 
         uiManager.UpdateUI(clientPlayerList, playerEntryPrefab, minimumPlayerToStart);
@@ -422,31 +474,37 @@ public class LobbyManager : NetworkBehaviour
     bool hasAutoReplayStarted = false;
 
     [TargetRpc]
-    private void StartRespawnCountdown(NetworkConnection conn) {
+    private void StartRespawnCountdown(NetworkConnection conn)
+    {
         StartCoroutine(uiManager.RespawnCountdownCoroutine(respawnCooldown));
     }
 
     [TargetRpc]
-    private void SetLife(NetworkConnection conn, int newlife) {
+    private void SetLife(NetworkConnection conn, int newlife)
+    {
         uiManager.SetLifeUI(newlife);
     }
 
     [TargetRpc]
-    private void ShowDefeatPanel(NetworkConnection conn) {
+    private void ShowDefeatPanel(NetworkConnection conn)
+    {
         uiManager.ShowDefeatPanel();
     }
 
     [ObserversRpc]
-    private void ShowEndGamePanel(string winnerName) {
+    private void ShowEndGamePanel(string winnerName)
+    {
         uiManager.ShowEndGamePanel(winnerName, winnerName == authController.CurrentUser.username.ToString());
     }
 
     [ObserversRpc]
-    private void UpdateReadyForReplay(int nbPlayer, int nbReady) {
+    private void UpdateReadyForReplay(int nbPlayer, int nbReady)
+    {
 
         if (CurrentSceneName() == "WaitingRoom") return;
 
-        if (!hasAutoReplayStarted) {
+        if (!hasAutoReplayStarted)
+        {
             hasAutoReplayStarted = true;
             StartCoroutine(uiManager.StartAutoReplayCountdown(autoReplayCountdown));
         }
@@ -454,7 +512,8 @@ public class LobbyManager : NetworkBehaviour
         uiManager.UpdateReadyForReplay(nbPlayer, nbReady);
     }
 
-    public void SendReadyForReplay() {
+    public void SendReadyForReplay()
+    {
         ReadyForReplay();
     }
 
@@ -473,7 +532,7 @@ public class LobbyManager : NetworkBehaviour
     [Header("Game parameters")]
     [Space(5)]
 
-    [Range(1,5)]
+    [Range(1, 5)]
     public int maxPlayerLives = 3;
     [Range(1, 5)]
     public int respawnCooldown = 3;
@@ -483,12 +542,15 @@ public class LobbyManager : NetworkBehaviour
     private List<int> availableSkins = new();
     private List<PlayerData> alivePlayers = new();
     private List<PlayerData> playerReadyForReplay = new();
+    private Dictionary<NetworkConnection, int> playerScores = new();
 
     [ObserversRpc]
-    private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins) {
+    private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins)
+    {
 
         // in game players
-        if (CurrentSceneName() == "LoadScene") {
+        if (CurrentSceneName() == "LoadScene")
+        {
             Tank_Player[] playersInGame = FindObjectsByType<Tank_Player>(FindObjectsSortMode.None);
             foreach (Tank_Player player in playersInGame)
             {
@@ -506,10 +568,12 @@ public class LobbyManager : NetworkBehaviour
             }
         }
 
-        else {
+        else
+        {
             // Lobby players
             Tank_Lobby[] playersLobby = FindObjectsByType<Tank_Lobby>(FindObjectsSortMode.None);
-            foreach (Tank_Lobby player in playersLobby) {
+            foreach (Tank_Lobby player in playersLobby)
+            {
                 GameObject go = player.GameObject();
                 Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
 
@@ -525,23 +589,28 @@ public class LobbyManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    private void UpdateAvailableSkins(NetworkConnection conn = null) {
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdateAvailableSkins(NetworkConnection conn = null)
+    {
         ClientUpdateAvailableSkins(conn, availableSkins);
     }
 
-    [ObserversRpc][TargetRpc]
-    private void ClientUpdateAvailableSkins(NetworkConnection target, List<int> serverAvailableSkins) {
+    [ObserversRpc]
+    [TargetRpc]
+    private void ClientUpdateAvailableSkins(NetworkConnection target, List<int> serverAvailableSkins)
+    {
         availableSkins = serverAvailableSkins;
         uiManager.UpdateSkinsPanel(availableSkins);
     }
 
-    public void GetAvailableSkins() {
+    public void GetAvailableSkins()
+    {
         UpdateAvailableSkins(base.ClientManager.Connection);
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    private void ChangeSkin(int newSkin, NetworkConnection conn = null) {
+    [ServerRpc(RequireOwnership = false)]
+    private void ChangeSkin(int newSkin, NetworkConnection conn = null)
+    {
         if (!availableSkins.Contains(newSkin)) return;
 
         availableSkins.Add(serverPlayerList[conn].skinColor);
@@ -551,23 +620,32 @@ public class LobbyManager : NetworkBehaviour
         SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
     }
 
-    public void PickSkin(int skinIndex) {
+    public void PickSkin(int skinIndex)
+    {
         ChangeSkin(skinIndex, base.ClientManager.Connection);
         GetAvailableSkins();
     }
 
-    public void OnPlayerHit(NetworkConnection connection) {
-        try {
+    public void OnPlayerHit(NetworkConnection connection, NetworkConnection attacker)
+    {
+        // connection is the player who got hit
+        try
+        {
             serverPlayerList[connection].livesLeft--; // lose a life
 
             // despawn player
             playerSpawner.DespawnPlayer(serverPlayerList[connection].name);
             // set UI player life 
-            SetLife(connection,serverPlayerList[connection].livesLeft);
-            
+            SetLife(connection, serverPlayerList[connection].livesLeft);
+
             // if life left, respawn after a short duration
             if (serverPlayerList[connection].livesLeft > 0)
             {
+                if (attacker != connection)
+                {
+                    playerScores[attacker]++;
+                    Debug.Log($"[In-Game] Player {serverPlayerList[attacker].name} score: {playerScores[attacker]} points");
+                }
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. {serverPlayerList[connection].livesLeft} lives left, respawning in {respawnCooldown} secondes");
 
                 StartRespawnCountdown(connection); // send the message to the player to update their UI
@@ -578,15 +656,23 @@ public class LobbyManager : NetworkBehaviour
             // if no life left, remove from the list alivePlayer
             else
             {
+                if (attacker != connection)
+                {
+                    playerScores[attacker] += 2;
+                    Debug.Log($"[In-Game] Player {serverPlayerList[attacker].name} score: {playerScores[attacker]} points");
+                }
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. No life left, game over");
+                SendScoresToDatabase(connection);
                 alivePlayers.Remove(serverPlayerList[connection]);
                 OnPlayerListChange(alivePlayers); // update the list for every players
+
 
                 // if only one player is alive, end game
                 if (alivePlayers.Count() == 1)
                 {
                     Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
                     ShowEndGamePanel(alivePlayers[0].name);
+                    SendScoresToDatabase(serverPlayerList.FirstOrDefault(x => x.Value.name == alivePlayers[0].name).Key); // send the score to the database
                 }
                 else
                 {
@@ -594,13 +680,16 @@ public class LobbyManager : NetworkBehaviour
                 }
             }
 
-        } catch {
+        }
+        catch
+        {
             Debug.Log($"[ERROR] No player found for connection {connection}");
         }
     }
 
-    private IEnumerator RespawnCoroutine(NetworkConnection playerConnection, PlayerData playerData) {
-        
+    private IEnumerator RespawnCoroutine(NetworkConnection playerConnection, PlayerData playerData)
+    {
+
         // wait `respawnCooldown` seconds
         yield return new WaitForSeconds(respawnCooldown);
 
@@ -610,27 +699,37 @@ public class LobbyManager : NetworkBehaviour
         Debug.Log($"Respawning player {playerData.name}");
     }
 
-    [ServerRpc(RequireOwnership=false)]
-    public void ReadyForReplay(NetworkConnection conn = null) {
+    [ServerRpc(RequireOwnership = false)]
+    public void ReadyForReplay(NetworkConnection conn = null)
+    {
         // if first to hit replay, start autoReplay countdown
-        if (!hasAutoReplayStarted) {
+        if (!hasAutoReplayStarted)
+        {
             Debug.Log($"[Lobby #number] Starting auto-replay in {autoReplayCountdown} seconds");
             hasAutoReplayStarted = true;
             StartCoroutine(AutoReplayCoroutine(autoReplayCountdown));
         }
 
         // check if player already ready
-        if (conn != null && !playerReadyForReplay.Exists(player => player.name == serverPlayerList[conn].name)) {
+        if (conn != null && !playerReadyForReplay.Exists(player => player.name == serverPlayerList[conn].name))
+        {
 
             playerReadyForReplay.Add(serverPlayerList[conn]);
             Debug.Log($"[Lobby #number] New player ready for replay. {playerReadyForReplay.Count}/{serverPlayerList.Count}");
 
             // if everyone is ready, restart the game
             UpdateReadyForReplay(serverPlayerList.Count, playerReadyForReplay.Count);
-            if (playerReadyForReplay.Count == serverPlayerList.Count) {
+            if (playerReadyForReplay.Count == serverPlayerList.Count)
+            {
                 ClearAndReplayServer();
             }
         }
+    }
+
+    [TargetRpc]
+    private void SendScoresToDatabase(NetworkConnection conn)
+    {
+        authController.UpdateUserStatistics(playerScores[conn]);
     }
 }
 
@@ -641,7 +740,8 @@ public class PlayerData
     public int livesLeft { get; set; }
     public int skinColor { get; set; }
 
-    public PlayerData() {
+    public PlayerData()
+    {
         name = "";
         livesLeft = -1;
         skinColor = -1;
@@ -654,20 +754,24 @@ public class PlayerData
         skinColor = _skinColor;
     }
 
-    static public List<string> GetNameList(List<PlayerData> playerDatas) {
+    static public List<string> GetNameList(List<PlayerData> playerDatas)
+    {
         List<string> names = new();
 
-        foreach(PlayerData player in playerDatas) {
+        foreach (PlayerData player in playerDatas)
+        {
             names.Add(player.name);
         }
 
         return names;
     }
 
-    static public Dictionary<NetworkConnection, int> GetSkinsDic(Dictionary<NetworkConnection, PlayerData> players) {
+    static public Dictionary<NetworkConnection, int> GetSkinsDic(Dictionary<NetworkConnection, PlayerData> players)
+    {
         Dictionary<NetworkConnection, int> skins = new();
 
-        foreach (KeyValuePair<NetworkConnection, PlayerData> pair in players) {
+        foreach (KeyValuePair<NetworkConnection, PlayerData> pair in players)
+        {
             skins.Add(pair.Key, pair.Value.skinColor);
         }
 

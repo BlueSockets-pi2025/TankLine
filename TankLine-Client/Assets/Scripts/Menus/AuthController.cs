@@ -324,6 +324,35 @@ public class AuthController : MonoBehaviour
         yield return StartCoroutine(GetUserStatistics());
     }
 
+    public IEnumerator UpdateUserStatistics(int highestScore)
+    {
+        var requestData = new UpdateStatisticsRequest
+        {
+            GamesPlayed = 1, // Default value
+            HighestScore = highestScore
+        };
+
+        string json = JsonUtility.ToJson(requestData);
+
+        yield return SendRequestWithAutoRefresh(
+            userStatisticsUrl + "/update",
+            "PUT",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            System.Text.Encoding.UTF8.GetBytes(json),
+            onSuccess: (response) =>
+            {
+                Debug.Log("User statistics updated successfully.");
+            },
+            onError: (response) =>
+            {
+                string errorMessage = !string.IsNullOrEmpty(response.downloadHandler.text)
+                    ? response.downloadHandler.text
+                    : "An unknown error occurred.";
+                Debug.LogError($"Failed to update user statistics: {errorMessage}");
+            }
+        );
+    }
+
     /// <summary>
     /// Logout the user.
     /// </summary>
@@ -1330,6 +1359,12 @@ public class UserStatistics
     public int ranking;
 }
 
+[System.Serializable]
+public class UpdateStatisticsRequest
+{
+    public int GamesPlayed;
+    public int HighestScore;
+}
 
 [System.Serializable]
 public class PlayedGameStats

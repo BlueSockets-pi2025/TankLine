@@ -142,7 +142,7 @@ public class Bullet : NetworkBehaviour {
             
             Tank_Player hitTank = collision.gameObject.GetComponent<Tank_Player>();
 
-            FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner);
+            FindAnyObjectByType<LobbyManager>().OnPlayerHit(hitTank.Owner, tankOwner.GetComponent<Tank_Player>().Owner);
 
             Despawn(thisBullet);
 
