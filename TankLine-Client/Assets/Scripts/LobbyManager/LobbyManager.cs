@@ -673,7 +673,7 @@ public class LobbyManager : NetworkBehaviour
                 {
                     Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
                     ShowEndGamePanel(alivePlayers[0].name);
-                    winnerConnection = serverPlayerList.FirstOrDefault(x => x.Value.name == alivePlayers[0].name).Key;
+                    NetworkConnection winnerConnection = serverPlayerList.FirstOrDefault(x => x.Value.name == alivePlayers[0].name).Key;
                     SendScoresToDatabase(winnerConnection, playerScores[winnerConnection]); // send the score to the database
                 }
                 else
