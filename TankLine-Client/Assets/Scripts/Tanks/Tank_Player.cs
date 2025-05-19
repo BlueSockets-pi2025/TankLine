@@ -64,6 +64,10 @@ public class Tank_Player : Tank
         controls.SetActive(false);
 #endif
 #if UNITY_ANDROID
+
+        playerInput = GetComponent<PlayerInput>();
+        activeInput();
+
         controls.SetActive(true);
         shootJoystick.player = gameObject;
 #endif
