@@ -663,7 +663,7 @@ public class LobbyManager : NetworkBehaviour
                     Debug.Log($"[In-Game] Player {serverPlayerList[attacker].name} score: {playerScores[attacker]} points");
                 }
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. No life left, game over");
-                SendScoresToDatabase(connection);
+                SendScoresToDatabase(connection, playerScores[connection]); // send the score to the database
                 alivePlayers.Remove(serverPlayerList[connection]);
                 OnPlayerListChange(alivePlayers); // update the list for every players
 
@@ -673,7 +673,8 @@ public class LobbyManager : NetworkBehaviour
                 {
                     Debug.Log($"[In-Game] End of game. {alivePlayers[0].name} won !");
                     ShowEndGamePanel(alivePlayers[0].name);
-                    SendScoresToDatabase(serverPlayerList.FirstOrDefault(x => x.Value.name == alivePlayers[0].name).Key); // send the score to the database
+                    winnerConnection = serverPlayerList.FirstOrDefault(x => x.Value.name == alivePlayers[0].name).Key;
+                    SendScoresToDatabase(winnerConnection, playerScores[winnerConnection]); // send the score to the database
                 }
                 else
                 {
@@ -728,9 +729,10 @@ public class LobbyManager : NetworkBehaviour
     }
 
     [TargetRpc]
-    private void SendScoresToDatabase(NetworkConnection conn)
+    private void SendScoresToDatabase(NetworkConnection conn, int score)
     {
-        authController.UpdateUserStatistics(playerScores[conn]);
+        authController.UpdateUserStatistics(score);
+        Debug.Log($"[Lobby #number] Player {serverPlayerList[conn].name} score : {score}");
     }
 }
 
