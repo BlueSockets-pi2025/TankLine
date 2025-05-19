@@ -246,6 +246,7 @@ public class LobbyManager : NetworkBehaviour
         {
             // reset the number of player ready when reloading a new game
             nbPlayerReady = 0;
+            authController = gameObject.GetComponent<AuthController>();
 
             // set a timeout to launch game even if a player can't make it in game
             if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true")
