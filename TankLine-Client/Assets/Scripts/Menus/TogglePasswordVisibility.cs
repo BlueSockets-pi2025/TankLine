@@ -20,6 +20,7 @@ public class TogglePasswordVisibility : MonoBehaviour
 
     void TogglePassword()
     {
+        #if UNITY_ANDROID
         isPasswordVisible = !isPasswordVisible;
 
         passwordInput.contentType = isPasswordVisible ? 
@@ -28,14 +29,17 @@ public class TogglePasswordVisibility : MonoBehaviour
 
         passwordInput.ForceLabelUpdate();
         UpdateEyeIcon();
+        #endif
     }
 
     void UpdateEyeIcon()
     {
+        #if UNITY_ANDROID
         if (eyeImage != null)
         {
             // Set the texture based on password visibility
             eyeImage.texture = isPasswordVisible ? eyeOpenTexture : eyeClosedTexture;
         }
+        #endif
     }
 }
