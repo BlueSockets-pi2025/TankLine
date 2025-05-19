@@ -241,6 +241,12 @@ public class LobbyManager : NetworkBehaviour
             playerScores.Add(kvp.Key, 0);
         }
 
+        tanksDestroyed.Clear();
+        foreach (var kvp in serverPlayerList)
+        {
+            tanksDestroyed.Add(kvp.Key, 0);
+        }
+
         // if in game
         if (scene.name == "LoadScene")
         {
@@ -544,6 +550,7 @@ public class LobbyManager : NetworkBehaviour
     private List<PlayerData> alivePlayers = new();
     private List<PlayerData> playerReadyForReplay = new();
     private Dictionary<NetworkConnection, int> playerScores = new();
+    private Dictionary<NetworkConnection, int> tanksDestroyed = new();
 
     [ObserversRpc]
     private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins)
@@ -660,10 +667,13 @@ public class LobbyManager : NetworkBehaviour
                 if (attacker != connection)
                 {
                     playerScores[attacker] += 2;
+                    tanksDestroyed[attacker]++;
+                    Debug.Log($"[In-Game] Player {serverPlayerList[attacker].name} destroyed a player. Total count: {tanksDestroyed[attacker]}");
                     Debug.Log($"[In-Game] Player {serverPlayerList[attacker].name} score: {playerScores[attacker]} points");
                 }
                 Debug.Log($"[In-Game] Player {serverPlayerList[connection].name} hit. No life left, game over");
                 SendScoresToDatabase(connection, playerScores[connection]); // send the score to the database
+                SendAchievementsToDatabase(connection, false, tanksDestroyed[connection], playerScores[connection]); 
                 alivePlayers.Remove(serverPlayerList[connection]);
                 OnPlayerListChange(alivePlayers); // update the list for every players
 
@@ -675,6 +685,7 @@ public class LobbyManager : NetworkBehaviour
                     ShowEndGamePanel(alivePlayers[0].name);
                     NetworkConnection winnerConnection = serverPlayerList.FirstOrDefault(x => x.Value.name == alivePlayers[0].name).Key;
                     SendScoresToDatabase(winnerConnection, playerScores[winnerConnection]); // send the score to the database
+                    SendAchievementsToDatabase(winnerConnection, true, tanksDestroyed[winnerConnection], playerScores[winnerConnection]);
                 }
                 else
                 {
@@ -734,6 +745,21 @@ public class LobbyManager : NetworkBehaviour
         Debug.Log($"[Lobby #number] Sending score to database : {score}");
         StartCoroutine(authController.UpdateUserStatistics(score));
     }
+
+    [TargetRpc]
+    private void SendAchievementsToDatabase(NetworkConnection conn, bool gameWon, int tanksDestroyed, int totalScore)
+    {
+        DateTime now = DateTime.Now;
+
+        string day = now.Day.ToString();
+        string month = now.Month.ToString();
+        string year = now.Year.ToString();
+        string hour = now.Hour.ToString();
+        string minute = now.Minute.ToString();
+
+        StartCoroutine(authController.AddGameAchievements("Map1.json", 0, gameWon, tanksDestroyed, totalScore, day, month, year, hour, minute));
+    }
+
 }
 
 [Serializable]

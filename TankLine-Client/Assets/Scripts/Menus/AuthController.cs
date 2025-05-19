@@ -1148,7 +1148,7 @@ public class AuthController : MonoBehaviour
 
 
 
-private IEnumerator AddGameAchievements(string mapId, int playerRank, bool gameWon, int tanksDestroyed, int totalScore, string day, string month, string year, string hour, string minute)
+public IEnumerator AddGameAchievements(string mapId, int playerRank, bool gameWon, int tanksDestroyed, int totalScore, string day, string month, string year, string hour, string minute)
     {
         AddGameStats gameStats = new AddGameStats
         {
