@@ -17,7 +17,8 @@ public class PlayerSpawner : NetworkBehaviour
     {
         // find new spawnpoint transform
         GameObject spawnPointsParent = GameObject.Find("PlayerSpawns");
-        if (spawnPointsParent == null) {
+        if (spawnPointsParent == null)
+        {
             Debug.Log("[ERROR] spawnpoint parent not found");
             return;
         }
@@ -26,10 +27,12 @@ public class PlayerSpawner : NetworkBehaviour
         spawnPoints = new();
         currentSpawnIndex = 0;
 
-        foreach (Transform child in spawnPointsParent.transform) {
+        foreach (Transform child in spawnPointsParent.transform)
+        {
             spawnPoints.Add(child.gameObject);
         }
 
+        ShuffleSpawnPoint(spawnPoints);
         Debug.Log($"{spawnPoints.Count} new spawn point initialized");
     }
 
@@ -38,7 +41,8 @@ public class PlayerSpawner : NetworkBehaviour
     /// </summary>
     /// <param name="ownerConnection">The connection of the player who will own the object</param>
     /// <param name="ownerName">The owner nickname</param>
-    public void SpawnPlayer(NetworkConnection ownerConnection, string ownerName) {
+    public void SpawnPlayer(NetworkConnection ownerConnection, string ownerName)
+    {
 
         // instantiate the new player at the current spawnpoint position
         GameObject newPlayer = Instantiate(playerObjectPrefab);
@@ -59,7 +63,8 @@ public class PlayerSpawner : NetworkBehaviour
     /// Despawn a player
     /// </summary>
     /// <param name="playerObject">The reference to the player gameObject</param>
-    public void DespawnPlayer(GameObject playerObject) {
+    public void DespawnPlayer(GameObject playerObject)
+    {
         Despawn(playerObject);
     }
 
@@ -67,18 +72,33 @@ public class PlayerSpawner : NetworkBehaviour
     /// Despawn a player
     /// </summary>
     /// <param name="playerName">The name of the player</param>
-    public void DespawnPlayer(string playerName) {
-        GameObject playerObject = GameObject.Find("Player:"+playerName);
+    public void DespawnPlayer(string playerName)
+    {
+        GameObject playerObject = GameObject.Find("Player:" + playerName);
         Despawn(playerObject);
     }
 
     /// <summary>
     /// Despawn every player
     /// </summary>
-    public void DespawnEveryone(List<string> playersName) {
-        foreach (string player in playersName) {
-            GameObject playerObject = GameObject.Find("Player:"+player);
+    public void DespawnEveryone(List<string> playersName)
+    {
+        foreach (string player in playersName)
+        {
+            GameObject playerObject = GameObject.Find("Player:" + player);
             Despawn(playerObject);
+        }
+    }
+
+    public void ShuffleSpawnPoint(List<GameObject> spawnPointsList)
+    {
+        System.Random rng = new();
+
+        int n = spawnPointsList.Count;
+        while (n > 1) {
+            n--;
+            int k = rng.Next(n + 1);
+            (spawnPointsList[n], spawnPointsList[k]) = (spawnPointsList[k], spawnPointsList[n]);
         }
     }
 }
