@@ -4,10 +4,6 @@
 ## Description
 A 2025 remake of "Tank 1990: Battle Defense War", as part of end of bachelor's 3rd year integrative project.
 
-## Table of contents
-[[_TOC_]]
-
-
 ## Run on university's VM
 
 ### Server 0
