@@ -731,8 +731,8 @@ public class LobbyManager : NetworkBehaviour
     [TargetRpc]
     private void SendScoresToDatabase(NetworkConnection conn, int score)
     {
-        authController.UpdateUserStatistics(score);
-        Debug.Log($"[Lobby #number] Player {serverPlayerList[conn].name} score : {score}");
+        Debug.Log($"[Lobby #number] Sending score to database : {score}");
+        StartCoroutine(authController.UpdateUserStatistics(score));
     }
 }
 
