@@ -79,26 +79,12 @@ public class Tank_Player : Tank
         activeIndicator();
     }
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        playerInput = GetComponent<PlayerInput>();
-        activeInput();
-    }
-
     public void activeIndicator()
     {
         if (base.IsOwner)
         {
             indicator.SetActive(true);
         }
-    }
-
-    public override void OnOwnershipClient(NetworkConnection prevOwner)
-    {
-        base.OnOwnershipClient(prevOwner);
-        Debug.Log($"OnOwnershipClient: IsOwner={IsOwner}");
-        activeInput();
     }
 
     public void activeInput()
