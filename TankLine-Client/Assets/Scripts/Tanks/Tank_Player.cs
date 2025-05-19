@@ -99,11 +99,12 @@ public class Tank_Player : Tank
     {
         if (!base.IsOwner)
         {
+            Debug.Log("TEST - Mobile input - X");
             playerInput.enabled = false;
         }
         else
         {
-            Debug.Log("TEST - Mobile input");
+            Debug.Log("TEST - Mobile input - active");
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
