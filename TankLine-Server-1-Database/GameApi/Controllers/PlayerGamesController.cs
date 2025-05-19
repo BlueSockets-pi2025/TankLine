@@ -8,6 +8,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using System.Security.Claims;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
+using Castle.Components.DictionaryAdapter;
+using System.Diagnostics;
 
 namespace GameApi.Controllers
 {
@@ -56,7 +59,7 @@ namespace GameApi.Controllers
             {
                 Username = username,
                 GameWon = lastGame.GameWon,
-                TanksDestroyed = lastGame.TanksDestroyed,
+                TanksDestroyed = games.Sum(g => g.TanksDestroyed),
                 TotalScore = lastGame.TotalScore,
                 PlayerRank = lastGame.PlayerRank,
                 MapPlayed = lastGame.MapId ?? "Unknown Map",
@@ -68,36 +71,54 @@ namespace GameApi.Controllers
             return Ok(stats);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<PlayedGame>> AddGame(PlayedGame newGame)
+
+    [HttpPost("addgame/")]
+    public async Task<ActionResult<PlayedGame>> AddGame(AddPlayedGameStatsDto newGameDto)
+    {
+        var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
         {
-            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (subClaim == null || string.IsNullOrEmpty(subClaim.Value))
-            {
-                return Unauthorized("Invalid token or missing user information.");
-            }
-
-            var username = subClaim.Value;
-
-            if (!_context.UserAccounts.Any(u => u.Username == username))
-            {
-                return BadRequest("User does not exist.");
-            }
-
-            var mapExists = await _context.GeneratedMaps
-                                .AnyAsync(m => m.MapId == newGame.MapId);
-            if (!mapExists)
-            {
-                return BadRequest("Map does not exist.");
-            }
-
-            newGame.Username = username;
-
-            _context.PlayedGames.Add(newGame);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetSummary), new { username = username }, newGame);
+            return Unauthorized("Invalid token or missing user information.");
         }
+        var username = subClaim.Value;
+
+        if (!_context.UserAccounts.Any(u => u.Username == username))
+        {
+            return BadRequest("User does not exist.");
+        }
+
+
+        var mapExists = await _context.GeneratedMaps.AnyAsync(m => m.MapId == newGameDto.MapId);
+        if (!mapExists)
+        {
+            return BadRequest("Map does not exist.");
+        }
+
+
+        if (newGameDto.GameDate == default)
+        {
+            newGameDto.GameDate = DateTime.UtcNow;
+        }
+
+
+        var newGame = new PlayedGame
+        {
+            Username = username,
+            GameDate = newGameDto.GameDate,
+            GameWon = newGameDto.GameWon,
+            TanksDestroyed = newGameDto.TanksDestroyed,
+            TotalScore = newGameDto.TotalScore,
+            PlayerRank = newGameDto.PlayerRank,
+            MapId = newGameDto.MapId,
+        };
+
+        _context.PlayedGames.Add(newGame);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetSummary), new { username = username }, newGame);
+    }
+
+
     }
 
     public class PlayedGameStatsDto
@@ -112,4 +133,19 @@ namespace GameApi.Controllers
         public int TotalVictories { get; set; }
         public required string Username { get; set; }
     }
+
+    public class AddPlayedGameStatsDto
+    {
+        public bool GameWon { get; set; }
+        public int TanksDestroyed { get; set; }
+        public int TotalScore { get; set; }
+        public int PlayerRank { get; set; }
+        public DateTime GameDate { get; set; }
+        public required string MapId { get; set; }
+
+    }
+
+
+
+
 }

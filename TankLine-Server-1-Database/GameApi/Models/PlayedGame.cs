@@ -32,7 +32,10 @@ namespace GameApi.Models
         public int PlayerRank { get; set; } = 0;
 
         [Column("map_id")] 
-        public string? MapId { get; set; }  
+        public string? MapId { get; set; }
 
+
+        [NotMapped]
+        public int TotalVictories { get; internal set; }
     }
 }
