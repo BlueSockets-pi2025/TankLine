@@ -91,6 +91,7 @@ public class Tank_Player : Tank
 
     public void desactiveInput()
     {
+        playerInput = GetComponent<PlayerInput>();
         playerInput.enabled = false;
         playerInput.DeactivateInput();
     }
@@ -98,6 +99,7 @@ public class Tank_Player : Tank
     public void activeInput()
     {
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return;
+        playerInput = GetComponent<PlayerInput>();
 
         if (!base.IsOwner)
         {
