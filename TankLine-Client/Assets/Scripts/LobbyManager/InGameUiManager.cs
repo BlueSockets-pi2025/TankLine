@@ -301,4 +301,16 @@ public class InGameUiManager
             skinEntry.GetComponent<Button>().interactable = availableSkins.Contains(i);
         }
     }
+
+    public void UpdateAllInput()
+    {
+        foreach (Tank_Player tank in GameObject.FindObjectsOfType<Tank_Player>())
+        {
+            tank.desactiveInput();
+        }
+        foreach (Tank_Player tank in GameObject.FindObjectsOfType<Tank_Player>())
+        {
+            tank.activeInput();
+        }
+    }
 }

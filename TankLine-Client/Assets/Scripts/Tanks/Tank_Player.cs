@@ -77,6 +77,8 @@ public class Tank_Player : Tank
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
         activeIndicator();
+
+        uiManager.UpdateAllInput();
     }
 
     public void activeIndicator()
@@ -84,12 +86,13 @@ public class Tank_Player : Tank
         if (base.IsOwner)
         {
             indicator.SetActive(true);
-            
-            playerInput = GetComponent<PlayerInput>();
-            playerInput.enabled = true;
-            playerInput.ActivateInput();
-
         }
+    }
+
+    public void desactiveInput()
+    {
+        playerInput.enabled = false;
+        playerInput.DeactivateInput();
     }
 
     public void activeInput()
@@ -100,6 +103,7 @@ public class Tank_Player : Tank
         {
             Debug.Log("TEST - Mobile input - X " + transform.Find("base").GetComponent<Renderer>().materials[4]);
             playerInput.enabled = false;
+            playerInput.DeactivateInput();
         }
         else
         {
@@ -108,6 +112,26 @@ public class Tank_Player : Tank
             playerInput.ActivateInput();
         }
     }
+
+    // public override void OnOwnershipClient(NetworkConnection prevOwner)
+    // {
+    //     base.OnOwnershipClient(prevOwner);
+    //     Debug.Log("[Tank_Player] OnOwnershipClient: IsOwner=" + IsOwner);
+
+    //     // Active l'indicateur et l'input seulement si owner
+    //     if (IsOwner)
+    //     {
+    //         playerInput = GetComponent<PlayerInput>();
+    //         playerInput.enabled = true;
+    //         playerInput.ActivateInput();
+    //     }
+    //     else
+    //     {
+    //         // DÃ©sactive l'indicateur et l'input si on perd l'ownership
+    //         if (indicator != null) indicator.SetActive(false);
+    //         if (playerInput != null) playerInput.enabled = false;
+    //     }
+    // }
 
     /// <summary>
     /// Automatically called by unity every frame after the physic engine
