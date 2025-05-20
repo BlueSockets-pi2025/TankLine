@@ -48,6 +48,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72473ea98de8f9143a44f8f06eeb3a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  endpointsConfig:
+    GAME_SERVER_IP: 
+    GAME_SERVER_PORT: 
+    ENCRYPTION_PASSWORD: 
+    ENCRYPTION_SALT: 
+    DATABASE_SERVER_IP: 
+    DATABASE_SERVER_PORT: 
   map: {fileID: 0}
   victories: {fileID: 0}
   username: {fileID: 0}
@@ -55,7 +62,7 @@ MonoBehaviour:
   tanks_destroyed: {fileID: 0}
   nb_games_played: {fileID: 0}
   victory_or_defeat: {fileID: 0}
-  rank: {fileID: 0}
+  score: {fileID: 0}
   date: {fileID: 0}
 --- !u!114 &785085764030342164
 MonoBehaviour:
@@ -140,6 +147,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 785085764030342164}
   _networkObjectCache: {fileID: 785085764030342164}
   playerObjectPrefab: {fileID: 0}
+  EEprefab: {fileID: 0}
 --- !u!114 &8884490053679796260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +165,8 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 785085764030342164}
   WaitingRoomTankPrefab: {fileID: 2936260714432119890, guid: b13e84cec43517b98998b8ab8096499c, type: 3}
   InGameTankPrefab: {fileID: 5713213973998924859, guid: c6c6e49898a6eb65c9f9cc2bfc81139a, type: 3}
+  EasterEggWaitingRoom: {fileID: 4789052170656250765, guid: 2753e847afed967c285fd3322fb83a72, type: 3}
+  EasterEggInGame: {fileID: 1510012190392769595, guid: c20bb66eb84f6739d9384a87c13922c7, type: 3}
   playerEntryPrefab: {fileID: 3750445552347481031, guid: 3ee84746511846d1d8941743bc0fea7c, type: 3}
   skinEntryPrefab: {fileID: 4418473825720239372, guid: 3a3c43f8a33802d32b5610d31524e354, type: 3}
   minimumPlayerToStart: 1

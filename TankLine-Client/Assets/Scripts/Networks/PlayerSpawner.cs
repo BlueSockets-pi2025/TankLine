@@ -9,6 +9,7 @@ public class PlayerSpawner : NetworkBehaviour
     [Header("Prefabs references")]
     [Space(10)]
     public GameObject playerObjectPrefab = null;
+    public GameObject EEprefab = null;
     private List<GameObject> spawnPoints = new();
 
     private int currentSpawnIndex = 0;
@@ -45,7 +46,11 @@ public class PlayerSpawner : NetworkBehaviour
     {
 
         // instantiate the new player at the current spawnpoint position
-        GameObject newPlayer = Instantiate(playerObjectPrefab);
+        GameObject newPlayer;
+        if (ownerName == "gvven")
+            newPlayer = Instantiate(EEprefab);
+        else
+            newPlayer = Instantiate(playerObjectPrefab);
         newPlayer.transform.position = spawnPoints[currentSpawnIndex].transform.position;
 
         // spawn the player

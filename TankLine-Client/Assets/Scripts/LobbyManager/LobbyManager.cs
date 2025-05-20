@@ -94,6 +94,8 @@ public class LobbyManager : NetworkBehaviour
     [Space(5)]
     public GameObject WaitingRoomTankPrefab;
     public GameObject InGameTankPrefab;
+    public GameObject EasterEggWaitingRoom;
+    public GameObject EasterEggInGame;
     private IEnumerator loadingTimeoutCoroutine;
     private bool hasGameStarted = false;
 
@@ -108,9 +110,11 @@ public class LobbyManager : NetworkBehaviour
         {
             case "LoadScene":
                 playerSpawner.playerObjectPrefab = InGameTankPrefab;
+                playerSpawner.EEprefab = EasterEggInGame;
                 break;
             case "WaitingRoom":
                 playerSpawner.playerObjectPrefab = WaitingRoomTankPrefab;
+                playerSpawner.EEprefab = EasterEggWaitingRoom;
                 break;
 
             default:
@@ -141,7 +145,7 @@ public class LobbyManager : NetworkBehaviour
 
     public void OnPlayerSpawned()
     {
-        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
+        SyncTexture(serverPlayerList);
     }
 
     public void StartGame()
@@ -560,7 +564,7 @@ public class LobbyManager : NetworkBehaviour
     private Dictionary<NetworkConnection, int> tanksDestroyed = new();
 
     [ObserversRpc]
-    private void SyncTexture(Dictionary<NetworkConnection, int> playersSkins)
+    private void SyncTexture(Dictionary<NetworkConnection, PlayerData> playersSkins)
     {
 
         // in game players
@@ -570,7 +574,8 @@ public class LobbyManager : NetworkBehaviour
             foreach (Tank_Player player in playersInGame)
             {
                 GameObject go = player.GameObject();
-                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
+                if (playersSkins[go.GetComponent<NetworkObject>().Owner].name == "gvven") return;
+                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner].skinColor];
 
                 Material[] mat = go.transform.Find("base").GetComponent<Renderer>().materials;
                 mat[4] = skinColor;
@@ -590,7 +595,8 @@ public class LobbyManager : NetworkBehaviour
             foreach (Tank_Lobby player in playersLobby)
             {
                 GameObject go = player.GameObject();
-                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner]];
+                if (playersSkins[go.GetComponent<NetworkObject>().Owner].name == "gvven") return;
+                Material skinColor = skins[playersSkins[go.GetComponent<NetworkObject>().Owner].skinColor];
 
                 Material[] mat = go.transform.Find("base").GetComponent<Renderer>().materials;
                 mat[4] = skinColor;
@@ -632,7 +638,7 @@ public class LobbyManager : NetworkBehaviour
         serverPlayerList[conn].skinColor = newSkin;
         availableSkins.Remove(newSkin);
         ClientUpdateAvailableSkins(null, availableSkins);
-        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
+        SyncTexture(serverPlayerList);
     }
 
     public void PickSkin(int skinIndex)
@@ -715,7 +721,7 @@ public class LobbyManager : NetworkBehaviour
 
         // respawn player
         playerSpawner.SpawnPlayer(playerConnection, playerData.name);
-        SyncTexture(PlayerData.GetSkinsDic(serverPlayerList));
+        SyncTexture(serverPlayerList);
         Debug.Log($"Respawning player {playerData.name}");
     }
 
@@ -800,17 +806,5 @@ public class PlayerData
         }
 
         return names;
-    }
-
-    static public Dictionary<NetworkConnection, int> GetSkinsDic(Dictionary<NetworkConnection, PlayerData> players)
-    {
-        Dictionary<NetworkConnection, int> skins = new();
-
-        foreach (KeyValuePair<NetworkConnection, PlayerData> pair in players)
-        {
-            skins.Add(pair.Key, pair.Value.skinColor);
-        }
-
-        return skins;
     }
 }
