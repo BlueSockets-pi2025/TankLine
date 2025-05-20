@@ -152,9 +152,6 @@ public class TokenCrypto
             string envContent = request.downloadHandler.text;
             encryptionConfig = JsonUtility.FromJson<EnvVariables>(envContent);
             Debug.Log("Encryption configuration successfully loaded on Android.");
-
-            Debug.Log("Env return:" + envContent);
-            Debug.Log("Encryption config:" + encryptionConfig);
         }
         else
         {

@@ -240,8 +240,6 @@ public class AuthController : MonoBehaviour
             endpointsConfig = JsonUtility.FromJson<EnvVariables>(envContent);
 
             Debug.Log("Endpoints configuration successfully loaded on Android.");
-            Debug.Log("Env return: " + envContent);
-            Debug.Log("EndpointsConfig: " + JsonUtility.ToJson(endpointsConfig));
 
         }
         else
