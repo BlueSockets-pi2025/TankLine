@@ -1,0 +1,2 @@
+C:\Users\bapti\Documents\L3\S6\PROJET_INTEGRATEUR\MOBILE\TankLine\TankLine-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\Users\bapti\Documents\L3\S6\PROJET_INTEGRATEUR\MOBILE\TankLine\TankLine-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

@@ -1,3 +1,5 @@
+#if UNITY_STANDALONE
+
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
@@ -101,3 +103,4 @@ public class ExplosionSfx : MonoBehaviour
     }
 }
 
+#endif

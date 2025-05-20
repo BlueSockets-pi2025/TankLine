@@ -27,8 +27,8 @@ public class MenuSwapper : MonoBehaviour
 
     public Toggle RememberMeToggle; // reference to the “Remember Me” checkbox
 
-    public GameObject leaderboardContent; 
-    public GameObject leaderboardEntryPrefab; 
+    public GameObject leaderboardContent;
+    public GameObject leaderboardEntryPrefab;
 
     // Testing : 
     public TMP_Text gamesPlayedInputField;
@@ -49,15 +49,25 @@ public class MenuSwapper : MonoBehaviour
         Canvas = _canvas.transform;
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         authController = GetComponent<AuthController>();
         if (authController == null)
         {
             Debug.LogError("AuthController not found.");
-            return;
+            yield break;
         }
 
+        // Wait for AuthController to be initialized:
+        while (!authController.IsInitialized)
+        {
+            Debug.Log("Waiting for AuthController initialization...");
+            yield return null;
+        }
+
+        Debug.Log("AuthController initialization complete.");
+
+        // Load first page: 
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))
         {
@@ -92,6 +102,16 @@ public class MenuSwapper : MonoBehaviour
         {
             OpenPage("MainMenu");
             //AutoLogin();
+
+#if UNITY_ANDROID
+        Canvas.transform.Find("OptionsKeyboard").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsGeneral/keyboard").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsMouse/keyboard").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsMouse").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsGeneral/mouse").gameObject.SetActive(false);
+        Canvas.transform.Find("OptionsKeyboard/mouse").gameObject.SetActive(false);
+#endif
+
         }
     }
 
@@ -243,8 +263,8 @@ public class MenuSwapper : MonoBehaviour
         }
 
         Transform page = CurrentPage.name == "PagePrincipale" ? CurrentPage.transform : Canvas.Find("PagePrincipale").transform;
-        string username = page.Find("LogUsername").GetComponent<TMP_InputField>().text;
-        string password = page.Find("LogPassword").GetComponent<TMP_InputField>().text;
+        string username = FindDeepChild(page, "LogUsername")?.GetComponent<TMP_InputField>().text;
+        string password = FindDeepChild(page, "LogPassword")?.GetComponent<TMP_InputField>().text;
 
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
@@ -267,8 +287,8 @@ public class MenuSwapper : MonoBehaviour
     {
 
         // Find username and password input field:
-        yield return authController.Login(PagePrincipale.Find("LogUsername").GetComponent<TMP_InputField>().text,
-                                        PagePrincipale.Find("LogPassword").GetComponent<TMP_InputField>().text);
+        yield return authController.Login(FindDeepChild(PagePrincipale, "LogUsername")?.GetComponent<TMP_InputField>().text,
+                                        FindDeepChild(PagePrincipale, "LogPassword")?.GetComponent<TMP_InputField>().text);
 
         if (authController.IsRequestSuccessful)
         {
@@ -767,7 +787,7 @@ public class MenuSwapper : MonoBehaviour
             GameObject newEntry = Instantiate(leaderboardEntryPrefab, leaderboardContent.transform);
 
             newEntry.SetActive(true); // Ensure the new entry is active
-            
+
             // Retrieve text fields from prefab:
             TMP_Text rankText = newEntry.transform.Find("Rank")?.GetComponent<TMP_Text>();
             TMP_Text nameText = newEntry.transform.Find("Name")?.GetComponent<TMP_Text>();
@@ -920,6 +940,14 @@ public class MenuSwapper : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("WaitingRoom");
     }
+    public void OpenTutorialScene()
+{
+#if UNITY_ANDROID
+    UnityEngine.SceneManagement.SceneManager.LoadScene("Tuto");
+#else
+    UnityEngine.SceneManagement.SceneManager.LoadScene("TutoPC");
+#endif
+}
 
     /// <summary>
     /// Rcursive search for a GameObject in the hierarchy by name </br>

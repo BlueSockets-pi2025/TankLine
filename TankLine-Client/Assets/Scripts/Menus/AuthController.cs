@@ -8,8 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Timers;
 
-using Heartbeat ; 
-using static TokenCrypto; 
+using Heartbeat;
+using static TokenCrypto;
 
 
 public class AuthController : MonoBehaviour
@@ -35,11 +35,16 @@ public class AuthController : MonoBehaviour
     private string refreshRefreshTokenUrl;
     private string leaderboardUrl;
 
+    private string addGameUrl;
+
+
     private int minExpirationRefreshToken = 24; // Minimum expiration time for refresh token in hours when checking in launch
 
     private static AuthController instance;
 
-    private static X509Certificate2 trustedCertificate;  
+    public bool IsInitialized { get; private set; } = false; // Indicates if the AuthController is initialized (for other managers)
+
+    private static X509Certificate2 trustedCertificate;
 
     public EnvVariables endpointsConfig; // Server configuration (database server endpoints)
 
@@ -58,9 +63,11 @@ public class AuthController : MonoBehaviour
     public TMP_Text tanks_destroyed;
     public TMP_Text nb_games_played;
     public TMP_Text victory_or_defeat;
-    public TMP_Text rank;
+    public TMP_Text score;
     public TMP_Text date;
-    
+
+    public const string PathToEnvFile = "/.env";
+
     private static X509Certificate2 staticTrustedCertificate;
 
     private void OnApplicationQuit()
@@ -68,17 +75,36 @@ public class AuthController : MonoBehaviour
         // Disconnect to enable other users to connect without deleting the refresh token: 
         DisconnectSynchronously();
     }
-
+    /*
+    public void OnApplicationQuitNative() // Mobile 
+    {
+        Debug.Log("Application is quitting (detected via native Android).");
+        DisconnectSynchronously();
+    }
+    */
     private void Awake()
-    {   
-        // Load the trusted certificate from the specified path:
-        LoadCertificate();
+    {
+        StartCoroutine(Initialization());
+    }
 
-        // Load the encryption configuration (password and salt) from the `.env` file:
-        TokenCrypto.LoadEncryptionConfig();
+    private IEnumerator Initialization()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            Debug.Log("Platform is Android.");
+        }
+        else
+        {
+            Debug.Log("Platform is not Android.");
+        }
+        // Load the trusted certificate from the specified path:
+        yield return StartCoroutine(LoadCertificate());
 
         // Load the server configuration (database server endpoints) from the `.env` file:
-        LoadEndpointsConfig();
+        yield return StartCoroutine(LoadEndpointsConfig());
+
+        // Load the encryption configuration (password and salt) from the `.env` file:
+        yield return StartCoroutine(TokenCrypto.LoadEncryptionConfig(this)); // "this" for the monoBehaviour instance
 
         // Load environment variables for the database server:         
         string serverIp = endpointsConfig.DATABASE_SERVER_IP;
@@ -87,7 +113,7 @@ public class AuthController : MonoBehaviour
         if (string.IsNullOrEmpty(serverIp) || string.IsNullOrEmpty(serverPort))
         {
             Debug.LogError("Database server IP or port is not set in the environment variables.");
-            return;
+            yield break;
         }
 
         // Build URLs dynamically: 
@@ -111,35 +137,115 @@ public class AuthController : MonoBehaviour
         refreshExpirationUrl = $"{baseUrl}/auth/refresh-expiration";
         refreshRefreshTokenUrl = $"{baseUrl}/auth/refresh-refresh-token";
         leaderboardUrl = $"{baseUrl}/leaderboard";
-    }   
+        addGameUrl = $"{baseUrl}/PlayedGames/addgame";
+
+
+        Debug.Log("Initialization complete.");
+        IsInitialized = true; // Indique que l'initialisation est terminée
+
+    }
 
     /// <summary>
     /// Loads the trusted certificate from the specified path. <br/>
     /// This method is called in the Awake method.
     /// </summary>
-    private void LoadCertificate()
+    private IEnumerator LoadCertificate()
     {
         string certificatePath = Application.streamingAssetsPath + "/certificat.pem";
+
+        Debug.Log("Loading trusted certificate from: " + certificatePath);
+
+        //Debug.Log("Certificate path: " + certificatePath);
+        Debug.Log("Current platform: " + Application.platform);
+
+#if UNITY_ANDROID
+            Debug.Log("Running on Android. Attempting to load certificate using UnityWebRequest.");
+            yield return StartCoroutine(LoadCertificateForAndroid(certificatePath));
+#else
+        Debug.Log("Running on a non-Android platform. Attempting to load certificate directly.");
         if (File.Exists(certificatePath))
         {
             byte[] certificateBytes = File.ReadAllBytes(certificatePath);
             trustedCertificate = new X509Certificate2(certificateBytes);
-            staticTrustedCertificate = trustedCertificate ; 
+            staticTrustedCertificate = trustedCertificate;
             Debug.Log("Certificate successfully loaded.");
         }
         else
         {
             Debug.LogError("Certificate file not found! Ensure it's in the correct directory.");
         }
+        yield return null; // Guarantee that the coroutine ends
+#endif
     }
+
+    /// <summary>
+    /// Loads the trusted certificate from the specified path for Android. <br/>
+    /// </summary>
+    /// <param name="certificatePath">The path to the certificate file.</param>
+    private IEnumerator LoadCertificateForAndroid(string certificatePath)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(certificatePath);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            byte[] certificateBytes = request.downloadHandler.data;
+            trustedCertificate = new X509Certificate2(certificateBytes);
+            staticTrustedCertificate = trustedCertificate;
+            Debug.Log("Certificate successfully loaded on Android.");
+        }
+        else
+        {
+            Debug.LogError("Failed to load certificate on Android: " + request.error);
+        }
+        yield return null; // Guarantee that the coroutine ends
+    }
+
+
 
     /// <summary>
     /// Load the server configuration (database server endpoints) from the `.env` file and store it in the variable `endpointsConfig`
     /// </summary>
-    private void LoadEndpointsConfig()
+    private IEnumerator LoadEndpointsConfig()
     {
-        string jsonEnv = File.ReadAllText(Application.streamingAssetsPath + PathToEnvFile);
-        endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+        string envFilePath;
+
+#if UNITY_ANDROID
+            Debug.Log("Running on Android. Attempting to load .env file using UnityWebRequest.");
+            envFilePath = System.IO.Path.Combine(Application.streamingAssetsPath, ".env");
+            yield return StartCoroutine(LoadEndpointsConfigForAndroid(envFilePath));
+#else
+        envFilePath = Application.streamingAssetsPath + "/.env";
+        if (File.Exists(envFilePath))
+        {
+            string jsonEnv = File.ReadAllText(envFilePath);
+            endpointsConfig = JsonUtility.FromJson<EnvVariables>(jsonEnv);
+            Debug.Log("Endpoints configuration successfully loaded.");
+        }
+        else
+        {
+            Debug.LogError("Env file not found! Ensure it's in the correct directory.");
+        }
+        yield return null;
+#endif
+    }
+
+    private IEnumerator LoadEndpointsConfigForAndroid(string envFilePath)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(envFilePath);
+        yield return request.SendWebRequest();
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string envContent = request.downloadHandler.text;
+            endpointsConfig = JsonUtility.FromJson<EnvVariables>(envContent);
+
+            Debug.Log("Endpoints configuration successfully loaded on Android.");
+
+        }
+        else
+        {
+            Debug.LogError("Failed to load .env file on Android: " + request.error);
+        }
     }
 
     /// <summary>
@@ -149,7 +255,7 @@ public class AuthController : MonoBehaviour
     {
         return heartbeatUrl;
     }
-    
+
     /// <summary>
     /// Returns the trusted certificate.
     /// </summary>
@@ -187,8 +293,9 @@ public class AuthController : MonoBehaviour
                 request.SetRequestHeader(header.Key, header.Value);
             }
         }
-        
+
         request.certificateHandler = new CustomCertificateHandler();
+
 
         yield return request.SendWebRequest();
 
@@ -324,6 +431,35 @@ public class AuthController : MonoBehaviour
         yield return StartCoroutine(GetUserStatistics());
     }
 
+    public IEnumerator UpdateUserStatistics(int highestScore)
+    {
+        var requestData = new UpdateStatisticsRequest
+        {
+            GamesPlayed = 1, // Default value
+            HighestScore = highestScore
+        };
+
+        string json = JsonUtility.ToJson(requestData);
+
+        yield return SendRequestWithAutoRefresh(
+            userStatisticsUrl + "/update",
+            "PUT",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            System.Text.Encoding.UTF8.GetBytes(json),
+            onSuccess: (response) =>
+            {
+                Debug.Log("User statistics updated successfully.");
+            },
+            onError: (response) =>
+            {
+                string errorMessage = !string.IsNullOrEmpty(response.downloadHandler.text)
+                    ? response.downloadHandler.text
+                    : "An unknown error occurred.";
+                Debug.LogError($"Failed to update user statistics: {errorMessage}");
+            }
+        );
+    }
+
     /// <summary>
     /// Logout the user.
     /// </summary>
@@ -374,7 +510,7 @@ public class AuthController : MonoBehaviour
     {
         // Attend la fin de la coroutine GetGamePlayedStats
         yield return StartCoroutine(GetGamePlayedStats());
-        
+
         Debug.Log("GAME PLAYED !");
     }
 
@@ -391,7 +527,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.LogError("Passwords do not match.");
             IsRequestSuccessful = false;
-            yield break; 
+            yield break;
         }
 
         string birthDate = FormatDateForApi(day, month, year);
@@ -402,9 +538,9 @@ public class AuthController : MonoBehaviour
             Username = username,
             Email = email,
             passwordHash = password,
-            ConfirmPassword = confirmPassword, 
-            FirstName = firstName,           
-            LastName = lastName,              
+            ConfirmPassword = confirmPassword,
+            FirstName = firstName,
+            LastName = lastName,
             BirthDate = birthDate
         };
 
@@ -433,7 +569,7 @@ public class AuthController : MonoBehaviour
             Debug.Log("Registration failed: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
             // Updates ErrorResponse with the error message (popup):
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             // Set IsRequestSuccessful to false to indicate failure to MenuSwapper:
             IsRequestSuccessful = false;
         }
@@ -477,7 +613,7 @@ public class AuthController : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
         request.certificateHandler = new CustomCertificateHandler();
 
         yield return request.SendWebRequest();
@@ -491,7 +627,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Verification failed: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -528,7 +664,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Error resending code: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -561,7 +697,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Login successful: " + request.downloadHandler.text);
             IsRequestSuccessful = true;
-            
+
             // Read the JSON response (with refresh-token):
             LoginResponse loginResponse = JsonUtility.FromJson<LoginResponse>(request.downloadHandler.text);
 
@@ -571,8 +707,9 @@ public class AuthController : MonoBehaviour
 
             // Check if “Remember Me” is enabled to activate autologin and save the refresh token: 
             if (MenuSwapper.Instance.RememberMeToggle.isOn)
-            {    
-                try {
+            {
+                try
+                {
                     // Encrypt the refresh token: 
                     string encryptedToken = TokenCrypto.Encrypt(loginResponse.refreshToken);
 
@@ -586,7 +723,8 @@ public class AuthController : MonoBehaviour
                     Debug.LogWarning("Failed to save refresh token securely: " + ex.Message);
                 }
             }
-            else {
+            else
+            {
                 Debug.Log("Remember Me is not enabled. Refresh token will not be saved.");
                 // Delete the refresh token file if it exists:
                 if (File.Exists(tokenPath))
@@ -599,23 +737,24 @@ public class AuthController : MonoBehaviour
                     Debug.Log("No refresh token file found to delete.");
                 }
             }
-            
+
             HeartbeatManager.Instance.SetLoggedIn(true);
         }
         else
         {
             Debug.Log("Login error: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
-        
+
         }
     }
 
     /// <summary>
     /// Coroutine to enable autologin at launch 
     /// </summary>
-    private IEnumerator AutoLoginUser() {
+    private IEnumerator AutoLoginUser()
+    {
         // Autologin to set the access token in the cookie (with refresh token) and to set the logged-in status to true (server-side):
         UnityWebRequest request = new UnityWebRequest(autologinUrl, "POST");
         request.downloadHandler = new DownloadHandlerBuffer();
@@ -636,7 +775,7 @@ public class AuthController : MonoBehaviour
             Debug.LogWarning("Failed autologin: " + request.error);
             Debug.LogWarning("Details: " + request.downloadHandler.text);
             MenuSwapper.Instance.HandleSessionExpired(); // Redirects to login page
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -710,9 +849,9 @@ public class AuthController : MonoBehaviour
         else
         {
             Debug.Log("Password reset failed: " + request.error);
-            Debug.Log("Details: " + request.downloadHandler.text); 
+            Debug.Log("Details: " + request.downloadHandler.text);
             // Updates ErrorResponse with the error message:
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -734,7 +873,7 @@ public class AuthController : MonoBehaviour
         var resetRequest = new ResetPasswordRequest
         {
             Email = email,
-            Code = code ,
+            Code = code,
             ConfirmPassword = confirmNewPassword,
             NewPassword = newPassword
         };
@@ -760,7 +899,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.Log("Password reset error: " + request.error);
             Debug.Log("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             IsRequestSuccessful = false;
         }
     }
@@ -801,7 +940,7 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Failed to retrieve user data: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
-                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
                 IsRequestSuccessful = false;
             }
         );
@@ -843,7 +982,7 @@ public class AuthController : MonoBehaviour
             {
                 Debug.LogError("Failed to retrieve user statistics: " + response.error);
                 Debug.LogError("Details: " + response.downloadHandler.text);
-                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+                ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
                 IsRequestSuccessful = false;
             }
         );
@@ -896,7 +1035,7 @@ public class AuthController : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
         request.certificateHandler = new CustomCertificateHandler();
 
         // Wait for request response: 
@@ -916,7 +1055,7 @@ public class AuthController : MonoBehaviour
             ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             // Delete the refresh token file if there is an error: 
             File.Delete(tokenPath);
-            
+
             IsRequestSuccessful = false;
 
         }
@@ -976,7 +1115,7 @@ public class AuthController : MonoBehaviour
                 Debug.Log("Refresh token expiring soon. Rotating.");
 
                 // Call the refresh token endpoint to rotate the refresh token if it's about to expire:
-                yield return RefreshRefreshToken(); 
+                yield return RefreshRefreshToken();
 
                 if (IsRequestSuccessful)
                 {
@@ -988,7 +1127,7 @@ public class AuthController : MonoBehaviour
                     Debug.LogWarning("Failed to rotate refresh token.");
                     ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
                     IsRequestSuccessful = false;
-                }     
+                }
             }
             else
             {
@@ -1000,7 +1139,7 @@ public class AuthController : MonoBehaviour
         {
             Debug.LogWarning("Could not check refresh token expiration.");
             Debug.LogWarning("Details: " + request.downloadHandler.text);
-            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred."; 
+            ErrorResponse = !string.IsNullOrEmpty(request.downloadHandler.text) ? request.downloadHandler.text : "An unknown error occurred.";
             MenuSwapper.Instance.HandleSessionExpired(); // Redirects to login page
             IsRequestSuccessful = false;
         }
@@ -1045,9 +1184,9 @@ public class AuthController : MonoBehaviour
             new Dictionary<string, string> { { "Content-Type", "application/json" } },
             null, // No body for a GET request
             onSuccess: (response) =>
-            {   
+            {
                 // Get and parse the leaderboard data:
-                try 
+                try
                 {
                     string jsonResponse = response.downloadHandler.text;
                     List<LeaderboardEntry> leaderboardEntries = JsonUtility.FromJson<LeaderboardList>($"{{\"entries\":{jsonResponse}}}").entries;
@@ -1070,6 +1209,89 @@ public class AuthController : MonoBehaviour
         );
     }
 
+
+
+
+    /// <summary>
+    /// Format the date and time for API request.
+    /// </summary>
+    /// <param name="day">Day of the date.</param>
+    /// <param name="month">Month of the date.</param>
+    /// <param name="year">Year of the date.</param>
+    /// <param name="hour">Hour of the date (24h).</param>
+    /// <param name="minute">Minute of the date.</param>
+    /// <returns>Formatted ISO 8601 date-time string with UTC "Z" suffix.</returns>
+    private string FormatDateTimeForApi(string day, string month, string year, string hour, string minute)
+    {
+        if (
+            int.TryParse(day, out int dayInt) &&
+            int.TryParse(month, out int monthInt) &&
+            int.TryParse(year, out int yearInt) &&
+            int.TryParse(hour, out int hourInt) &&
+            int.TryParse(minute, out int minuteInt)
+        )
+        {
+            try
+            {
+                DateTime dateTime = new DateTime(yearInt, monthInt, dayInt, hourInt, minuteInt, 0, DateTimeKind.Utc);
+                return dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Date construction error: " + ex.Message);
+                return null;
+            }
+        }
+        else
+        {
+            Debug.LogError("Invalid date or time format.");
+            return null;
+        }
+    }
+
+
+
+
+
+    public IEnumerator AddGameAchievements(string mapId, int playerRank, bool gameWon, int tanksDestroyed, int totalScore, string day, string month, string year, string hour, string minute)
+    {
+        AddGameStats gameStats = new AddGameStats
+        {
+            tanksDestroyed = tanksDestroyed,
+            mapId = mapId,
+            playerRank = playerRank,
+            gameWon = gameWon,
+            totalScore = totalScore,
+            gameDate = FormatDateTimeForApi(day, month, year, hour, minute)
+        };
+
+        string jsonData = JsonUtility.ToJson(gameStats);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+
+        yield return SendRequestWithAutoRefresh(
+            addGameUrl,
+            "POST",
+            new Dictionary<string, string> { { "Content-Type", "application/json" } },
+            bodyRaw,  // added the body 
+            onSuccess: (response) =>
+            {
+                Debug.Log("Games Played Updated");
+                IsRequestSuccessful = true;
+            },
+            onError: (response) =>
+            {
+                Debug.LogError("Failed to retrieve games played: " + response.error);
+                Debug.LogError("Details: " + response.downloadHandler.text);
+                ErrorResponse = !string.IsNullOrEmpty(response.downloadHandler.text) ? response.downloadHandler.text : "An unknown error occurred.";
+                IsRequestSuccessful = false;
+            }
+        );
+    }
+
+
+
+
+
     /// <summary>
     /// Coroutine to get the statistics of the played games.
     /// </summary>  
@@ -1088,7 +1310,7 @@ public class AuthController : MonoBehaviour
             null, // No body for GET
             onSuccess: (response) =>
             {
-                string json = response.downloadHandler?.text; 
+                string json = response.downloadHandler?.text;
                 if (json == null)
                 {
                     Debug.LogError("DownloadHandler text is null.");
@@ -1124,8 +1346,8 @@ public class AuthController : MonoBehaviour
                         : 0f;
 
                     Debug.LogWarning("Updating UI with game stats.");
-                    
-                    if (username != null ) 
+
+                    if (username != null)
                     {
                         username.text = stats.username.ToString();
 
@@ -1161,11 +1383,12 @@ public class AuthController : MonoBehaviour
                         Debug.LogWarning("Updated map.");
                     }
 
-                    if (rank != null)
+                    if (score != null)
                     {
-                        rank.text = stats.playerRank.ToString();
-                        Debug.LogWarning("Updated rank.");
+                        score.text = stats.totalScore.ToString();
+                        Debug.LogWarning("Updated score.");
                     }
+
 
                     if (victory_or_defeat != null)
                     {
@@ -1227,7 +1450,7 @@ public class CustomCertificateHandler : CertificateHandler
     {
         // Retrieve the trusted certificate that was preloaded into Unity's assets
         X509Certificate2 trustedCert = AuthController.GetTrustedCertificate();
-        
+
         // If no trusted certificate is loaded, log an error and return false to reject the certificate
         if (trustedCert == null)
         {
@@ -1254,6 +1477,10 @@ public class CustomCertificateHandler : CertificateHandler
         // Return whether the thumbprints match
         return isMatch;
     }
+
+
+
+
 }
 
 
@@ -1262,7 +1489,7 @@ public class RegisterRequest
 {
     public string Username;
     public string Email;
-    public string passwordHash; 
+    public string passwordHash;
     public string ConfirmPassword;
     public string FirstName;
     public string LastName;
@@ -1330,6 +1557,12 @@ public class UserStatistics
     public int ranking;
 }
 
+[System.Serializable]
+public class UpdateStatisticsRequest
+{
+    public int GamesPlayed;
+    public int HighestScore;
+}
 
 [System.Serializable]
 public class PlayedGameStats
@@ -1341,7 +1574,9 @@ public class PlayedGameStats
     public string mapPlayed;
     public int playerRank;
     public bool gameWon;
-    public string gameDate;  
+    public string gameDate;
+    public int totalScore;
+
 }
 
 [System.Serializable]
@@ -1375,4 +1610,19 @@ public class LeaderboardEntry
 public class LeaderboardList
 {
     public List<LeaderboardEntry> entries;
+}
+
+
+
+
+[System.Serializable]
+public class AddGameStats
+{
+
+    public int tanksDestroyed;
+    public string mapId;
+    public int playerRank;
+    public bool gameWon;
+    public string gameDate;
+    public int totalScore;
 }

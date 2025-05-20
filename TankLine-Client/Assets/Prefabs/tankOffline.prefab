@@ -99,7 +99,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 3.5
   rotationSpeed: 0.06544985
-  nbLifeLeft: 3
+  nbLifeLeft: 1
   bulletPrefab: {fileID: 5711717282606037894, guid: 479d9ed58408bbfbfa8fcca6367a07c8, type: 3}
   nbBulletShot: 0
   MaxBulletShot: 5
