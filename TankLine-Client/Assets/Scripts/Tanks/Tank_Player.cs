@@ -76,7 +76,7 @@ public class Tank_Player : Tank
         uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
-        //activeIndicator();
+        activeIndicator();
 
         //uiManager.UpdateAllInput();
     }
@@ -133,17 +133,14 @@ public class Tank_Player : Tank
     {
         base.OnOwnershipClient(prevOwner);
         Debug.Log("[Tank_Player] OnOwnershipClient: IsOwner=" + IsOwner);
-
-        // désactive tout d'abord
-        if (indicator != null) indicator.SetActive(false);
-        if (playerInput == null) playerInput = GetComponent<PlayerInput>();
+        
+        playerInput = GetComponent<PlayerInput>();
         playerInput.enabled = false;
         playerInput.DeactivateInput();
 
         // puis active si owner
         if (IsOwner)
         {
-            indicator.SetActive(true);
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
