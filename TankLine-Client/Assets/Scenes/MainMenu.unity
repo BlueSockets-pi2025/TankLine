@@ -11225,6 +11225,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 897803373}
+    - target: {fileID: 4864209390451572475, guid: 83c9330c448034539b0948c0c489a662, type: 3}
+      propertyPath: m_text
+      value: 'Your score was : '
+      objectReference: {fileID: 0}
     - target: {fileID: 6549377587285342410, guid: 83c9330c448034539b0948c0c489a662, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11311,7 +11315,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8360632436206295726, guid: 83c9330c448034539b0948c0c489a662, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9161205007655274927, guid: 83c9330c448034539b0948c0c489a662, type: 3}
       propertyPath: m_Name
