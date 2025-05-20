@@ -138,7 +138,6 @@ public class Tank_Player : Tank
         playerInput.enabled = false;
         playerInput.DeactivateInput();
 
-        // puis active si owner
         if (IsOwner)
         {
             playerInput.enabled = true;
