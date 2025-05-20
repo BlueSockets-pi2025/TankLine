@@ -306,6 +306,10 @@ public class InGameUiManager
     {
         foreach (Tank_Player tank in GameObject.FindObjectsOfType<Tank_Player>())
         {
+            tank.inpuuttt();
+        }
+        foreach (Tank_Player tank in GameObject.FindObjectsOfType<Tank_Player>())
+        {
             tank.desactiveInput();
         }
         foreach (Tank_Player tank in GameObject.FindObjectsOfType<Tank_Player>())

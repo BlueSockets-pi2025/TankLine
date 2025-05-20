@@ -96,23 +96,37 @@ public class Tank_Player : Tank
         playerInput.DeactivateInput();
     }
 
+    public void inpuuttt()
+    {
+        playerInput = GetComponent<PlayerInput>();
+        playerInput.enabled = true;
+        playerInput.ActivateInput();
+    }
+
     public void activeInput()
     {
         if (Environment.GetEnvironmentVariable("IS_DEDICATED_SERVER") == "true") return;
         playerInput = GetComponent<PlayerInput>();
 
-        if (!base.IsOwner)
-        {
-            Debug.Log("TEST - Mobile input - X " + transform.Find("base").GetComponent<Renderer>().materials[4]);
-            playerInput.enabled = false;
-            playerInput.DeactivateInput();
-        }
-        else
+        if (base.IsOwner)
         {
             Debug.Log("TEST - Mobile input - active " + transform.Find("base").GetComponent<Renderer>().materials[4]);
             playerInput.enabled = true;
             playerInput.ActivateInput();
         }
+
+        // if (!base.IsOwner)
+        // {
+        //     Debug.Log("TEST - Mobile input - X " + transform.Find("base").GetComponent<Renderer>().materials[4]);
+        //     playerInput.enabled = false;
+        //     playerInput.DeactivateInput();
+        // }
+        // else
+        // {
+        //     Debug.Log("TEST - Mobile input - active " + transform.Find("base").GetComponent<Renderer>().materials[4]);
+        //     playerInput.enabled = true;
+        //     playerInput.ActivateInput();
+        // }
     }
 
     // public override void OnOwnershipClient(NetworkConnection prevOwner)
