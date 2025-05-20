@@ -85,6 +85,7 @@ public class Tank_Player : Tank
         {
             indicator.SetActive(true);
             
+            playerInput = GetComponent<PlayerInput>();
             playerInput.enabled = true;
             playerInput.ActivateInput();
 
