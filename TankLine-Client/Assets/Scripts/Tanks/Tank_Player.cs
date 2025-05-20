@@ -76,9 +76,9 @@ public class Tank_Player : Tank
         uiManager.SetBulletUI(nbBulletShot, MaxBulletShot);
         // get the indicator
         indicator = thisTank.Find("indicator").gameObject;
-        activeIndicator();
+        //activeIndicator();
 
-        uiManager.UpdateAllInput();
+        //uiManager.UpdateAllInput();
     }
 
     public void activeIndicator()
@@ -129,25 +129,25 @@ public class Tank_Player : Tank
         // }
     }
 
-    // public override void OnOwnershipClient(NetworkConnection prevOwner)
-    // {
-    //     base.OnOwnershipClient(prevOwner);
-    //     Debug.Log("[Tank_Player] OnOwnershipClient: IsOwner=" + IsOwner);
+    public override void OnOwnershipClient(NetworkConnection prevOwner)
+    {
+        base.OnOwnershipClient(prevOwner);
+        Debug.Log("[Tank_Player] OnOwnershipClient: IsOwner=" + IsOwner);
 
-    //     // Active l'indicateur et l'input seulement si owner
-    //     if (IsOwner)
-    //     {
-    //         playerInput = GetComponent<PlayerInput>();
-    //         playerInput.enabled = true;
-    //         playerInput.ActivateInput();
-    //     }
-    //     else
-    //     {
-    //         // DÃ©sactive l'indicateur et l'input si on perd l'ownership
-    //         if (indicator != null) indicator.SetActive(false);
-    //         if (playerInput != null) playerInput.enabled = false;
-    //     }
-    // }
+        // désactive tout d'abord
+        if (indicator != null) indicator.SetActive(false);
+        if (playerInput == null) playerInput = GetComponent<PlayerInput>();
+        playerInput.enabled = false;
+        playerInput.DeactivateInput();
+
+        // puis active si owner
+        if (IsOwner)
+        {
+            indicator.SetActive(true);
+            playerInput.enabled = true;
+            playerInput.ActivateInput();
+        }
+    }
 
     /// <summary>
     /// Automatically called by unity every frame after the physic engine
