@@ -68,8 +68,8 @@ public class Tank_Player : Tank
         shootJoystick.player = gameObject;
 #endif
 
-        playerInput = GetComponent<PlayerInput>();
-        activeInput();
+        // playerInput = GetComponent<PlayerInput>();
+        // activeInput();
 
         // get the canvas
         uiManager = new(GameObject.Find("Canvas"), true);
@@ -84,11 +84,9 @@ public class Tank_Player : Tank
         if (base.IsOwner)
         {
             indicator.SetActive(true);
-
-// #if UNITY_ANDROID
-//             playerInput = GetComponent<PlayerInput>();
-//             activeInput();
-// #endif
+            
+            playerInput.enabled = true;
+            playerInput.ActivateInput();
 
         }
     }
