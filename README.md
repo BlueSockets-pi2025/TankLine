@@ -4,6 +4,11 @@
 ## Description
 A 2025 remake of "Tank 1990: Battle Defense War", as part of end of bachelor's 3rd year integrative project.
 
+
+## Download 
+
+https://seafile.unistra.fr/d/39f491f443974f55a6a1/
+
 ## Run on university's VM
 
 ### Server 0
